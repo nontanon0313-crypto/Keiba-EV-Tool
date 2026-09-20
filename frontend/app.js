@@ -7,6 +7,11 @@ const TIMEOUT_MS = 60000;
   }
 
   var list = document.getElementById("race-list");
+  var detail = document.getElementById("detail");
+  var detailTitle = document.getElementById("detail-title");
+  var detailBody = document.getElementById("detail-body");
+  var backBtn = document.getElementById("back-btn");
+  var racesSection = document.getElementById("races");
 
   function esc(s){
     return String(s == null ? "" : s).replace(/[&<>"\x27]/g, function(c){
@@ -14,7 +19,7 @@ const TIMEOUT_MS = 60000;
     });
   }
 
-  function render(races){
+  function renderList(races){
     if (!races || !races.length) { list.textContent = "本日のレースはありません"; return; }
     var html = "";
     races.forEach(function(r){
@@ -25,7 +30,7 @@ const TIMEOUT_MS = 60000;
       var time = (r.start_at || "").slice(11, 16);
       var runners = (r.runners || []).length;
       var waku = KeibaTheme.wakuClass(no);
-      html += "<div class=\"race\" data-race-id=\"" + esc(r.race_id) + "\">"
+      html += "<div class=\"race\" data-race-id=\"" + esc(r.race_id) + "\" role=\"button\" tabindex=\"0\">"
             + "<span class=\"" + waku + "\">" + no + "</span> "
             + "<strong>" + esc(venue) + "</strong> "
             + esc(surface) + " " + esc(dist) + "m "
@@ -35,14 +40,80 @@ const TIMEOUT_MS = 60000;
     list.innerHTML = html;
   }
 
+  function renderDetail(race){
+    var title = (race.venue || "") + " " + (race.race_number || "") + "R";
+    detailTitle.textContent = title;
+    var html = "";
+    var runners = race.runners || [];
+    if (!runners.length) {
+      html = "<p>出走馬データがありません</p>";
+    } else {
+      html += "<table class=\"horse-table\"><thead><tr>"
+            + "<th>枠</th><th>番</th><th>馬名</th><th>騎手</th><th>斤量</th><th>単勝</th><th>人気</th>"
+            + "</tr></thead><tbody>";
+      runners.forEach(function(h){
+        var frame = h.frame_number || h.waku || 0;
+        var num = h.horse_number || h.num || 0;
+        var waku = KeibaTheme.wakuClass(frame || num);
+        html += "<tr>"
+              + "<td><span class=\"" + waku + "\">" + frame + "</span></td>"
+              + "<td>" + num + "</td>"
+              + "<td>" + esc(h.horse_name || "") + "</td>"
+              + "<td>" + esc(h.jockey || "") + "</td>"
+              + "<td>" + (h.weight || h.wEight || "") + "</td>"
+              + "<td>" + (h.odds_win || h["勝ちオッズ"] || "") + "</td>"
+              + "<td>" + (h["人気"] || h.popularity || "") + "</td>"
+              + "</tr>";
+      });
+      html += "</tbody></table>";
+    }
+    detailBody.innerHTML = html;
+    racesSection.hidden = true;
+    detail.hidden = false;
+    window.scrollTo(0, 0);
+  }
+
+  function showList(){
+    detail.hidden = true;
+    racesSection.hidden = false;
+    window.scrollTo(0, 0);
+  }
+
   function fetchWithTimeout(url, ms){
     var ctrl = new AbortController();
     var timer = setTimeout(function(){ ctrl.abort(); }, ms);
     return fetch(url, { signal: ctrl.signal }).finally(function(){ clearTimeout(timer); });
   }
 
-  list.textContent = "読み込み中... (サーバー起動待ちの場合があります)";
+  function loadDetail(raceId){
+    detail.hidden = false;
+    racesSection.hidden = true;
+    detailTitle.textContent = "読み込み中...";
+    detailBody.innerHTML = "";
+    fetchWithTimeout(API_BASE + "/races/" + encodeURIComponent(raceId), TIMEOUT_MS)
+      .then(function(res){
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.json();
+      })
+      .then(function(race){ renderDetail(race); })
+      .catch(function(err){ detailBody.textContent = "取得失敗: " + err.message; });
+  }
 
+  list.addEventListener("click", function(e){
+    var el = e.target.closest(".race");
+    if (!el) return;
+    loadDetail(el.getAttribute("data-race-id"));
+  });
+  list.addEventListener("keydown", function(e){
+    if (e.key !== "Enter" && e.key !== " ") return;
+    var el = e.target.closest(".race");
+    if (!el) return;
+    e.preventDefault();
+    loadDetail(el.getAttribute("data-race-id"));
+  });
+  backBtn.addEventListener("click", showList);
+
+  list.textContent = "読み込み中... (サーバー起動待ちの場合があります)";
   fetchWithTimeout(API_BASE + "/races", TIMEOUT_MS)
     .then(function(res){
       if (!res.ok) throw new Error("HTTP " + res.status);
@@ -50,7 +121,7 @@ const TIMEOUT_MS = 60000;
     })
     .then(function(data){
       var races = Array.isArray(data) ? data : (data.races || data.items || []);
-      render(races);
+      renderList(races);
     })
     .catch(function(err){
       list.textContent = "API取得失敗: " + err.message + " — 再読み込みしてください";

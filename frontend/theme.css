@@ -15,8 +15,15 @@
   --ev-mid:#D4AF37;
   --ev-high:#ff4d4d;
 }
-body{background:var(--keiba-bg);color:var(--keiba-text);}
-.waku{display:inline-block;min-width:22px;padding:2px 6px;border-radius:4px;font-weight:700;text-align:center;}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--keiba-bg);color:var(--keiba-text);font-family:-apple-system,"Noto Sans JP",sans-serif;}
+header{padding:16px;border-bottom:1px solid rgba(212,175,55,0.3);}
+header h1{margin:0;color:var(--keiba-gold);font-size:20px;}
+main{padding:16px;}
+h2{color:var(--keiba-gold);font-size:16px;margin:8px 0 12px;}
+.race{padding:12px;border:1px solid rgba(212,175,55,0.25);border-radius:8px;margin-bottom:8px;cursor:pointer;}
+.race:active{background:rgba(212,175,55,0.1);}
+.waku{display:inline-block;min-width:24px;padding:2px 6px;border-radius:4px;font-weight:700;text-align:center;margin-right:6px;}
 .waku-1{background:var(--waku-1);color:#000;}
 .waku-2{background:var(--waku-2);color:#fff;border:1px solid #444;}
 .waku-3{background:var(--waku-3);color:#fff;}
@@ -29,3 +36,5 @@ body{background:var(--keiba-bg);color:var(--keiba-text);}
 .ev-low{color:var(--ev-low);}
 .ev-mid{color:var(--ev-mid);font-weight:700;}
 .ev-high{color:var(--ev-high);font-weight:700;}
+#back-btn{background:transparent;color:var(--keiba-gold);border:1px solid var(--keiba-gold);border-radius:6px;padding:6px 12px;margin-bottom:12px;font-size:14px;cursor:pointer;}
+.horse-table{width:100
