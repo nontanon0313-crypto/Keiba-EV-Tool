@@ -49,3 +49,14 @@ uvicorn backend.main:app --reload --port 8000
 - backend/adapters/jravan_adapter.py : JRA-VAN 骨組み
 - frontend/theme.css : 枠番色 + EV 色テーマ
 - frontend/ev-theme.js : evClass / wakuClass ユーティリティ
+
+## Render デプロイ
+1. Render Dashboard → New → Blueprint → このリポジトリを接続
+2. render.yaml が自動検出され、keiba-ev-api と keiba-ev-frontend が作成される
+3. 環境変数 (VOTE_MANAGER_URL / JRAVAN_SID / JRAVAN_DATA_DIR) を Dashboard で設定
+4. デプロイ完了後、API: https://keiba-ev-api.onrender.com/health で確認
+5. フロント: https://keiba-ev-frontend.onrender.com
+
+## Docker 起動
+docker build -t keiba-ev .
+docker run -p 10000:10000 keiba-ev

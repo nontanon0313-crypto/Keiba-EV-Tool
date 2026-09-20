@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: keiba-ev-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: VOTE_MANAGER_URL
+        sync: false
+      - key: JRAVAN_SID
+        sync: false
+      - key: JRAVAN_DATA_DIR
+        sync: false
+      - key: LOG_LEVEL
+        value: INFO
+
+  - type: web
+    name: keiba-ev-frontend
+    runtime: static
+    plan: free
+    staticPublishPath: frontend
+    buildCommand: ""
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
