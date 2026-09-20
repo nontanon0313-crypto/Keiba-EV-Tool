@@ -9,32 +9,34 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     navigator.serviceWorker.addEventListener("controllerchange", function(){ window.location.reload(); });
   }
 
-  var list = document.getElementById("race-list");
-  var detail = document.getElementById("detail");
-  var detailTitle = document.getElementById("detail-title");
-  var detailBody = document.getElementById("detail-body");
-  var backBtn = document.getElementById("back-btn");
-  var racesSection = document.getElementById("races");
-  var tabPredict = document.getElementById("tab-predict");
-  var tabAnalytics = document.getElementById("tab-analytics");
-  var tabBets = document.getElementById("tab-bets");
-  var fMinProb = document.getElementById("f-minprob");
-  var fMinOdds = document.getElementById("f-minodds");
-  var fCollateral = document.getElementById("f-collateral");
-  var fMaxInv = document.getElementById("f-maxinv");
-  var anaProb = document.getElementById("ana-prob");
-  var anaOdds = document.getElementById("ana-odds");
-  var anaFeatures = document.getElementById("ana-features");
-  var betsSummary = document.getElementById("bets-summary");
-  var betsList = document.getElementById("bets-list");
+  var $ = function(id){ return document.getElementById(id); };
+  var list = $("race-list");
+  var detail = $("detail");
+  var detailTitle = $("detail-title");
+  var detailBody = $("detail-body");
+  var backBtn = $("back-btn");
+  var racesSection = $("races");
+  var tabPredict = $("tab-predict");
+  var tabAnalytics = $("tab-analytics");
+  var tabBets = $("tab-bets");
+  var fMinProb = $("f-minprob");
+  var fMinOdds = $("f-minodds");
+  var fCollateral = $("f-collateral");
+  var fMaxInv = $("f-maxinv");
+  var anaSummary = $("ana-summary");
+  var anaProb = $("ana-prob");
+  var anaOdds = $("ana-odds");
+  var anaFeatures = $("ana-features");
+  var anaScopeTabs = $("ana-scope-tabs");
+  var betsSummary = $("bets-summary");
+  var betsList = $("bets-list");
+  var curveCanvas = $("curve-chart");
+  var analyticsData = null;
+  var currentScope = "all";
   var filters = {};
   var currentBets = [];
 
-  function esc(s){
-    return String(s == null ? "" : s).replace(/[&<>\x27]/g, function(c){
-      return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","\x27":"&#39;"}[c];
-    });
-  }
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>\x27]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","\x27":"&#39;"}[c]; }); }
   function fmtPct(v, d){ return (v * 100).toFixed(d == null ? 2 : d) + "%"; }
   function fmtNum(v, d){ return Number(v).toFixed(d == null ? 2 : d); }
   function fmtInt(v){ return String(Math.round(v)); }
@@ -47,20 +49,8 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     filters.maxInvestment = Math.max(100, Math.round(Number(fMaxInv.value || 10000)));
   }
 
-  function sortRaces(races){
-    return races.slice().sort(function(a, b){
-      var sa = a.start_at || "";
-      var sb = b.start_at || "";
-      return sa < sb ? -1 : sa > sb ? 1 : 0;
-    });
-  }
-
-  function isFinished(r){
-    if (!r.start_at) return false;
-    var t = Date.parse(r.start_at);
-    if (isNaN(t)) return false;
-    return (Date.now() - t) > FINISH_GRACE_MS;
-  }
+  function sortRaces(races){ return races.slice().sort(function(a, b){ var sa = a.start_at || ""; var sb = b.start_at || ""; return sa < sb ? -1 : sa > sb ? 1 : 0; }); }
+  function isFinished(r){ if (!r.start_at) return false; var t = Date.parse(r.start_at); if (isNaN(t)) return false; return (Date.now() - t) > FINISH_GRACE_MS; }
 
   function renderList(races){
     var visible = sortRaces(races.filter(function(r){ return !isFinished(r); }));
@@ -74,43 +64,25 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
       var time = (r.start_at || "").slice(11, 16);
       var runners = (r.runners || []).length;
       var waku = KeibaTheme.wakuClass(no);
-      html += "<div class=\"race\" data-race-id=\"" + esc(r.race_id) + "\" role=\"button\" tabindex=\"0\">"
-            + "<span class=\"" + waku + "\">" + no + "</span> "
-            + "<strong>" + esc(venue) + "</strong> " + no + "R "
-            + esc(surface) + " " + esc(dist) + "m "
-            + esc(time) + " 発走 / " + runners + "頭"
-            + "</div>";
+      html += "<div class=\"race\" data-race-id=\"" + esc(r.race_id) + "\" role=\"button\" tabindex=\"0\">" + "<span class=\"" + waku + "\">" + no + "</span> " + "<strong>" + esc(venue) + "</strong> " + no + "R " + esc(surface) + " " + esc(dist) + "m " + esc(time) + " 発走 / " + runners + "頭" + "</div>";
     });
     list.innerHTML = html;
   }
 
   function renderDetail(race){
-    var title = (race.venue || "") + " " + (race.race_number || "") + "R";
-    detailTitle.textContent = title;
+    detailTitle.textContent = (race.venue || "") + " " + (race.race_number || "") + "R";
     var html = "";
-    html += "<h3 class=\"ev-title\">EV上位の買い目 (3連単)</h3>"
-          + "<div id=\"ev-table\">読み込み中...</div>";
+    html += "<h3 class=\"ev-title\">EV上位の買い目 (3連単)</h3><div id=\"ev-table\">読み込み中...</div>";
     html += "<h3 class=\"ev-title\">出走馬</h3>";
     var runners = race.runners || [];
-    if (!runners.length) {
-      html += "<p>出走馬データがありません</p>";
-    } else {
-      html += "<table class=\"horse-table\"><thead><tr>"
-            + "<th>枠</th><th>番</th><th>馬名</th><th>騎手</th><th>斤量</th><th>単勝</th><th>人気</th>"
-            + "</tr></thead><tbody>";
+    if (!runners.length) { html += "<p>出走馬データがありません</p>"; }
+    else {
+      html += "<table class=\"horse-table\"><thead><tr><th>枠</th><th>番</th><th>馬名</th><th>騎手</th><th>斤量</th><th>単勝</th><th>人気</th></tr></thead><tbody>";
       runners.forEach(function(h){
         var frame = h.frame_number || h.waku || 0;
         var num = h.horse_number || h.num || 0;
         var waku = KeibaTheme.wakuClass(frame || num);
-        html += "<tr>"
-              + "<td><span class=\"" + waku + "\">" + frame + "</span></td>"
-              + "<td>" + num + "</td>"
-              + "<td>" + esc(h.horse_name || "") + "</td>"
-              + "<td>" + esc(h.jockey || "") + "</td>"
-              + "<td>" + (h.weight || h.wEight || "") + "</td>"
-              + "<td>" + (h.odds_win || h["勝ちオッズ"] || "") + "</td>"
-              + "<td>" + (h["人気"] || h.popularity || "") + "</td>"
-              + "</tr>";
+        html += "<tr><td><span class=\"" + waku + "\">" + frame + "</span></td><td>" + num + "</td><td>" + esc(h.horse_name || "") + "</td><td>" + esc(h.jockey || "") + "</td><td>" + (h.weight || h.wEight || "") + "</td><td>" + (h.odds_win || h["勝ちオッズ"] || "") + "</td><td>" + (h["人気"] || h.popularity || "") + "</td></tr>";
       });
       html += "</tbody></table>";
     }
@@ -122,59 +94,34 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   }
 
   function renderEvTable(raceId, bets, totalAmount){
-    var box = document.getElementById("ev-table");
+    var box = $("ev-table");
     if (!box) return;
     currentBets = bets || [];
-    if (!currentBets.length) {
-      box.textContent = "条件に合う買い目はありません";
-      return;
-    }
+    if (!currentBets.length) { box.textContent = "条件に合う買い目はありません"; return; }
     var html = "<p class=\"ev-total\">推奨合計: " + fmtYen(totalAmount) + " / " + currentBets.length + "点</p>";
-    html += "<table class=\"ev-table\"><thead><tr>"
-          + "<th>買い目</th><th>確率</th><th>オッズ</th><th>EV</th><th>金額</th><th></th>"
-          + "</tr></thead><tbody>";
+    html += "<table class=\"ev-table\"><thead><tr><th>買い目</th><th>確率</th><th>オッズ</th><th>EV</th><th>金額</th><th></th></tr></thead><tbody>";
     currentBets.forEach(function(b, idx){
       var cls = KeibaTheme.evClass(b.ev, EV_THRESHOLD);
-      html += "<tr class=\"" + cls + "\">"
-            + "<td>" + esc(b.combination) + "</td>"
-            + "<td>" + fmtPct(b.prob) + "</td>"
-            + "<td>" + fmtNum(b.odds, 1) + "</td>"
-            + "<td>" + (b.ev >= 0 ? "+" : "") + fmtNum(b.ev, 3) + "</td>"
-            + "<td>" + fmtYen(b.amount) + "</td>"
-            + "<td><button class=\"bet-btn\" data-idx=\"" + idx + "\" type=\"button\">投票</button></td>"
-            + "</tr>";
+      html += "<tr class=\"" + cls + "\"><td>" + esc(b.combination) + "</td><td>" + fmtPct(b.prob) + "</td><td>" + fmtNum(b.odds, 1) + "</td><td>" + (b.ev >= 0 ? "+" : "") + fmtNum(b.ev, 3) + "</td><td>" + fmtYen(b.amount) + "</td><td><button class=\"bet-btn\" data-idx=\"" + idx + "\" type=\"button\">投票</button></td></tr>";
     });
     html += "</tbody></table>";
     box.innerHTML = html;
     box.querySelectorAll(".bet-btn").forEach(function(btn){
       btn.addEventListener("click", function(){
         var i = Number(btn.getAttribute("data-idx"));
-        var b = currentBets[i];
-        recordBet(raceId, b);
+        recordBet(raceId, currentBets[i]);
       });
     });
   }
 
   function recordBet(raceId, b){
-    fetchWithTimeout(API_BASE + "/bets", TIMEOUT_MS, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ race_id: raceId, combo: b.combination, amount: b.amount, odds: b.odds, prob: b.prob, ev: b.ev })
-    }).then(function(res){
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      return res.json();
-    }).then(function(){
-      alert("投票を記録しました");
-    }).catch(function(err){
-      alert("記録失敗: " + err.message);
-    });
+    fetchWithTimeout(API_BASE + "/bets", TIMEOUT_MS, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ race_id: raceId, combo: b.combination, amount: b.amount, odds: b.odds, prob: b.prob, ev: b.ev }) })
+      .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+      .then(function(){ alert("投票を記録しました"); })
+      .catch(function(err){ alert("記録失敗: " + err.message); });
   }
 
-  function showList(){
-    detail.hidden = true;
-    racesSection.hidden = false;
-    window.scrollTo(0, 0);
-  }
+  function showList(){ detail.hidden = true; racesSection.hidden = false; window.scrollTo(0, 0); }
 
   function fetchWithTimeout(url, ms, opts){
     var ctrl = new AbortController();
@@ -185,29 +132,15 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   }
 
   function loadEvTable(raceId){
-    var box = document.getElementById("ev-table");
+    var box = $("ev-table");
     if (!box) return;
     box.textContent = "EV計算中...";
     readFilters();
-    var qs = "?race_id=" + encodeURIComponent(raceId)
-      + "&min_prob=" + encodeURIComponent(filters.minProb)
-      + "&min_odds=" + encodeURIComponent(filters.minOdds)
-      + "&collateral=" + encodeURIComponent(filters.collateral)
-      + "&max_investment=" + encodeURIComponent(filters.maxInvestment);
+    var qs = "?race_id=" + encodeURIComponent(raceId) + "&min_prob=" + encodeURIComponent(filters.minProb) + "&min_odds=" + encodeURIComponent(filters.minOdds) + "&collateral=" + encodeURIComponent(filters.collateral) + "&max_investment=" + encodeURIComponent(filters.maxInvestment);
     fetchWithTimeout(API_BASE + "/vote-plans" + qs, TIMEOUT_MS, { method: "POST" })
-      .then(function(res){
-        if (res.status === 204) { renderEvTable(raceId, [], 0); return null; }
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        return res.json();
-      })
-      .then(function(data){
-        if (!data) return;
-        var plan = data.plan || {};
-        renderEvTable(raceId, plan.bets || [], plan.total_amount || 0);
-      })
-      .catch(function(err){
-        if (box) box.textContent = "EV取得失敗: " + err.message;
-      });
+      .then(function(res){ if (res.status === 204) { renderEvTable(raceId, [], 0); return null; } if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+      .then(function(data){ if (!data) return; var plan = data.plan || {}; renderEvTable(raceId, plan.bets || [], plan.total_amount || 0); })
+      .catch(function(err){ if (box) box.textContent = "EV取得失敗: " + err.message; });
   }
 
   function loadDetail(raceId){
@@ -216,30 +149,18 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     detailTitle.textContent = "読み込み中...";
     detailBody.innerHTML = "";
     fetchWithTimeout(API_BASE + "/races/" + encodeURIComponent(raceId), TIMEOUT_MS)
-      .then(function(res){
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        return res.json();
-      })
+      .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
       .then(function(race){ renderDetail(race); })
       .catch(function(err){ detailBody.textContent = "取得失敗: " + err.message; });
   }
 
   function analyticsTable(rows, label){
     if (!rows || !rows.length) return "<p>該当データなし</p>";
-    var html = "<table class=\"ev-table\"><thead><tr>"
-      + "<th>" + label + "</th><th>件数</th><th>予想的中率</th><th>オッズ平均</th><th>想定利益%</th><th>実績</th>"
-      + "</tr></thead><tbody>";
+    var html = "<table class=\"ev-table\"><thead><tr><th>" + label + "</th><th>件数</th><th>予想的中率</th><th>オッズ平均</th><th>想定利益%</th><th>実的中率</th></tr></thead><tbody>";
     rows.forEach(function(r){
-      var cls = KeibaTheme.evClass(r.expected_profit_pct / 100, 0.12);
+      var cls = KeibaTheme.evClass(r.expected_profit_pct / 100, EV_THRESHOLD);
       var actual = r.actual_rate == null ? "-" : fmtPct(r.actual_rate);
-      html += "<tr class=\"" + cls + "\">"
-            + "<td>" + esc(r.range) + "</td>"
-            + "<td>" + r.count + "</td>"
-            + "<td>" + fmtPct(r.avg_prob) + "</td>"
-            + "<td>" + fmtNum(r.avg_odds, 1) + "</td>"
-            + "<td>" + (r.expected_profit_pct >= 0 ? "+" : "") + fmtNum(r.expected_profit_pct, 1) + "</td>"
-            + "<td>" + actual + "</td>"
-            + "</tr>";
+      html += "<tr class=\"" + cls + "\"><td>" + esc(r.range) + "</td><td>" + r.count + "</td><td>" + fmtPct(r.avg_prob) + "</td><td>" + fmtNum(r.avg_odds, 1) + "</td><td>" + (r.expected_profit_pct >= 0 ? "+" : "") + fmtNum(r.expected_profit_pct, 1) + "</td><td>" + actual + "</td></tr>";
     });
     html += "</tbody></table>";
     return html;
@@ -250,85 +171,120 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     var html = "";
     features.forEach(function(f){
       html += "<h4 class=\"feature-title\">" + esc(f.label) + "</h4>";
-      html += "<table class=\"ev-table\"><thead><tr>"
-        + "<th>範囲</th><th>件数</th><th>予想的中率</th><th>オッズ平均</th><th>想定利益%</th><th>実績</th>"
-        + "</tr></thead><tbody>";
+      html += "<table class=\"ev-table\"><thead><tr><th>範囲</th><th>件数</th><th>予想的中率</th><th>オッズ平均</th><th>想定利益%</th><th>実的中率</th></tr></thead><tbody>";
       (f.rows || []).forEach(function(r){
-        var cls = KeibaTheme.evClass(r.expected_profit_pct / 100, 0.12);
+        var cls = KeibaTheme.evClass(r.expected_profit_pct / 100, EV_THRESHOLD);
         var actual = r.actual_rate == null ? "-" : fmtPct(r.actual_rate);
-        html += "<tr class=\"" + cls + "\">"
-              + "<td>" + esc(r.range) + "</td>"
-              + "<td>" + r.count + "</td>"
-              + "<td>" + fmtPct(r.avg_prob) + "</td>"
-              + "<td>" + fmtNum(r.avg_odds, 1) + "</td>"
-              + "<td>" + (r.expected_profit_pct >= 0 ? "+" : "") + fmtNum(r.expected_profit_pct, 1) + "</td>"
-              + "<td>" + actual + "</td>"
-              + "</tr>";
+        html += "<tr class=\"" + cls + "\"><td>" + esc(r.range) + "</td><td>" + r.count + "</td><td>" + fmtPct(r.avg_prob) + "</td><td>" + fmtNum(r.avg_odds, 1) + "</td><td>" + (r.expected_profit_pct >= 0 ? "+" : "") + fmtNum(r.expected_profit_pct, 1) + "</td><td>" + actual + "</td></tr>";
       });
       html += "</tbody></table>";
     });
     return html;
   }
 
+  function renderAnaSummary(s){
+    if (!s) { anaSummary.innerHTML = ""; return; }
+    anaSummary.innerHTML = "<div>件数: " + s.count + "</div><div>実的中率: " + (s.actual_rate == null ? "-" : fmtPct(s.actual_rate)) + "</div><div>想定利益%: " + (s.avg_expected_profit_pct >= 0 ? "+" : "") + fmtNum(s.avg_expected_profit_pct, 2) + "</div>";
+  }
+
+  function renderScope(){
+    if (!analyticsData) return;
+    var ticket = (analyticsData.by_ticket || [])[0] || { scopes: {} };
+    var scopes = ticket.scopes || {};
+    var s = scopes[currentScope] || { summary: null, prob_bins: [], odds_bins: [], features: [] };
+    renderAnaSummary(s.summary);
+    anaProb.innerHTML = analyticsTable(s.prob_bins || [], "確率帯");
+    anaOdds.innerHTML = analyticsTable(s.odds_bins || [], "オッズ帯");
+    anaFeatures.innerHTML = featuresTable(s.features || []);
+  }
+
   function loadAnalytics(){
-    anaProb.textContent = "読み込み中...";
-    anaOdds.textContent = "読み込み中...";
-    anaFeatures.textContent = "読み込み中...";
+    anaSummary.textContent = "読み込み中...";
+    anaProb.textContent = "";
+    anaOdds.textContent = "";
+    anaFeatures.textContent = "";
     fetchWithTimeout(API_BASE + "/analytics", TIMEOUT_MS)
-      .then(function(res){
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        return res.json();
-      })
-      .then(function(data){
-        anaProb.innerHTML = analyticsTable(data.prob_bins || [], "確率帯");
-        anaOdds.innerHTML = analyticsTable(data.odds_bins || [], "オッズ帯");
-        anaFeatures.innerHTML = featuresTable(data.features || []);
-      })
-      .catch(function(err){
-        anaProb.textContent = "取得失敗: " + err.message;
-        anaOdds.textContent = "";
-        anaFeatures.textContent = "";
+      .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+      .then(function(data){ analyticsData = data; renderScope(); })
+      .catch(function(err){ anaSummary.textContent = "取得失敗: " + err.message; });
+  }
+
+  function drawCurve(data){
+    if (!curveCanvas || !data) return;
+    var ctx = curveCanvas.getContext("2d");
+    var W = curveCanvas.width;
+    var H = curveCanvas.height;
+    var pad = 40;
+    ctx.clearRect(0, 0, W, H);
+    var act = data.actual || [];
+    var exp = data.expected || [];
+    var all = act.concat(exp);
+    if (!all.length) { ctx.fillStyle = "#E8E8E8"; ctx.font = "14px sans-serif"; ctx.fillText("データなし", 20, 30); return; }
+    var maxX = Math.max.apply(null, all.map(function(p){ return p.x; })) || 1;
+    var maxY = Math.max.apply(null, all.map(function(p){ return p.y; })) || 1;
+    var minY = Math.min.apply(null, all.map(function(p){ return p.y; }));
+    if (minY > 0) minY = 0;
+    if (maxY < 0) maxY = 0;
+    var rangeY = (maxY - minY) || 1;
+    var sx = function(x){ return pad + (x / maxX) * (W - pad * 2); };
+    var sy = function(y){ return H - pad - ((y - minY) / rangeY) * (H - pad * 2); };
+    ctx.strokeStyle = "rgba(212,175,55,0.3)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad, sy(0));
+    ctx.lineTo(W - pad, sy(0));
+    ctx.stroke();
+    ctx.fillStyle = "#E8E8E8";
+    ctx.font = "11px sans-serif";
+    ctx.fillText("投資 " + fmtInt(maxX) + "円", W - 130, H - 10);
+    ctx.fillText("損益 " + fmtInt(maxY) + "円", 4, sy(maxY) + 12);
+    function line(points, color){
+      if (!points.length) return;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      points.forEach(function(p, i){
+        var x = sx(p.x);
+        var y = sy(p.y);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
       });
+      ctx.stroke();
+    }
+    line(exp, "#D4AF37");
+    line(act, "#ff4d4d");
+    ctx.fillStyle = "#D4AF37";
+    ctx.fillText("想定", W - 60, 20);
+    ctx.fillStyle = "#ff4d4d";
+    ctx.fillText("実績", W - 60, 36);
   }
 
   function renderBetsSummary(s){
     if (!s) { betsSummary.textContent = "データなし"; return; }
     var cls = s.total_profit >= 0 ? "ev-mid" : "ev-neg";
-    betsSummary.innerHTML = "<div class=\"summary\">"
-      + "<div>投票数: " + s.total_bets + "</div>"
+    betsSummary.innerHTML = "<div>投票数: " + s.total_bets + "</div>"
       + "<div>投資: " + fmtYen(s.total_stake) + "</div>"
       + "<div>払戻: " + fmtYen(s.total_return) + "</div>"
       + "<div class=\"" + cls + "\">損益: " + (s.total_profit >= 0 ? "+" : "") + fmtYen(s.total_profit) + "</div>"
-      + "<div class=\"summary-row\">ROI: " + fmtPct(s.roi, 1) + " / 的中率: " + fmtPct(s.hit_rate, 1) + " (" + s.hits + "/" + s.settled + ")</div>"
-      + "</div>";
+      + "<div>実的中率: " + fmtPct(s.hit_rate, 1) + " / 想定的中率: " + fmtPct(s.expected_hit_rate, 1) + "</div>"
+      + "<div>実ROI: " + fmtPct(s.roi, 1) + " / 想定ROI: " + fmtPct(s.expected_roi, 1) + "</div>"
+      + "<div>平均オッズ: " + fmtNum(s.avg_odds, 1) + " / 加重平均: " + fmtNum(s.weighted_avg_odds, 1) + "</div>"
+      + "<div>想定損益: " + (s.expected_profit >= 0 ? "+" : "") + fmtYen(s.expected_profit) + "</div>";
   }
 
   function renderBetsList(rows){
     if (!rows || !rows.length) { betsList.textContent = "投票履歴はありません"; return; }
-    var html = "<table class=\"ev-table\"><thead><tr>"
-      + "<th>レース</th><th>買い目</th><th>金額</th><th>オッズ</th><th>状態</th><th>損益</th><th></th>"
-      + "</tr></thead><tbody>";
+    var html = "<table class=\"ev-table\"><thead><tr><th>レース</th><th>買い目</th><th>金額</th><th>オッズ</th><th>状態</th><th>損益</th><th></th></tr></thead><tbody>";
     rows.forEach(function(r){
       var cls = r.profit > 0 ? "ev-mid" : r.profit < 0 ? "ev-neg" : "";
       var statusLabel = r.status === "hit" ? "的中" : r.status === "miss" ? "不的中" : r.status === "pending" ? "確定待ち" : r.status;
-      html += "<tr class=\"" + cls + "\">"
-            + "<td>" + esc(r.race_id) + "</td>"
-            + "<td>" + esc(r.combo) + "</td>"
-            + "<td>" + fmtYen(r.amount) + "</td>"
-            + "<td>" + fmtNum(r.odds, 1) + "</td>"
-            + "<td>" + statusLabel + "</td>"
-            + "<td>" + (r.profit >= 0 ? "+" : "") + fmtYen(r.profit) + "</td>"
-            + "<td><button class=\"del-btn\" data-id=\"" + r.id + "\" type=\"button\">削除</button></td>"
-            + "</tr>";
+      html += "<tr class=\"" + cls + "\"><td>" + esc(r.race_id) + "</td><td>" + esc(r.combo) + "</td><td>" + fmtYen(r.amount) + "</td><td>" + fmtNum(r.odds, 1) + "</td><td>" + statusLabel + "</td><td>" + (r.profit >= 0 ? "+" : "") + fmtYen(r.profit) + "</td><td><button class=\"del-btn\" data-id=\"" + r.id + "\" type=\"button\">削除</button></td></tr>";
     });
     html += "</tbody></table>";
     betsList.innerHTML = html;
     betsList.querySelectorAll(".del-btn").forEach(function(btn){
       btn.addEventListener("click", function(){
         var id = btn.getAttribute("data-id");
-        fetchWithTimeout(API_BASE + "/bets/" + id, TIMEOUT_MS, { method: "DELETE" })
-          .then(function(){ loadBets(); })
-          .catch(function(){ alert("削除失敗"); });
+        fetchWithTimeout(API_BASE + "/bets/" + id, TIMEOUT_MS, { method: "DELETE" }).then(function(){ loadBets(); }).catch(function(){ alert("削除失敗"); });
       });
     });
   }
@@ -336,14 +292,9 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   function loadBets(){
     betsSummary.textContent = "読み込み中...";
     betsList.textContent = "読み込み中...";
-    fetchWithTimeout(API_BASE + "/bets/summary", TIMEOUT_MS)
-      .then(function(res){ return res.json(); })
-      .then(function(s){ renderBetsSummary(s); })
-      .catch(function(err){ betsSummary.textContent = "取得失敗: " + err.message; });
-    fetchWithTimeout(API_BASE + "/bets", TIMEOUT_MS)
-      .then(function(res){ return res.json(); })
-      .then(function(rows){ renderBetsList(rows); })
-      .catch(function(err){ betsList.textContent = "取得失敗: " + err.message; });
+    fetchWithTimeout(API_BASE + "/bets/summary", TIMEOUT_MS).then(function(res){ return res.json(); }).then(renderBetsSummary).catch(function(err){ betsSummary.textContent = "取得失敗: " + err.message; });
+    fetchWithTimeout(API_BASE + "/bets/curve", TIMEOUT_MS).then(function(res){ return res.json(); }).then(drawCurve).catch(function(){ drawCurve(null); });
+    fetchWithTimeout(API_BASE + "/bets", TIMEOUT_MS).then(function(res){ return res.json(); }).then(renderBetsList).catch(function(err){ betsList.textContent = "取得失敗: " + err.message; });
   }
 
   function switchTab(name){
@@ -356,42 +307,23 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     if (name === "bets") loadBets();
   }
 
-  document.querySelectorAll(".tab").forEach(function(t){
-    t.addEventListener("click", function(){ switchTab(t.getAttribute("data-tab")); });
+  document.querySelectorAll(".tab").forEach(function(t){ t.addEventListener("click", function(){ switchTab(t.getAttribute("data-tab")); }); });
+  anaScopeTabs.querySelectorAll(".subtab").forEach(function(t){
+    t.addEventListener("click", function(){
+      anaScopeTabs.querySelectorAll(".subtab").forEach(function(x){ x.classList.remove("active"); });
+      t.classList.add("active");
+      currentScope = t.getAttribute("data-scope");
+      renderScope();
+    });
   });
-
   [fMinProb, fMinOdds, fCollateral, fMaxInv].forEach(function(el){
     el.addEventListener("change", function(){ if (detail && !detail.hidden && detail.dataset.raceId) loadEvTable(detail.dataset.raceId); });
   });
-
-  list.addEventListener("click", function(e){
-    var el = e.target.closest(".race");
-    if (!el) return;
-    detail.dataset.raceId = el.getAttribute("data-race-id");
-    loadDetail(el.getAttribute("data-race-id"));
-  });
-  list.addEventListener("keydown", function(e){
-    if (e.key !== "Enter" && e.key !== " ") return;
-    var el = e.target.closest(".race");
-    if (!el) return;
-    e.preventDefault();
-    detail.dataset.raceId = el.getAttribute("data-race-id");
-    loadDetail(el.getAttribute("data-race-id"));
-  });
+  list.addEventListener("click", function(e){ var el = e.target.closest(".race"); if (!el) return; detail.dataset.raceId = el.getAttribute("data-race-id"); loadDetail(el.getAttribute("data-race-id")); });
+  list.addEventListener("keydown", function(e){ if (e.key !== "Enter" && e.key !== " ") return; var el = e.target.closest(".race"); if (!el) return; e.preventDefault(); detail.dataset.raceId = el.getAttribute("data-race-id"); loadDetail(el.getAttribute("data-race-id")); });
   backBtn.addEventListener("click", showList);
 
   readFilters();
   list.textContent = "読み込み中... (サーバー起動待ちの場合があります)";
-  fetchWithTimeout(API_BASE + "/races", TIMEOUT_MS)
-    .then(function(res){
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      return res.json();
-    })
-    .then(function(data){
-      var races = Array.isArray(data) ? data : (data.races || data.items || []);
-      renderList(races);
-    })
-    .catch(function(err){
-      list.textContent = "API取得失敗: " + err.message + " — 再読み込みしてください";
-    });
+  fetchWithTimeout(API_BASE + "/races", TIMEOUT_MS).then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); }).then(function(data){ var races = Array.isArray(data) ? data : (data.races || data.items || []); renderList(races); }).catch(function(err){ list.textContent = "API取得失敗: " + err.message + " — 再読み込みしてください"; });
 })();
