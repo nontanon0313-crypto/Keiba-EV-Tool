@@ -4,3 +4,5 @@ pydantic
 python-dotenv
 httpx
 pydantic-settings
+psycopg[binary]
+libsql-client
