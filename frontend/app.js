@@ -10,37 +10,21 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   }
 
   var $ = function(id){ return document.getElementById(id); };
-  var list = $("race-list");
-  var detail = $("detail");
-  var detailTitle = $("detail-title");
-  var detailBody = $("detail-body");
-  var backBtn = $("back-btn");
-  var racesSection = $("races");
-  var tabPredict = $("tab-predict");
-  var tabAnalytics = $("tab-analytics");
-  var tabBets = $("tab-bets");
-  var fMinProb = $("f-minprob");
-  var fMinOdds = $("f-minodds");
-  var fCollateral = $("f-collateral");
-  var fMaxInv = $("f-maxinv");
-  var anaSummary = $("ana-summary");
-  var anaProb = $("ana-prob");
-  var anaOdds = $("ana-odds");
-  var anaFeatures = $("ana-features");
-  var anaScopeTabs = $("ana-scope-tabs");
-  var betsSummary = $("bets-summary");
-  var betsList = $("bets-list");
-  var curveCanvas = $("curve-chart");
-  var analyticsData = null;
-  var currentScope = "all";
-  var filters = {};
-  var currentBets = [];
+  var list = $("race-list"), detail = $("detail"), detailTitle = $("detail-title"), detailBody = $("detail-body");
+  var backBtn = $("back-btn"), racesSection = $("races");
+  var tabPredict = $("tab-predict"), tabAnalytics = $("tab-analytics"), tabBets = $("tab-bets");
+  var fMinProb = $("f-minprob"), fMinOdds = $("f-minodds"), fCollateral = $("f-collateral"), fMaxInv = $("f-maxinv");
+  var anaSummary = $("ana-summary"), anaView = $("ana-view");
+  var anaScopeTabs = $("ana-scope-tabs"), anaViewTabs = $("ana-view-tabs");
+  var betsSummary = $("bets-summary"), betsList = $("bets-list"), curveCanvas = $("curve-chart");
+  var analyticsData = null, currentScope = "all", currentView = "ev", filters = {}, currentBets = [];
 
   function esc(s){ return String(s == null ? "" : s).replace(/[&<>\x27]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","\x27":"&#39;"}[c]; }); }
   function fmtPct(v, d){ return (v * 100).toFixed(d == null ? 2 : d) + "%"; }
   function fmtNum(v, d){ return Number(v).toFixed(d == null ? 2 : d); }
   function fmtInt(v){ return String(Math.round(v)); }
   function fmtYen(v){ return fmtInt(v) + "円"; }
+  function fmtSigned(v, d){ return (v >= 0 ? "+" : "") + fmtNum(v, d); }
 
   function readFilters(){
     filters.minProb = Math.max(0, Number(fMinProb.value || 0)) / 100;
@@ -49,7 +33,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     filters.maxInvestment = Math.max(100, Math.round(Number(fMaxInv.value || 10000)));
   }
 
-  function sortRaces(races){ return races.slice().sort(function(a, b){ var sa = a.start_at || ""; var sb = b.start_at || ""; return sa < sb ? -1 : sa > sb ? 1 : 0; }); }
+  function sortRaces(races){ return races.slice().sort(function(a, b){ var sa = a.start_at || "", sb = b.start_at || ""; return sa < sb ? -1 : sa > sb ? 1 : 0; }); }
   function isFinished(r){ if (!r.start_at) return false; var t = Date.parse(r.start_at); if (isNaN(t)) return false; return (Date.now() - t) > FINISH_GRACE_MS; }
 
   function renderList(races){
@@ -57,10 +41,8 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     if (!visible.length) { list.textContent = "本日のレースはありません（終了分を除く）"; return; }
     var html = "";
     visible.forEach(function(r){
-      var no = r.race_number || r.race_no || 1;
-      var venue = r.venue || r.course || "";
-      var surface = r.surface || "";
-      var dist = r.distance || "";
+      var no = r.race_number || r.race_no || 1, venue = r.venue || r.course || "";
+      var surface = r.surface || "", dist = r.distance || "";
       var time = (r.start_at || "").slice(11, 16);
       var runners = (r.runners || []).length;
       var waku = KeibaTheme.wakuClass(no);
@@ -71,16 +53,14 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
 
   function renderDetail(race){
     detailTitle.textContent = (race.venue || "") + " " + (race.race_number || "") + "R";
-    var html = "";
-    html += "<h3 class=\"ev-title\">EV上位の買い目 (3連単)</h3><div id=\"ev-table\">読み込み中...</div>";
+    var html = "<h3 class=\"ev-title\">EV上位の買い目 (3連単)</h3><div id=\"ev-table\">読み込み中...</div>";
     html += "<h3 class=\"ev-title\">出走馬</h3>";
     var runners = race.runners || [];
     if (!runners.length) { html += "<p>出走馬データがありません</p>"; }
     else {
       html += "<table class=\"horse-table\"><thead><tr><th>枠</th><th>番</th><th>馬名</th><th>騎手</th><th>斤量</th><th>単勝</th><th>人気</th></tr></thead><tbody>";
       runners.forEach(function(h){
-        var frame = h.frame_number || h.waku || 0;
-        var num = h.horse_number || h.num || 0;
+        var frame = h.frame_number || h.waku || 0, num = h.horse_number || h.num || 0;
         var waku = KeibaTheme.wakuClass(frame || num);
         html += "<tr><td><span class=\"" + waku + "\">" + frame + "</span></td><td>" + num + "</td><td>" + esc(h.horse_name || "") + "</td><td>" + esc(h.jockey || "") + "</td><td>" + (h.weight || h.wEight || "") + "</td><td>" + (h.odds_win || h["勝ちオッズ"] || "") + "</td><td>" + (h["人気"] || h.popularity || "") + "</td></tr>";
       });
@@ -102,15 +82,12 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     html += "<table class=\"ev-table\"><thead><tr><th>買い目</th><th>確率</th><th>オッズ</th><th>EV</th><th>金額</th><th></th></tr></thead><tbody>";
     currentBets.forEach(function(b, idx){
       var cls = KeibaTheme.evClass(b.ev, EV_THRESHOLD);
-      html += "<tr class=\"" + cls + "\"><td>" + esc(b.combination) + "</td><td>" + fmtPct(b.prob) + "</td><td>" + fmtNum(b.odds, 1) + "</td><td>" + (b.ev >= 0 ? "+" : "") + fmtNum(b.ev, 3) + "</td><td>" + fmtYen(b.amount) + "</td><td><button class=\"bet-btn\" data-idx=\"" + idx + "\" type=\"button\">投票</button></td></tr>";
+      html += "<tr class=\"" + cls + "\"><td>" + esc(b.combination) + "</td><td>" + fmtPct(b.prob) + "</td><td>" + fmtNum(b.odds, 1) + "</td><td>" + fmtSigned(b.ev, 3) + "</td><td>" + fmtYen(b.amount) + "</td><td><button class=\"bet-btn\" data-idx=\"" + idx + "\" type=\"button\">投票</button></td></tr>";
     });
     html += "</tbody></table>";
     box.innerHTML = html;
     box.querySelectorAll(".bet-btn").forEach(function(btn){
-      btn.addEventListener("click", function(){
-        var i = Number(btn.getAttribute("data-idx"));
-        recordBet(raceId, currentBets[i]);
-      });
+      btn.addEventListener("click", function(){ recordBet(raceId, currentBets[Number(btn.getAttribute("data-idx"))]); });
     });
   }
 
@@ -126,8 +103,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   function fetchWithTimeout(url, ms, opts){
     var ctrl = new AbortController();
     var timer = setTimeout(function(){ ctrl.abort(); }, ms);
-    var o = opts || {};
-    o.signal = ctrl.signal;
+    var o = opts || {}; o.signal = ctrl.signal;
     return fetch(url, o).finally(function(){ clearTimeout(timer); });
   }
 
@@ -144,80 +120,73 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   }
 
   function loadDetail(raceId){
-    detail.hidden = false;
-    racesSection.hidden = true;
-    detailTitle.textContent = "読み込み中...";
-    detailBody.innerHTML = "";
+    detail.hidden = false; racesSection.hidden = true;
+    detailTitle.textContent = "読み込み中..."; detailBody.innerHTML = "";
     fetchWithTimeout(API_BASE + "/races/" + encodeURIComponent(raceId), TIMEOUT_MS)
       .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
       .then(function(race){ renderDetail(race); })
       .catch(function(err){ detailBody.textContent = "取得失敗: " + err.message; });
   }
 
-  function analyticsTable(rows, label){
+  function tableRows(rows, label){
     if (!rows || !rows.length) return "<p>該当データなし</p>";
-    var html = "<table class=\"ev-table\"><thead><tr><th>" + label + "</th><th>件数</th><th>予想的中率</th><th>オッズ平均</th><th>想定利益%</th><th>実的中率</th></tr></thead><tbody>";
+    var html = "<table class=\"ev-table\"><thead><tr><th>" + label + "</th><th>件数</th><th>予想的中率</th><th>オッズ平均</th><th>想定利益%</th><th>実的中率</th><th>実利益%</th></tr></thead><tbody>";
     rows.forEach(function(r){
       var cls = KeibaTheme.evClass(r.expected_profit_pct / 100, EV_THRESHOLD);
       var actual = r.actual_rate == null ? "-" : fmtPct(r.actual_rate);
-      html += "<tr class=\"" + cls + "\"><td>" + esc(r.range) + "</td><td>" + r.count + "</td><td>" + fmtPct(r.avg_prob) + "</td><td>" + fmtNum(r.avg_odds, 1) + "</td><td>" + (r.expected_profit_pct >= 0 ? "+" : "") + fmtNum(r.expected_profit_pct, 1) + "</td><td>" + actual + "</td></tr>";
+      var ap = r.actual_profit_pct == null ? "-" : fmtSigned(r.actual_profit_pct, 1);
+      html += "<tr class=\"" + cls + "\"><td>" + esc(r.range) + "</td><td>" + r.count + "</td><td>" + fmtPct(r.avg_prob) + "</td><td>" + fmtNum(r.avg_odds, 1) + "</td><td>" + fmtSigned(r.expected_profit_pct, 1) + "</td><td>" + actual + "</td><td>" + ap + "</td></tr>";
     });
     html += "</tbody></table>";
     return html;
   }
 
-  function featuresTable(features){
+  function featuresView(features){
     if (!features || !features.length) return "<p>該当データなし</p>";
     var html = "";
     features.forEach(function(f){
       html += "<h4 class=\"feature-title\">" + esc(f.label) + "</h4>";
-      html += "<table class=\"ev-table\"><thead><tr><th>範囲</th><th>件数</th><th>予想的中率</th><th>オッズ平均</th><th>想定利益%</th><th>実的中率</th></tr></thead><tbody>";
-      (f.rows || []).forEach(function(r){
-        var cls = KeibaTheme.evClass(r.expected_profit_pct / 100, EV_THRESHOLD);
-        var actual = r.actual_rate == null ? "-" : fmtPct(r.actual_rate);
-        html += "<tr class=\"" + cls + "\"><td>" + esc(r.range) + "</td><td>" + r.count + "</td><td>" + fmtPct(r.avg_prob) + "</td><td>" + fmtNum(r.avg_odds, 1) + "</td><td>" + (r.expected_profit_pct >= 0 ? "+" : "") + fmtNum(r.expected_profit_pct, 1) + "</td><td>" + actual + "</td></tr>";
-      });
-      html += "</tbody></table>";
+      html += tableRows(f.rows || [], "範囲");
     });
     return html;
   }
 
   function renderAnaSummary(s){
     if (!s) { anaSummary.innerHTML = ""; return; }
-    anaSummary.innerHTML = "<div>件数: " + s.count + "</div><div>実的中率: " + (s.actual_rate == null ? "-" : fmtPct(s.actual_rate)) + "</div><div>想定利益%: " + (s.avg_expected_profit_pct >= 0 ? "+" : "") + fmtNum(s.avg_expected_profit_pct, 2) + "</div>";
+    var cnt = s.count || 0;
+    var voted = s.voted_count == null ? 0 : s.voted_count;
+    var total = s.total_count == null ? cnt : s.total_count;
+    var ratio = currentScope === "all" ? (voted + "/" + total + " が投票対象") : (cnt + " 件");
+    anaSummary.innerHTML = "<div>件数: " + cnt + " (" + ratio + ")</div>"
+      + "<div>実的中率: " + (s.actual_rate == null ? "-" : fmtPct(s.actual_rate)) + "</div>"
+      + "<div>想定利益%: " + fmtSigned(s.avg_expected_profit_pct, 2) + "</div>";
   }
 
-  function renderScope(){
+  function renderView(){
     if (!analyticsData) return;
     var ticket = (analyticsData.by_ticket || [])[0] || { scopes: {} };
-    var scopes = ticket.scopes || {};
-    var s = scopes[currentScope] || { summary: null, prob_bins: [], odds_bins: [], features: [] };
+    var s = (ticket.scopes || {})[currentScope] || { summary: null, prob_bins: [], odds_bins: [], ev_bins: [], features: [] };
     renderAnaSummary(s.summary);
-    anaProb.innerHTML = analyticsTable(s.prob_bins || [], "確率帯");
-    anaOdds.innerHTML = analyticsTable(s.odds_bins || [], "オッズ帯");
-    anaFeatures.innerHTML = featuresTable(s.features || []);
+    if (currentView === "prob") { anaView.innerHTML = tableRows(s.prob_bins || [], "確率帯"); return; }
+    if (currentView === "odds") { anaView.innerHTML = tableRows(s.odds_bins || [], "オッズ帯"); return; }
+    if (currentView === "features") { anaView.innerHTML = featuresView(s.features || []); return; }
+    anaView.innerHTML = tableRows(s.ev_bins || [], "期待値帯");
   }
 
   function loadAnalytics(){
-    anaSummary.textContent = "読み込み中...";
-    anaProb.textContent = "";
-    anaOdds.textContent = "";
-    anaFeatures.textContent = "";
+    anaSummary.textContent = "読み込み中..."; anaView.textContent = "読み込み中...";
     fetchWithTimeout(API_BASE + "/analytics", TIMEOUT_MS)
       .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
-      .then(function(data){ analyticsData = data; renderScope(); })
-      .catch(function(err){ anaSummary.textContent = "取得失敗: " + err.message; });
+      .then(function(data){ analyticsData = data; renderView(); })
+      .catch(function(err){ anaSummary.textContent = "取得失敗: " + err.message; anaView.textContent = ""; });
   }
 
   function drawCurve(data){
     if (!curveCanvas || !data) return;
     var ctx = curveCanvas.getContext("2d");
-    var W = curveCanvas.width;
-    var H = curveCanvas.height;
-    var pad = 40;
+    var W = curveCanvas.width, H = curveCanvas.height, pad = 40;
     ctx.clearRect(0, 0, W, H);
-    var act = data.actual || [];
-    var exp = data.expected || [];
+    var act = data.actual || [], exp = data.expected || [];
     var all = act.concat(exp);
     if (!all.length) { ctx.fillStyle = "#E8E8E8"; ctx.font = "14px sans-serif"; ctx.fillText("データなし", 20, 30); return; }
     var maxX = Math.max.apply(null, all.map(function(p){ return p.x; })) || 1;
@@ -228,47 +197,26 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     var rangeY = (maxY - minY) || 1;
     var sx = function(x){ return pad + (x / maxX) * (W - pad * 2); };
     var sy = function(y){ return H - pad - ((y - minY) / rangeY) * (H - pad * 2); };
-    ctx.strokeStyle = "rgba(212,175,55,0.3)";
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(pad, sy(0));
-    ctx.lineTo(W - pad, sy(0));
-    ctx.stroke();
-    ctx.fillStyle = "#E8E8E8";
-    ctx.font = "11px sans-serif";
+    ctx.strokeStyle = "rgba(212,175,55,0.3)"; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(pad, sy(0)); ctx.lineTo(W - pad, sy(0)); ctx.stroke();
+    ctx.fillStyle = "#E8E8E8"; ctx.font = "11px sans-serif";
     ctx.fillText("投資 " + fmtInt(maxX) + "円", W - 130, H - 10);
     ctx.fillText("損益 " + fmtInt(maxY) + "円", 4, sy(maxY) + 12);
-    function line(points, color){
-      if (!points.length) return;
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      points.forEach(function(p, i){
-        var x = sx(p.x);
-        var y = sy(p.y);
-        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-      });
-      ctx.stroke();
-    }
-    line(exp, "#D4AF37");
-    line(act, "#ff4d4d");
-    ctx.fillStyle = "#D4AF37";
-    ctx.fillText("想定", W - 60, 20);
-    ctx.fillStyle = "#ff4d4d";
-    ctx.fillText("実績", W - 60, 36);
+    function line(points, color){ if (!points.length) return; ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.beginPath(); points.forEach(function(p, i){ var x = sx(p.x), y = sy(p.y); if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y); }); ctx.stroke(); }
+    line(exp, "#D4AF37"); line(act, "#ff4d4d");
+    ctx.fillStyle = "#D4AF37"; ctx.fillText("想定", W - 60, 20);
+    ctx.fillStyle = "#ff4d4d"; ctx.fillText("実績", W - 60, 36);
   }
 
   function renderBetsSummary(s){
     if (!s) { betsSummary.textContent = "データなし"; return; }
     var cls = s.total_profit >= 0 ? "ev-mid" : "ev-neg";
     betsSummary.innerHTML = "<div>投票数: " + s.total_bets + "</div>"
-      + "<div>投資: " + fmtYen(s.total_stake) + "</div>"
-      + "<div>払戻: " + fmtYen(s.total_return) + "</div>"
-      + "<div class=\"" + cls + "\">損益: " + (s.total_profit >= 0 ? "+" : "") + fmtYen(s.total_profit) + "</div>"
+      + "<div>投資: " + fmtYen(s.total_stake) + " / 払戻: " + fmtYen(s.total_return) + "</div>"
+      + "<div class=\"" + cls + "\">損益: " + (s.total_profit >= 0 ? "+" : "") + fmtYen(s.total_profit) + " (想定: " + fmtSigned(s.expected_profit, 0) + "円)</div>"
       + "<div>実的中率: " + fmtPct(s.hit_rate, 1) + " / 想定的中率: " + fmtPct(s.expected_hit_rate, 1) + "</div>"
       + "<div>実ROI: " + fmtPct(s.roi, 1) + " / 想定ROI: " + fmtPct(s.expected_roi, 1) + "</div>"
-      + "<div>平均オッズ: " + fmtNum(s.avg_odds, 1) + " / 加重平均: " + fmtNum(s.weighted_avg_odds, 1) + "</div>"
-      + "<div>想定損益: " + (s.expected_profit >= 0 ? "+" : "") + fmtYen(s.expected_profit) + "</div>";
+      + "<div>平均オッズ: " + fmtNum(s.avg_odds, 1) + " / 加重平均: " + fmtNum(s.weighted_avg_odds, 1) + "</div>";
   }
 
   function renderBetsList(rows){
@@ -282,16 +230,12 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     html += "</tbody></table>";
     betsList.innerHTML = html;
     betsList.querySelectorAll(".del-btn").forEach(function(btn){
-      btn.addEventListener("click", function(){
-        var id = btn.getAttribute("data-id");
-        fetchWithTimeout(API_BASE + "/bets/" + id, TIMEOUT_MS, { method: "DELETE" }).then(function(){ loadBets(); }).catch(function(){ alert("削除失敗"); });
-      });
+      btn.addEventListener("click", function(){ var id = btn.getAttribute("data-id"); fetchWithTimeout(API_BASE + "/bets/" + id, TIMEOUT_MS, { method: "DELETE" }).then(function(){ loadBets(); }).catch(function(){ alert("削除失敗"); }); });
     });
   }
 
   function loadBets(){
-    betsSummary.textContent = "読み込み中...";
-    betsList.textContent = "読み込み中...";
+    betsSummary.textContent = "読み込み中..."; betsList.textContent = "読み込み中...";
     fetchWithTimeout(API_BASE + "/bets/summary", TIMEOUT_MS).then(function(res){ return res.json(); }).then(renderBetsSummary).catch(function(err){ betsSummary.textContent = "取得失敗: " + err.message; });
     fetchWithTimeout(API_BASE + "/bets/curve", TIMEOUT_MS).then(function(res){ return res.json(); }).then(drawCurve).catch(function(){ drawCurve(null); });
     fetchWithTimeout(API_BASE + "/bets", TIMEOUT_MS).then(function(res){ return res.json(); }).then(renderBetsList).catch(function(err){ betsList.textContent = "取得失敗: " + err.message; });
@@ -311,14 +255,16 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   anaScopeTabs.querySelectorAll(".subtab").forEach(function(t){
     t.addEventListener("click", function(){
       anaScopeTabs.querySelectorAll(".subtab").forEach(function(x){ x.classList.remove("active"); });
-      t.classList.add("active");
-      currentScope = t.getAttribute("data-scope");
-      renderScope();
+      t.classList.add("active"); currentScope = t.getAttribute("data-scope"); renderView();
     });
   });
-  [fMinProb, fMinOdds, fCollateral, fMaxInv].forEach(function(el){
-    el.addEventListener("change", function(){ if (detail && !detail.hidden && detail.dataset.raceId) loadEvTable(detail.dataset.raceId); });
+  anaViewTabs.querySelectorAll(".subtab").forEach(function(t){
+    t.addEventListener("click", function(){
+      anaViewTabs.querySelectorAll(".subtab").forEach(function(x){ x.classList.remove("active"); });
+      t.classList.add("active"); currentView = t.getAttribute("data-view"); renderView();
+    });
   });
+  [fMinProb, fMinOdds, fCollateral, fMaxInv].forEach(function(el){ el.addEventListener("change", function(){ if (detail && !detail.hidden && detail.dataset.raceId) loadEvTable(detail.dataset.raceId); }); });
   list.addEventListener("click", function(e){ var el = e.target.closest(".race"); if (!el) return; detail.dataset.raceId = el.getAttribute("data-race-id"); loadDetail(el.getAttribute("data-race-id")); });
   list.addEventListener("keydown", function(e){ if (e.key !== "Enter" && e.key !== " ") return; var el = e.target.closest(".race"); if (!el) return; e.preventDefault(); detail.dataset.raceId = el.getAttribute("data-race-id"); loadDetail(el.getAttribute("data-race-id")); });
   backBtn.addEventListener("click", showList);
