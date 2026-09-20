@@ -48,9 +48,11 @@ def _hit(ticket_type, combo, winner):
     return 0
 
 
-def _collect(scope="all"):
+def _collect(scope="all", model_version=None):
     from backend.app.services import bet_store
     bets_data = bet_store.list_bets()
+    if model_version:
+        bets_data = [b for b in bets_data if b.get("model_version") == model_version]
     voted_keys = set((b["race_id"], b["combo"], b.get("ticket_type", "trifecta")) for b in bets_data)
     races = get_races()
     stats = {}
@@ -111,7 +113,7 @@ def _collect(scope="all"):
 
 
 @router.get("")
-def get_ticket_stats(scope: str = "all"):
+def get_ticket_stats(scope: str = "all", model_version: str = None):
     if scope not in ("all", "voted", "excluded"):
         scope = "all"
-    return {"scope": scope, "tickets": _collect(scope)}
+    return {"scope": scope, "model_version": model_version, "tickets": _collect(scope, model_version)}

@@ -125,13 +125,15 @@ def _scope_summary(bucket):
 
 
 @router.get("")
-def get_analytics():
+def get_analytics(model_version: str = None):
     pb = _prob_bins()
     ob = _odds_bins()
     eb = _ev_bins()
     fc = _features_conf()
     scopes = {"all": _empty_bucket(), "voted": _empty_bucket(), "excluded": _empty_bucket()}
     bets_data = bet_store.list_bets()
+    if model_version:
+        bets_data = [b for b in bets_data if b.get("model_version") == model_version]
     voted_keys = set((b["race_id"], b["combo"]) for b in bets_data)
     races = get_races()
     for race in races:
