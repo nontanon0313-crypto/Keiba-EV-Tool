@@ -1,5 +1,6 @@
 const API_BASE = "https://keiba-ev-tool.onrender.com";
 const TIMEOUT_MS = 60000;
+const EV_THRESHOLD = 0.12;
 
 (function(){
   if ("serviceWorker" in navigator) {
@@ -15,6 +16,7 @@ const TIMEOUT_MS = 60000;
   var detailBody = document.getElementById("detail-body");
   var backBtn = document.getElementById("back-btn");
   var racesSection = document.getElementById("races");
+  var currentRace = null;
 
   function esc(s){
     return String(s == null ? "" : s).replace(/[&<>\x27]/g, function(c){
@@ -44,6 +46,7 @@ const TIMEOUT_MS = 60000;
   }
 
   function renderDetail(race){
+    currentRace = race;
     var title = (race.venue || "") + " " + (race.race_number || "") + "R";
     detailTitle.textContent = title;
     var html = "";
@@ -70,22 +73,73 @@ const TIMEOUT_MS = 60000;
       });
       html += "</tbody></table>";
     }
+    html += "<h3 class=\"ev-title\">EV上位の買い目 (3連単)</h3>"
+          + "<div id=\"ev-table\">読み込み中...</div>";
     detailBody.innerHTML = html;
     racesSection.hidden = true;
     detail.hidden = false;
     window.scrollTo(0, 0);
+    loadEvTable(race.race_id);
+  }
+
+  function renderEvTable(bets, totalAmount){
+    var box = document.getElementById("ev-table");
+    if (!box) return;
+    if (!bets || !bets.length) {
+      box.textContent = "EV閾値超えの買い目はありません";
+      return;
+    }
+    var html = "<p class=\"ev-total\">推奨合計: " + totalAmount + "円</p>";
+    html += "<table class=\"ev-table\"><thead><tr>"
+          + "<th>買い目</th><th>確率</th><th>オッズ</th><th>EV</th><th>金額</th>"
+          + "</tr></thead><tbody>";
+    bets.forEach(function(b){
+      var cls = KeibaTheme.evClass(b.ev, EV_THRESHOLD);
+      html += "<tr class=\"" + cls + "\">"
+            + "<td>" + esc(b.combination) + "</td>"
+            + "<td>" + (b.prob * 100).toFixed(2) + "%</td>"
+            + "<td>" + b.odds.toFixed(1) + "</td>"
+            + "<td>" + (b.ev >= 0 ? "+" : "") + b.ev.toFixed(3) + "</td>"
+            + "<td>" + b.amount + "円</td>"
+            + "</tr>";
+    });
+    html += "</tbody></table>";
+    box.innerHTML = html;
   }
 
   function showList(){
     detail.hidden = true;
     racesSection.hidden = false;
+    currentRace = null;
     window.scrollTo(0, 0);
   }
 
-  function fetchWithTimeout(url, ms){
+  function fetchWithTimeout(url, ms, opts){
     var ctrl = new AbortController();
     var timer = setTimeout(function(){ ctrl.abort(); }, ms);
-    return fetch(url, { signal: ctrl.signal }).finally(function(){ clearTimeout(timer); });
+    var o = opts || {};
+    o.signal = ctrl.signal;
+    return fetch(url, o).finally(function(){ clearTimeout(timer); });
+  }
+
+  function loadEvTable(raceId){
+    var box = document.getElementById("ev-table");
+    if (!box) return;
+    box.textContent = "EV計算中...";
+    fetchWithTimeout(API_BASE + "/vote-plans?race_id=" + encodeURIComponent(raceId) + "&budget=2000", TIMEOUT_MS, { method: "POST" })
+      .then(function(res){
+        if (res.status === 204) { renderEvTable([], 0); return null; }
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.json();
+      })
+      .then(function(data){
+        if (!data) return;
+        var plan = data.plan || {};
+        renderEvTable(plan.bets || [], plan.total_amount || 0);
+      })
+      .catch(function(err){
+        if (box) box.textContent = "EV取得失敗: " + err.message;
+      });
   }
 
   function loadDetail(raceId){

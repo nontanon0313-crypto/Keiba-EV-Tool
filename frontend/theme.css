@@ -40,3 +40,9 @@ h2{color:var(--keiba-gold);font-size:16px;margin:8px 0 12px;}
 .horse-table{width:100%;border-collapse:collapse;font-size:13px;}
 .horse-table th,.horse-table td{padding:6px 4px;border-bottom:1px solid rgba(212,175,55,0.15);text-align:left;}
 .horse-table th{color:var(--keiba-gold);font-weight:600;}
+.ev-title{color:var(--keiba-gold);font-size:15px;margin:24px 0 8px;}
+.ev-total{color:var(--keiba-gold);font-size:13px;margin:8px 0;}
+.ev-table{width:100%;border-collapse:collapse;font-size:13px;}
+.ev-table th,.ev-table td{padding:6px 4px;border-bottom:1px solid rgba(212,175,55,0.15);text-align:right;}
+.ev-table th{color:var(--keiba-gold);font-weight:600;}
+.ev-table td:first-child,.ev-table th:first-child{text-align:left;}
