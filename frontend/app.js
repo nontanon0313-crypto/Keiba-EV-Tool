@@ -19,6 +19,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   var betsSummary = $("bets-summary"), betsList = $("bets-list"), curveCanvas = $("curve-chart");
   var analyticsData = null, currentScope = "all", currentView = "ev", filters = {}, currentBets = [];
   var currentTicket = "trifecta";
+  var ticketStats = null;
 
   function esc(s){ return String(s == null ? "" : s).replace(/[&<>\x27]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","\x27":"&#39;"}[c]; }); }
   function ticketLabel(t){ return ({trifecta:"3連単",trio:"3連複",exacta:"馬単",quinella:"馬連",wide:"ワイド",win:"単勝",place:"複勝"}[t] || t); }
@@ -220,6 +221,31 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
       + "<div>想定利益%: " + fmtSigned(s.avg_expected_profit_pct, 2) + "</div>";
   }
 
+  function renderTicketStats(){
+    if (!ticketStats) { anaView.textContent = "読み込み中..."; return; }
+    var rows = ticketStats.tickets || [];
+    if (!rows.length) { anaView.textContent = "データなし"; return; }
+    var html = "<table class=\"ev-table\"><thead><tr><th>券種</th><th>件数</th><th>的中率</th><th>想定的中率</th><th>ROI</th><th>想定ROI</th><th>損益</th></tr></thead><tbody>";
+    rows.forEach(function(r){
+      var cls = KeibaTheme.evClass(r.roi, EV_THRESHOLD);
+      var hit = fmtPct(r.hit_rate, 2);
+      var ehit = fmtPct(r.expected_hit_rate, 2);
+      var roi = fmtPct(r.roi, 1);
+      var eroi = fmtPct(r.expected_roi, 1);
+      html += "<tr class=\"" + cls + "\"><td>" + esc(r.label) + "</td><td>" + r.count + "</td><td>" + hit + "</td><td>" + ehit + "</td><td>" + roi + "</td><td>" + eroi + "</td><td>" + (r.profit >= 0 ? "+" : "") + fmtYen(r.profit) + "</td></tr>";
+    });
+    html += "</tbody></table>";
+    html += "<p class=\"hint\">均等100円賭けで集計。想定ROIがプラスでも的中率が低い券種は分散が大きい点に注意。</p>";
+    anaView.innerHTML = html;
+  }
+
+  function loadTicketStats(){
+    fetchWithTimeout(API_BASE + "/analytics/tickets", TIMEOUT_MS)
+      .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+      .then(function(data){ ticketStats = data; if (currentView === "tickets") renderTicketStats(); })
+      .catch(function(err){ if (currentView === "tickets") anaView.textContent = "取得失敗: " + err.message; });
+  }
+
   function renderView(){
     if (!analyticsData) return;
     var ticket = (analyticsData.by_ticket || [])[0] || { scopes: {} };
@@ -228,6 +254,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     if (currentView === "prob") { anaView.innerHTML = tableRows(s.prob_bins || [], "確率帯"); return; }
     if (currentView === "odds") { anaView.innerHTML = tableRows(s.odds_bins || [], "オッズ帯"); return; }
     if (currentView === "features") { anaView.innerHTML = featuresView(s.features || []); return; }
+    if (currentView === "tickets") { renderTicketStats(); return; }
     anaView.innerHTML = tableRows(s.ev_bins || [], "期待値帯");
   }
 
@@ -235,7 +262,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     anaSummary.textContent = "読み込み中..."; anaView.textContent = "読み込み中...";
     fetchWithTimeout(API_BASE + "/analytics", TIMEOUT_MS)
       .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
-      .then(function(data){ analyticsData = data; renderView(); })
+      .then(function(data){ analyticsData = data; if (!ticketStats) loadTicketStats(); renderView(); })
       .catch(function(err){ anaSummary.textContent = "取得失敗: " + err.message; anaView.textContent = ""; });
   }
 
