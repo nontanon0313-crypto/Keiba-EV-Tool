@@ -48,6 +48,12 @@ class _Turso:
             "scraped_at TEXT NOT NULL)"
         )
 
+    def close(self):
+        try:
+            self.client.close()
+        except Exception:
+            pass
+
     def load(self):
         r = self.client.execute("SELECT race_id, payload, scraped_at FROM scraped_races ORDER BY race_id")
         out = []
@@ -86,6 +92,19 @@ def _get():
     _backend = _File()
     print("[race_store] backend=file")
     return _backend
+
+
+def close_race_store():
+    global _backend
+    if _backend is not None and hasattr(_backend, "close"):
+        try:
+            _backend.close()
+        except Exception:
+            pass
+    _backend = None
+
+
+atexit.register(close_race_store)
 
 
 def save_race(race_id, payload):

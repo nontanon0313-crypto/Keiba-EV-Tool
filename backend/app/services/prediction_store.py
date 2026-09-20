@@ -51,6 +51,12 @@ class _Turso:
             "UNIQUE(race_id, model_version))"
         )
 
+    def close(self):
+        try:
+            self.client.close()
+        except Exception:
+            pass
+
     def load(self):
         r = self.client.execute("SELECT race_id, model_version, created_at, payload FROM predictions ORDER BY id")
         out = []
@@ -89,6 +95,19 @@ def _get():
     _backend = _File()
     print("[pred_store] backend=file")
     return _backend
+
+
+def close_prediction_store():
+    global _backend
+    if _backend is not None and hasattr(_backend, "close"):
+        try:
+            _backend.close()
+        except Exception:
+            pass
+    _backend = None
+
+
+atexit.register(close_prediction_store)
 
 
 def save_prediction(race_id, model_version, payload):

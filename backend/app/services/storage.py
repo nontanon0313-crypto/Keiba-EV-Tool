@@ -144,6 +144,10 @@ class PostgresStorage:
             conn.close()
 
 
+    def close(self):
+        pass
+
+
 class TursoStorage:
     name = "turso"
 
@@ -174,6 +178,12 @@ class TursoStorage:
                 created_at TEXT
             )
         """)
+
+    def close(self):
+        try:
+            self.client.close()
+        except Exception:
+            pass
 
     def load_all(self):
         r = self.client.execute("SELECT id, race_id, combo, amount, odds, prob, ev, ticket_type, payout, model_version, created_at FROM bets ORDER BY id")
@@ -231,3 +241,16 @@ def get_storage():
     _storage = FileStorage()
     print("[storage] backend=file")
     return _storage
+
+
+def close_storage():
+    global _storage
+    if _storage is not None and hasattr(_storage, "close"):
+        try:
+            _storage.close()
+        except Exception:
+            pass
+    _storage = None
+
+
+atexit.register(close_storage)
