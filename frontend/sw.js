@@ -1,5 +1,5 @@
 const CACHE = "keiba-ev-v3";
-const ASSETS = ["./", "./index.html", "./theme.css", "./ev-theme.js", "./app.js", "./manifest.json"];
+const ASSETS = ["./", "./index.html", "./theme.css", "./ev-theme.js", "./app.js", "./manifest.json", "./icon.svg"];
 self.addEventListener("install", function(e){
   self.skipWaiting();
   e.waitUntil(caches.open(CACHE).then(function(c){ return c.addAll(ASSETS); }));
