@@ -3,7 +3,8 @@
 race_id 形式 (12桁): YYYY + 場コード(2) + 回(2) + 日(2) + R(2)
 場コード: 01札幌 02函館 03福島 04新潟 05東京 06中山 07中京 08京都 09阪神 10小倉
 
-礼儀: 1リクエストごとに1〜2秒の間隔、User-Agent 明示。
+結果テーブル: table.ResultsByRaceDetail
+セル: 0着順 1枠番 2馬番 3馬名 4性齢 5斤量 6騎手 7タイム 16単勝 17人気
 """
 from __future__ import annotations
 import re
@@ -34,7 +35,7 @@ def _sleep():
     time.sleep(random.uniform(1.2, 2.2))
 
 
-def parse_race_id(race_id: str) -> Dict[str, str]:
+def parse_race_id(race_id: str) -> Dict:
     race_id = str(race_id).strip()
     if len(race_id) != 12 or not race_id.isdigit():
         raise ValueError("race_id must be 12 digits: " + race_id)
@@ -63,6 +64,30 @@ def fetch_race_list(date: str) -> List[str]:
     return sorted(ids)
 
 
+def _to_float(txt):
+    if not txt:
+        return None
+    t = txt.strip()
+    if t in ("--", "", "**"):
+        return None
+    try:
+        return float(t)
+    except ValueError:
+        return None
+
+
+def _to_int(txt):
+    if not txt:
+        return None
+    t = txt.strip()
+    if not t.isdigit():
+        return None
+    try:
+        return int(t)
+    except ValueError:
+        return None
+
+
 def fetch_race_result(race_id: str) -> Optional[Dict]:
     url = BASE_DB + "/race/" + race_id + "/"
     with httpx.Client(headers=HEADERS, timeout=20, follow_redirects=True) as c:
@@ -76,7 +101,7 @@ def fetch_race_result(race_id: str) -> Optional[Dict]:
 
     surface = ""
     distance = 0
-    info = soup.select_one(".racedata dl")
+    info = soup.select_one(".racedata dl") or soup.select_one(".racedata")
     if info:
         info_text = info.get_text(" ", strip=True)
         m = re.search(r"(芝|ダ|障)\s*(\d{3,4})m", info_text)
@@ -84,64 +109,39 @@ def fetch_race_result(race_id: str) -> Optional[Dict]:
             surface = {"芝": "芝", "ダ": "ダート", "障": "障害"}.get(m.group(1), "")
             distance = int(m.group(2))
 
-    table = soup.select_one("table.race_table_01")
+    table = soup.select_one("table.ResultsByRaceDetail")
     if table is None:
         return None
-    rows = table.select("tr")[1:]
+    rows = table.find_all("tr")
     runners = []
     finish_order = []
-    for row in rows:
+    for row in rows[1:]:
         tds = row.find_all("td")
-        if len(tds) < 10:
+        if len(tds) < 18:
             continue
-        try:
-            finish = tds[0].get_text(strip=True)
-            finish_num = int(finish) if finish.isdigit() else None
-        except Exception:
-            finish_num = None
-        frame_txt = tds[2].get_text(strip=True) if len(tds) > 2 else ""
-        num_txt = tds[3].get_text(strip=True) if len(tds) > 3 else ""
-        name_el = tds[3].find("a") if len(tds) > 3 else None
+        finish = _to_int(tds[0].get_text(strip=True))
+        frame = _to_int(tds[1].get_text(strip=True))
+        num = _to_int(tds[2].get_text(strip=True))
+        if num is None:
+            continue
+        name_el = tds[3].find("a")
         horse_name = name_el.get_text(strip=True) if name_el else tds[3].get_text(strip=True)
-        try:
-            horse_number = int(num_txt)
-        except ValueError:
-            continue
-        try:
-            frame = int(frame_txt) if frame_txt else 0
-        except ValueError:
-            frame = 0
-        jockey_txt = tds[6].get_text(strip=True) if len(tds) > 6 else ""
-        weight_txt = tds[5].get_text(strip=True) if len(tds) > 5 else ""
-        try:
-            weight = float(re.sub(r"[^\d.]", "", weight_txt) or 0)
-        except ValueError:
-            weight = 0.0
-        odds_txt = tds[9].get_text(strip=True) if len(tds) > 9 else ""
-        try:
-            odds_win = float(odds_txt) if odds_txt and odds_txt != "--" else None
-        except ValueError:
-            odds_win = None
-        popularity = None
-        if len(tds) > 10:
-            pop = tds[10].get_text(strip=True)
-            try:
-                popularity = int(pop) if pop.isdigit() else None
-            except ValueError:
-                popularity = None
+        weight = _to_float(re.sub(r"[^\d.]", "", tds[5].get_text(strip=True)))
+        jockey = tds[6].get_text(strip=True)
+        odds_win = _to_float(tds[16].get_text(strip=True))
+        popularity = _to_int(tds[17].get_text(strip=True))
         runners.append({
-            "horse_number": horse_number,
-            "frame_number": frame,
+            "horse_number": num,
+            "frame_number": frame or 0,
             "horse_name": horse_name,
-            "jockey": jockey_txt,
-            "weight": weight,
+            "jockey": jockey,
+            "weight": weight or 0.0,
             "odds_win": odds_win,
             "popularity": popularity,
-            "finish": finish_num,
+            "finish": finish,
         })
-        if finish_num is not None and finish_num <= 3:
-            finish_order.append((finish_num, horse_number))
-
+        if finish is not None and finish <= 3:
+            finish_order.append((finish, num))
     finish_order.sort()
     order = [hn for _, hn in finish_order]
 
@@ -153,3 +153,46 @@ def fetch_race_result(race_id: str) -> Optional[Dict]:
         "runners": runners,
         "finish_order": order,
     }
+
+
+def fetch_race_card(race_id: str) -> Optional[Dict]:
+    """発走前の出馬表 (枠・斤量・オッズ)。取れない場合 None。"""
+    url = BASE_RACE + "/race/shutuba.html?race_id=" + race_id
+    with httpx.Client(headers=HEADERS, timeout=20, follow_redirects=True) as c:
+        r = c.get(url)
+        r.raise_for_status()
+        html = r.text
+    soup = BeautifulSoup(html, "html.parser")
+    table = soup.select_one("table.Shutuba_Table")
+    if table is None:
+        return None
+    runners = []
+    for row in table.find_all("tr"):
+        tds = row.find_all("td")
+        if len(tds) < 8:
+            continue
+        num = _to_int(tds[1].get_text(strip=True))
+        if num is None:
+            continue
+        frame = _to_int(tds[0].get_text(strip=True)) or 0
+        name_el = tds[3].find("a")
+        name = name_el.get_text(strip=True) if name_el else tds[3].get_text(strip=True)
+        jockey = tds[6].get_text(strip=True) if len(tds) > 6 else ""
+        weight = _to_float(re.sub(r"[^\d.]", "", tds[5].get_text(strip=True) if len(tds) > 5 else ""))
+        odds_win = None
+        for td in tds:
+            cls = " ".join(td.get("class", []))
+            if "Txt_R" in cls or "Odds" in cls:
+                v = _to_float(td.get_text(strip=True))
+                if v is not None and odds_win is None:
+                    odds_win = v
+        runners.append({
+            "horse_number": num,
+            "frame_number": frame,
+            "horse_name": name,
+            "jockey": jockey,
+            "weight": weight or 0.0,
+            "odds_win": odds_win,
+            "popularity": None,
+        })
+    return {"race_id": race_id, "runners": runners}
