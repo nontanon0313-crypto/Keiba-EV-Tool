@@ -16,7 +16,6 @@ const EV_THRESHOLD = 0.12;
   var detailBody = document.getElementById("detail-body");
   var backBtn = document.getElementById("back-btn");
   var racesSection = document.getElementById("races");
-  var currentRace = null;
 
   function esc(s){
     return String(s == null ? "" : s).replace(/[&<>\x27]/g, function(c){
@@ -46,13 +45,15 @@ const EV_THRESHOLD = 0.12;
   }
 
   function renderDetail(race){
-    currentRace = race;
     var title = (race.venue || "") + " " + (race.race_number || "") + "R";
     detailTitle.textContent = title;
     var html = "";
+    html += "<h3 class=\"ev-title\">EV上位の買い目 (3連単)</h3>"
+          + "<div id=\"ev-table\">読み込み中...</div>";
+    html += "<h3 class=\"ev-title\">出走馬</h3>";
     var runners = race.runners || [];
     if (!runners.length) {
-      html = "<p>出走馬データがありません</p>";
+      html += "<p>出走馬データがありません</p>";
     } else {
       html += "<table class=\"horse-table\"><thead><tr>"
             + "<th>枠</th><th>番</th><th>馬名</th><th>騎手</th><th>斤量</th><th>単勝</th><th>人気</th>"
@@ -73,8 +74,6 @@ const EV_THRESHOLD = 0.12;
       });
       html += "</tbody></table>";
     }
-    html += "<h3 class=\"ev-title\">EV上位の買い目 (3連単)</h3>"
-          + "<div id=\"ev-table\">読み込み中...</div>";
     detailBody.innerHTML = html;
     racesSection.hidden = true;
     detail.hidden = false;
@@ -110,7 +109,6 @@ const EV_THRESHOLD = 0.12;
   function showList(){
     detail.hidden = true;
     racesSection.hidden = false;
-    currentRace = null;
     window.scrollTo(0, 0);
   }
 
