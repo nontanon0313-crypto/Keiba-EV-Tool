@@ -28,6 +28,28 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   function fmtYen(v){ return fmtInt(v) + "円"; }
   function fmtSigned(v, d){ return (v >= 0 ? "+" : "") + fmtNum(v, d); }
 
+  var FILTER_KEY = "keiba-filters-v1";
+
+  function loadFiltersFromStorage(){
+    try {
+      var raw = localStorage.getItem(FILTER_KEY);
+      if (!raw) return;
+      var o = JSON.parse(raw);
+      if (o && typeof o === "object") {
+        if (o.minProb != null) fMinProb.value = o.minProb;
+        if (o.minOdds != null) fMinOdds.value = o.minOdds;
+        if (o.collateral != null) fCollateral.value = o.collateral;
+        if (o.maxInvestment != null) fMaxInv.value = o.maxInvestment;
+      }
+    } catch (e) {}
+  }
+
+  function saveFiltersToStorage(){
+    try {
+      localStorage.setItem(FILTER_KEY, JSON.stringify({ minProb: fMinProb.value, minOdds: fMinOdds.value, collateral: fCollateral.value, maxInvestment: fMaxInv.value }));
+    } catch (e) {}
+  }
+
   function readFilters(){
     filters.minProb = Math.max(0, Number(fMinProb.value || 0)) / 100;
     filters.minOdds = Math.max(0, Number(fMinOdds.value || 0));
@@ -300,7 +322,22 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
       t.classList.add("active"); currentView = t.getAttribute("data-view"); renderView();
     });
   });
-  [fMinProb, fMinOdds, fCollateral, fMaxInv].forEach(function(el){ el.addEventListener("change", function(){ if (detail && !detail.hidden && detail.dataset.raceId) loadEvTable(detail.dataset.raceId); }); });
+  [fMinProb, fMinOdds, fCollateral, fMaxInv].forEach(function(el){
+    el.addEventListener("change", function(){
+      saveFiltersToStorage();
+      readFilters();
+      if (detail && !detail.hidden && detail.dataset.raceId) loadEvTable(detail.dataset.raceId);
+    });
+  });
+
+  var settingsBtn = $("settings-btn");
+  var settingsModal = $("settings-modal");
+  var settingsClose = $("settings-close");
+  if (settingsBtn) settingsBtn.addEventListener("click", function(){ settingsModal.hidden = false; });
+  if (settingsClose) settingsClose.addEventListener("click", function(){ settingsModal.hidden = true; });
+  if (settingsModal) settingsModal.addEventListener("click", function(e){ if (e.target === settingsModal) settingsModal.hidden = true; });
+
+  loadFiltersFromStorage();
   var ticketTabs = document.getElementById("ticket-tabs");
   if (ticketTabs) ticketTabs.querySelectorAll(".subtab").forEach(function(t){
     t.addEventListener("click", function(){

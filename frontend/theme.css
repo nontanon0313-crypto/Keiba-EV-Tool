@@ -17,7 +17,13 @@
 }
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;background:var(--keiba-bg);color:var(--keiba-text);font-family:-apple-system,"Noto Sans JP",sans-serif;}
-header{padding:16px;border-bottom:1px solid rgba(212,175,55,0.3);}
+header{padding:16px;border-bottom:1px solid rgba(212,175,55,0.3);position:relative;}
+.gear{position:absolute;top:14px;right:16px;background:transparent;color:var(--keiba-gold);border:1px solid var(--keiba-gold);border-radius:6px;width:36px;height:36px;font-size:18px;line-height:1;cursor:pointer;}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px;}
+.modal[hidden]{display:none;}
+.modal-content{background:var(--keiba-bg);border:1px solid var(--keiba-gold);border-radius:10px;padding:20px;width:100%%;max-width:420px;box-sizing:border-box;}
+.modal-content h2{margin-top:0;}
+.hint{font-size:11px;color:rgba(232,232,232,0.6);margin:8px 0 12px;}
 header h1{margin:0;color:var(--keiba-gold);font-size:20px;}
 main{padding:16px;}
 h2{color:var(--keiba-gold);font-size:16px;margin:8px 0 12px;}
@@ -49,9 +55,9 @@ h2{color:var(--keiba-gold);font-size:16px;margin:8px 0 12px;}
 .tabs{display:flex;gap:8px;padding:0 16px 8px;border-bottom:1px solid rgba(212,175,55,0.3);}
 .tab{flex:1;padding:10px;background:transparent;color:var(--keiba-text);border:1px solid rgba(212,175,55,0.4);border-radius:6px;font-size:14px;cursor:pointer;}
 .tab.active{background:var(--keiba-gold);color:#0B1426;font-weight:700;}
-.filters{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;width:100%%;overflow:hidden;}
-.filters label{display:flex;flex-direction:column;font-size:11px;color:var(--keiba-gold);gap:4px;}
-.filters input{width:100%%;min-width:0;box-sizing:border-box;background:#0f1a30;color:var(--keiba-text);border:1px solid rgba(212,175,55,0.4);border-radius:6px;padding:8px;font-size:14px;}
+.filters{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;width:100%%;max-width:100%%;box-sizing:border-box;}
+.filters label{display:flex;flex-direction:column;font-size:11px;color:var(--keiba-gold);gap:4px;min-width:0;width:100%%;}
+.filters input{width:100%%;min-width:0;max-width:100%%;box-sizing:border-box;background:#0f1a30;color:var(--keiba-text);border:1px solid rgba(212,175,55,0.4);border-radius:6px;padding:8px;font-size:14px;}
 .ev-title{color:var(--keiba-gold);font-size:15px;margin:24px 0 8px;}
 .ev-total{color:var(--keiba-gold);font-size:13px;margin:8px 0;}
 .ev-table{width:100%;border-collapse:collapse;font-size:13px;}
