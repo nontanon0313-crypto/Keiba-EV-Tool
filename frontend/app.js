@@ -20,6 +20,8 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   var analyticsData = null, currentScope = "all", currentView = "ev", filters = {}, currentBets = [];
   var currentTicket = "trifecta";
   var ticketStats = null;
+  var currentRaceRunners = [];
+  var runnerSort = "num";
   var storageBadge = $("storage-badge");
 
   function esc(s){ return String(s == null ? "" : s).replace(/[&<>\x27]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","\x27":"&#39;"}[c]; }); }
@@ -65,14 +67,25 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   function renderList(races){
     var visible = sortRaces(races.filter(function(r){ return !isFinished(r); }));
     if (!visible.length) { list.textContent = "本日のレースはありません（終了分を除く）"; return; }
-    var html = "";
+    var groups = {};
+    var order = [];
     visible.forEach(function(r){
-      var no = r.race_number || r.race_no || 1, venue = r.venue || r.course || "";
-      var surface = r.surface || "", dist = r.distance || "";
-      var time = (r.start_at || "").slice(11, 16);
-      var runners = (r.runners || []).length;
-      var waku = KeibaTheme.wakuClass(no);
-      html += "<div class=\"race\" data-race-id=\"" + esc(r.race_id) + "\" role=\"button\" tabindex=\"0\">" + "<span class=\"" + waku + "\">" + no + "</span> " + "<strong>" + esc(venue) + "</strong> " + no + "R " + esc(surface) + " " + esc(dist) + "m " + esc(time) + " 発走 / " + runners + "頭" + "</div>";
+      var v = r.venue || r.course || "その他";
+      if (!groups[v]) { groups[v] = []; order.push(v); }
+      groups[v].push(r);
+    });
+    var html = "";
+    order.forEach(function(v){
+      html += "<div class=\"venue-group\"><h3>" + esc(v) + "</h3>";
+      groups[v].forEach(function(r){
+        var no = r.race_number || r.race_no || 1;
+        var surface = r.surface || "", dist = r.distance || "";
+        var time = (r.start_at || "").slice(11, 16);
+        var runners = (r.runners || []).length;
+        var waku = KeibaTheme.wakuClass(no);
+        html += "<div class=\"race\" data-race-id=\"" + esc(r.race_id) + "\" role=\"button\" tabindex=\"0\">" + "<span class=\"" + waku + "\">" + no + "</span> " + no + "R " + esc(surface) + " " + esc(dist) + "m " + esc(time) + " 発走 / " + runners + "頭" + "</div>";
+      });
+      html += "</div>";
     });
     list.innerHTML = html;
   }
@@ -83,22 +96,59 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     if (evLabel) evLabel.textContent = "EV上位の買い目 (" + ticketLabel(currentTicket) + ")";
     var html = "<h3 class=\"ev-title\" id=\"ev-title-label\">EV上位の買い目</h3><div id=\"ev-table\">読み込み中...</div>";
     html += "<h3 class=\"ev-title\">出走馬</h3>";
-    var runners = race.runners || [];
-    if (!runners.length) { html += "<p>出走馬データがありません</p>"; }
-    else {
-      html += "<table class=\"horse-table\"><thead><tr><th>枠</th><th>番</th><th>馬名</th><th>騎手</th><th>斤量</th><th>単勝</th><th>人気</th></tr></thead><tbody>";
-      runners.forEach(function(h){
-        var frame = h.frame_number || h.waku || 0, num = h.horse_number || h.num || 0;
-        var waku = KeibaTheme.wakuClass(frame || num);
-        html += "<tr><td><span class=\"" + waku + "\">" + frame + "</span></td><td>" + num + "</td><td>" + esc(h.horse_name || "") + "</td><td>" + esc(h.jockey || "") + "</td><td>" + (h.weight || h.wEight || "") + "</td><td>" + (h.odds_win || h["勝ちオッズ"] || "") + "</td><td>" + (h["人気"] || h.popularity || "") + "</td></tr>";
-      });
-      html += "</tbody></table>";
-    }
+    html += "<div class=\"sort-bar\" id=\"runner-sort-bar\">" +
+            "<button class=\"sort-btn active\" data-sort=\"num\" type=\"button\">馬番</button>" +
+            "<button class=\"sort-btn\" data-sort=\"pop\" type=\"button\">人気</button>" +
+            "<button class=\"sort-btn\" data-sort=\"odds\" type=\"button\">単勝</button>" +
+            "<button class=\"sort-btn\" data-sort=\"weight\" type=\"button\">斤量</button>" +
+            "</div>";
+    html += "<div id=\"runner-table-wrap\"></div>";
+    currentRaceRunners = race.runners || [];
+    var runners = [];
+    if (!currentRaceRunners.length) { html += "<p>出走馬データがありません</p>"; }
     detailBody.innerHTML = html;
     racesSection.hidden = true;
     detail.hidden = false;
     window.scrollTo(0, 0);
+    renderRunnerTable();
+    bindSortBar();
     loadEvTable(race.race_id);
+  }
+
+  function renderRunnerTable(){
+    var wrap = document.getElementById("runner-table-wrap");
+    if (!wrap) return;
+    var arr = currentRaceRunners.slice();
+    if (runnerSort === "num") {
+      arr.sort(function(a, b){ return (a.horse_number || 0) - (b.horse_number || 0); });
+    } else if (runnerSort === "pop") {
+      arr.sort(function(a, b){ var pa = a.popularity || a["人気"] || 999; var pb = b.popularity || b["人気"] || 999; return pa - pb; });
+    } else if (runnerSort === "odds") {
+      arr.sort(function(a, b){ var oa = a.odds_win || a["勝ちオッズ"] || 9999; var ob = b.odds_win || b["勝ちオッズ"] || 9999; return oa - ob; });
+    } else if (runnerSort === "weight") {
+      arr.sort(function(a, b){ var wa = a.weight || a.wEight || 0; var wb = b.weight || b.wEight || 0; return wb - wa; });
+    }
+    var html = "<table class=\"horse-table\"><thead><tr><th>枠</th><th>番</th><th>馬名</th><th>騎手</th><th>斤量</th><th>単勝</th><th>人気</th></tr></thead><tbody>";
+    arr.forEach(function(h){
+      var frame = h.frame_number || h.waku || 0, num = h.horse_number || h.num || 0;
+      var waku = KeibaTheme.wakuClass(frame || num);
+      html += "<tr><td><span class=\"" + waku + "\">" + frame + "</span></td><td>" + num + "</td><td>" + esc(h.horse_name || "") + "</td><td>" + esc(h.jockey || "") + "</td><td>" + (h.weight || h.wEight || "") + "</td><td>" + (h.odds_win || h["勝ちオッズ"] || "") + "</td><td>" + (h["人気"] || h.popularity || "") + "</td></tr>";
+    });
+    html += "</tbody></table>";
+    wrap.innerHTML = html;
+  }
+
+  function bindSortBar(){
+    var bar = document.getElementById("runner-sort-bar");
+    if (!bar) return;
+    bar.querySelectorAll(".sort-btn").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        bar.querySelectorAll(".sort-btn").forEach(function(x){ x.classList.remove("active"); });
+        btn.classList.add("active");
+        runnerSort = btn.getAttribute("data-sort");
+        renderRunnerTable();
+      });
+    });
   }
 
   function renderEvTable(raceId, bets, totalAmount){
