@@ -146,7 +146,9 @@ class TursoStorage:
 
     def __init__(self, url, token):
         import libsql_client
-        self.client = libsql_client.create_client_sync(url=url, auth_token=token)
+        # libsql:// -> https:// に変換 (WebSocketではなくHTTP接続を使う)
+        http_url = url.replace("libsql://", "https://").replace("wss://", "https://")
+        self.client = libsql_client.create_client_sync(url=http_url, auth_token=token)
         self._ensure_schema()
 
     def _ensure_schema(self):
