@@ -96,14 +96,18 @@ def fetch_race_result(race_id: str) -> Optional[Dict]:
         html = r.text
     soup = BeautifulSoup(html, "html.parser")
 
-    title_el = soup.select_one(".race_title")
-    race_name = title_el.get_text(strip=True) if title_el else ""
+    name_el = soup.select_one(".RaceName")
+    race_name = name_el.get_text(strip=True) if name_el else ""
 
     surface = ""
     distance = 0
-    info = soup.select_one(".racedata dl") or soup.select_one(".racedata")
-    if info:
-        info_text = info.get_text(" ", strip=True)
+    info_text = ""
+    for sel in [".RaceData01", ".RaceData", ".racedata"]:
+        el = soup.select_one(sel)
+        if el:
+            info_text = el.get_text(" ", strip=True)
+            break
+    if info_text:
         m = re.search(r"(芝|ダ|障)\s*(\d{3,4})m", info_text)
         if m:
             surface = {"芝": "芝", "ダ": "ダート", "障": "障害"}.get(m.group(1), "")

@@ -10,3 +10,7 @@ predictions.json
 
 # predictions snapshot
 predictions.json
+
+# debug
+race_debug.html
+*.debug.html
