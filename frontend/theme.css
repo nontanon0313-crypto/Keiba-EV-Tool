@@ -96,3 +96,7 @@ label.bulk-btn.inline{cursor:pointer;}
 .sort-bar{display:flex;gap:6px;margin:8px 0;flex-wrap:wrap;}
 .sort-btn{background:transparent;color:var(--keiba-text);border:1px solid rgba(212,175,55,0.4);border-radius:4px;padding:4px 10px;font-size:12px;cursor:pointer;}
 .sort-btn.active{background:rgba(212,175,55,0.2);color:var(--keiba-gold);font-weight:700;}
+
+.model-filter-row{display:flex;gap:8px;margin-bottom:8px;align-items:center;}
+.model-filter{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--keiba-gold);}
+.model-filter select{background:#0f1a30;color:var(--keiba-text);border:1px solid rgba(212,175,55,0.4);border-radius:6px;padding:6px 8px;font-size:13px;}
