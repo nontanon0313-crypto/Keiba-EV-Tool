@@ -6,7 +6,7 @@ from backend.app.models.schemas import Race, Runner
 from backend.app.services.prediction import predict_race
 from backend.app.services.ev_calc import calc_ev, mock_odds, _candidates, TICKET_TYPES, _TICKET_LABEL
 from backend.app.services import race_store
-from backend.app.config import settings
+from backend.config import settings
 
 THRESHOLDS = {
     "trifecta": settings.EV_THRESHOLD_TRIFECTA,
