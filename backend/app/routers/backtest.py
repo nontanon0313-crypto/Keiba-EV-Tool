@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from backend.app.services.scraper import netkeiba
-from backend.app.services import race_store
+from backend.app.services import race_store, odds_store
 from backend.app.services.backtest import run_backtest
 import time
 
@@ -20,6 +20,12 @@ def ingest(date: str, sleep: float = 1.5):
             data = netkeiba.fetch_race_result(rid)
             if data and data.get("finish_order"):
                 race_store.save_race(rid, data)
+                try:
+                    o = netkeiba.fetch_odds(rid)
+                    if o:
+                        odds_store.save_odds(rid, o)
+                except Exception as e:
+                    print("[ingest] odds fail", rid, str(e)[:60])
                 saved.append(rid)
             else:
                 failed.append(rid)

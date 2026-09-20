@@ -15,3 +15,4 @@ predictions.json
 race_debug.html
 *.debug.html
 scraped_races.json
+scraped_odds.json

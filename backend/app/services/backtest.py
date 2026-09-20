@@ -6,6 +6,7 @@ from backend.app.models.schemas import Race, Runner
 from backend.app.services.prediction import predict_race
 from backend.app.services.ev_calc import calc_ev, mock_odds, _candidates, TICKET_TYPES, _TICKET_LABEL
 from backend.app.services import race_store
+from backend.app.services import odds_store
 from backend.config import settings
 
 THRESHOLDS = {
@@ -47,6 +48,21 @@ def _hit(ticket_type, combo, finish):
     if ticket_type == "place":
         return 1 if len(nums) == 1 and nums[0] in w[:3] else 0
     return 0
+
+
+
+
+def _real_odds(odds_payload, ticket, combo):
+    if not odds_payload:
+        return None
+    t = odds_payload.get(ticket) or {}
+    entry = t.get(combo)
+    if not entry:
+        return None
+    if ticket == "wide":
+        v = entry.get("max") or entry.get("min")
+        return v
+    return entry.get("odds")
 
 
 def _race_from_payload(race_id, payload):
@@ -93,6 +109,7 @@ def run_backtest(tickets=None, ev_threshold_override=None, amount=100, min_prob=
         if len(finish) < 3:
             continue
         race = _race_from_payload(race_id, payload)
+        odds_payload = odds_store.get_odds(race_id)
         try:
             pred = predict_race(race)
         except Exception:
@@ -109,7 +126,8 @@ def run_backtest(tickets=None, ev_threshold_override=None, amount=100, min_prob=
             for combo, prob in _candidates(pred, t):
                 if prob < min_prob:
                     continue
-                odds = mock_odds(prob, race_id, combo, t)
+                real = _real_odds(odds_payload, t, combo)
+                odds = real if real is not None else mock_odds(prob, race_id, combo, t)
                 ev = calc_ev(prob, odds)
                 if ev < threshold:
                     continue

@@ -200,3 +200,70 @@ def fetch_race_card(race_id: str) -> Optional[Dict]:
             "popularity": None,
         })
     return {"race_id": race_id, "runners": runners}
+
+
+ODDS_TYPE_MAP = {
+    "1": "win",
+    "3": "quinella",
+    "4": "exacta",
+    "5": "wide",
+    "6": "trio",
+    "7": "trifecta",
+}
+
+
+def _combo_from_key(key, ticket):
+    """APIのキー (例: 010203) を '1-2-3' 形式に変換。"""
+    n = len(key) // 2
+    parts = []
+    for i in range(n):
+        parts.append(str(int(key[i * 2: i * 2 + 2])))
+    return "-".join(parts)
+
+
+def _to_float_odds(s):
+    if not s:
+        return None
+    t = str(s).replace(",", "").strip()
+    try:
+        v = float(t)
+        if v <= 0:
+            return None
+        return v
+    except ValueError:
+        return None
+
+
+def fetch_odds(race_id: str) -> Optional[Dict]:
+    """内部APIから全券種オッズを取得。"""
+    import json
+    out = {}
+    for t, ticket in ODDS_TYPE_MAP.items():
+        url = "https://race.netkeiba.com/api/api_get_jra_odds.html"
+        params = {"race_id": race_id, "type": t, "action": "update", "sort": "1"}
+        try:
+            with httpx.Client(headers=HEADERS, timeout=20, follow_redirects=True) as c:
+                r = c.get(url, params=params)
+                r.raise_for_status()
+                data = r.json()
+        except Exception as e:
+            print("[odds]", ticket, "fail:", str(e)[:60])
+            continue
+        odds_map = (data.get("data") or {}).get("odds") or {}
+        inner = odds_map.get(t) or {}
+        result = {}
+        for key, arr in inner.items():
+            if not isinstance(arr, list) or not arr:
+                continue
+            combo = _combo_from_key(key, ticket)
+            v = _to_float_odds(arr[0])
+            if v is None:
+                continue
+            if ticket == "wide" and len(arr) >= 2:
+                v2 = _to_float_odds(arr[1])
+                result[combo] = {"min": v, "max": v2 or v}
+            else:
+                result[combo] = {"odds": v}
+        out[ticket] = result
+        _sleep()
+    return out
