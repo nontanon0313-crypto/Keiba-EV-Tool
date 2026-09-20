@@ -1,21 +1,13 @@
-import json
-from pathlib import Path
 from datetime import datetime
-
-STORE = Path("bets.json")
+from backend.app.services.storage import get_storage
 
 
 def _load():
-    if not STORE.exists():
-        return []
-    try:
-        return json.loads(STORE.read_text(encoding="utf-8"))
-    except Exception:
-        return []
+    return get_storage().load_all()
 
 
 def _save(data):
-    STORE.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    get_storage().save_all(data)
 
 
 def add_bet(race_id, combo, amount, odds, prob=None, ev=None, ticket_type="trifecta"):
@@ -101,29 +93,20 @@ def curve():
     rows = sorted(list_bets(), key=lambda r: r.get("created_at") or "")
     actual = [{"x": 0, "y": 0}]
     expected = [{"x": 0, "y": 0}]
-    ax = 0
-    ay = 0
-    ex = 0
-    ey = 0
+    ax = ay = ex = ey = 0
     for r in rows:
-        ax += r["amount"]
-        ay += r["profit"]
-        actual.append({"x": ax, "y": ay})
-        ex += r["amount"]
-        ey += r["amount"] * (r.get("ev") or 0)
-        expected.append({"x": ex, "y": ey})
+        ax += r["amount"]; ay += r["profit"]; actual.append({"x": ax, "y": ay})
+        ex += r["amount"]; ey += r["amount"] * (r.get("ev") or 0); expected.append({"x": ex, "y": ey})
     return {"actual": actual, "expected": expected}
 
 
 def delete_bet(bet_id):
-    data = _load()
-    data = [d for d in data if d.get("id") != int(bet_id)]
+    data = [d for d in _load() if d.get("id") != int(bet_id)]
     _save(data)
     return {"deleted": int(bet_id)}
 
 
 def replace_all(items):
-    """エクスポート/インポート用: 全件置換。"""
     clean = []
     for it in items or []:
         if not isinstance(it, dict):
@@ -140,11 +123,10 @@ def replace_all(items):
             "payout": int(it["payout"]) if it.get("payout") is not None else None,
             "created_at": str(it.get("created_at", "")),
         })
-    # id 重複を再採番
     seen = set()
     for c in clean:
         if c["id"] in seen or c["id"] <= 0:
-            c["id"] = max(seen) + 1 if seen else 1
+            c["id"] = (max(seen) + 1) if seen else 1
         seen.add(c["id"])
     _save(clean)
     return {"imported": len(clean)}
