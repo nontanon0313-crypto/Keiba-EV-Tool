@@ -1,20 +1,20 @@
 from fastapi import APIRouter, HTTPException
 from backend.app.services.scraper import netkeiba
 from backend.app.services import race_store
+from backend.app.services.backtest import run_backtest
+import time
 
 router = APIRouter(prefix="/backtest")
 
 
 @router.post("/ingest")
 def ingest(date: str, sleep: float = 1.5):
-    """指定日 (YYYYMMDD) の全レース結果を取得して保存。"""
     try:
         ids = netkeiba.fetch_race_list(date)
     except Exception as e:
         raise HTTPException(500, "list failed: " + str(e))
     saved = []
     failed = []
-    import time
     for i, rid in enumerate(ids):
         try:
             data = netkeiba.fetch_race_result(rid)
@@ -27,7 +27,8 @@ def ingest(date: str, sleep: float = 1.5):
             failed.append(rid + ":" + str(e)[:40])
         if i < len(ids) - 1:
             time.sleep(sleep)
-    return {"date": date, "total": len(ids), "saved": len(saved), "failed": len(failed), "saved_ids": saved[:50], "failed_ids": failed[:20]}
+    return {"date": date, "total": len(ids), "saved": len(saved), "failed": len(failed),
+            "saved_ids": saved[:50], "failed_ids": failed[:20]}
 
 
 @router.get("/races")
@@ -46,3 +47,17 @@ def list_saved():
             "scraped_at": it.get("scraped_at", ""),
         })
     return {"count": len(out), "races": out}
+
+
+@router.get("/run")
+def run(tickets: str = None, min_prob: float = 0.0, amount: int = 100):
+    """保存済みレースでバックテスト実行。tickets=trifecta,trio,... (カンマ区切り)。"""
+    tl = None
+    if tickets:
+        tl = [t.strip() for t in tickets.split(",") if t.strip()]
+    try:
+        result = run_backtest(tickets=tl, amount=amount, min_prob=min_prob)
+    except Exception as e:
+        raise HTTPException(500, "backtest failed: " + str(e))
+    result.pop("per_race", None)
+    return result
