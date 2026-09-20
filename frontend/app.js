@@ -1,3 +1,4 @@
+const API_BASE = "https://keiba-ev-tool.onrender.com";
 (function(){
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./sw.js");
@@ -12,7 +13,7 @@
     });
     list.innerHTML = html;
   }
-  fetch("/api/races/today").then(function(res){ return res.json(); }).then(render).catch(function(){
+  fetch(API_BASE + "/races").then(function(res){ return res.json(); }).then(render).catch(function(){
     render([{race_id:"keiba-mock-001",course:"東京",race_no:3}]);
   });
 })();
