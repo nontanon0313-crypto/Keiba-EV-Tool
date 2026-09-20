@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from backend.app.services.race_fetcher import get_races
 from backend.app.services.prediction import predict_race
-from backend.app.services.ev_calc import build_bets
+from backend.app.services.ev_calc import build_bets, TICKET_TYPES
 from backend.app.services.vote_manager import send_plan
 from backend.app.models.schemas import VotePlan
 from datetime import datetime
@@ -10,13 +10,9 @@ router = APIRouter(prefix="/vote-plans")
 
 
 @router.post("")
-def create_vote_plan(
-    race_id: str,
-    min_prob: float = 0.0,
-    min_odds: float = 0.0,
-    collateral: int = 100000,
-    max_investment: int = 10000,
-):
+def create_vote_plan(race_id: str, ticket_type: str = "trifecta", min_prob: float = 0.0, min_odds: float = 0.0, collateral: int = 100000, max_investment: int = 10000):
+    if ticket_type not in TICKET_TYPES:
+        raise HTTPException(400, "unknown ticket_type")
     races = get_races()
     race = next((r for r in races if r.race_id == race_id), None)
     if not race:
@@ -24,9 +20,9 @@ def create_vote_plan(
     if race.has_critical_change:
         raise HTTPException(409, "critical change detected")
     pred = predict_race(race)
-    bets = build_bets(race, pred, min_prob=min_prob, min_odds=min_odds, collateral=collateral, max_investment=max_investment)
+    bets = build_bets(race, pred, ticket_type=ticket_type, min_prob=min_prob, min_odds=min_odds, collateral=collateral, max_investment=max_investment)
     if not bets:
         raise HTTPException(204, "no EV positive")
     plan = VotePlan(client_plan_id=f"keiba-{race.date}-{race.venue}-{race.race_number}-{uuid.uuid4().hex[:6]}", venue=race.venue, race_number=race.race_number, start_at=race.start_at, deadline_at=race.deadline_at, bets=bets, total_amount=sum(b.amount for b in bets), created_at=datetime.now(), race_id=race.race_id)
     result = send_plan(plan)
-    return {"plan": plan, "send_result": result}
+    return {"plan": plan, "send_result": result, "ticket_type": ticket_type}
