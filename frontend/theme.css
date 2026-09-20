@@ -83,3 +83,8 @@ h2{color:var(--keiba-gold);font-size:16px;margin:8px 0 12px;}
 .row-actions{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
 .bulk-btn.inline{display:inline-block;width:auto;padding:8px 12px;font-size:13px;margin:0;}
 label.bulk-btn.inline{cursor:pointer;}
+
+.storage-badge{display:inline-block;padding:4px 10px;border-radius:6px;font-size:11px;margin-bottom:10px;border:1px solid var(--keiba-gold);color:var(--keiba-gold);}
+.storage-pg{background:rgba(76,175,80,0.15);border-color:#4caf50;color:#7ee080;}
+.storage-turso{background:rgba(33,150,243,0.15);border-color:#2196f3;color:#7fc4ff;}
+.storage-file{background:rgba(212,175,55,0.12);}

@@ -20,6 +20,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   var analyticsData = null, currentScope = "all", currentView = "ev", filters = {}, currentBets = [];
   var currentTicket = "trifecta";
   var ticketStats = null;
+  var storageBadge = $("storage-badge");
 
   function esc(s){ return String(s == null ? "" : s).replace(/[&<>\x27]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","\x27":"&#39;"}[c]; }); }
   function ticketLabel(t){ return ({trifecta:"3連単",trio:"3連複",exacta:"馬単",quinella:"馬連",wide:"ワイド",win:"単勝",place:"複勝"}[t] || t); }
@@ -399,7 +400,21 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     }).catch(function(err){ alert("取得失敗: " + err.message); });
   }
 
+  function loadStorageBadge(){
+    if (!storageBadge) return;
+    fetchWithTimeout(API_BASE + "/storage", TIMEOUT_MS)
+      .then(function(res){ return res.json(); })
+      .then(function(d){
+        var label = d.backend || "unknown";
+        var color = label === "postgres" ? "storage-pg" : label === "turso" ? "storage-turso" : "storage-file";
+        storageBadge.className = "storage-badge " + color;
+        storageBadge.textContent = "DB: " + label;
+      })
+      .catch(function(){ storageBadge.textContent = "DB: ?"; });
+  }
+
   function loadBets(){
+    loadStorageBadge();
     betsSummary.textContent = "読み込み中..."; betsList.textContent = "読み込み中...";
     fetchWithTimeout(API_BASE + "/bets/summary", TIMEOUT_MS).then(function(res){ return res.json(); }).then(renderBetsSummary).catch(function(err){ betsSummary.textContent = "取得失敗: " + err.message; });
     fetchWithTimeout(API_BASE + "/bets/curve", TIMEOUT_MS).then(function(res){ return res.json(); }).then(drawCurve).catch(function(){ drawCurve(null); });
