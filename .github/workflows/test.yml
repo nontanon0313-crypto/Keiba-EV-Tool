@@ -3,7 +3,6 @@ on:
   push:
     branches: [main]
   pull_request:
-
 jobs:
   pytest:
     runs-on: ubuntu-latest
@@ -11,11 +10,38 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
       - name: Install
         run: |
           python -m pip install --upgrade pip
+          pip install pytest pytest-cov pydantic pydantic-settings httpx
           if [ -f backend/requirements.txt ]; then pip install -r backend/requirements.txt; fi
-          pip install pytest pydantic pydantic-settings
-      - name: Run tests
-        run: pytest backend/tests -v
+      - name: Test with coverage
+        run: pytest backend/tests -v --cov=backend --cov-report=term-missing
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff
+      - name: Ruff
+        run: ruff check backend frontend
+  typecheck:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install mypy pydantic pydantic-settings
+      - name: Mypy
+        run: mypy backend --ignore-missing-imports
