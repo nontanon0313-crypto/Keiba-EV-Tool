@@ -37,4 +37,6 @@ h2{color:var(--keiba-gold);font-size:16px;margin:8px 0 12px;}
 .ev-mid{color:var(--ev-mid);font-weight:700;}
 .ev-high{color:var(--ev-high);font-weight:700;}
 #back-btn{background:transparent;color:var(--keiba-gold);border:1px solid var(--keiba-gold);border-radius:6px;padding:6px 12px;margin-bottom:12px;font-size:14px;cursor:pointer;}
-.horse-table{width:100
+.horse-table{width:100%;border-collapse:collapse;font-size:13px;}
+.horse-table th,.horse-table td{padding:6px 4px;border-bottom:1px solid rgba(212,175,55,0.15);text-align:left;}
+.horse-table th{color:var(--keiba-gold);font-weight:600;}
