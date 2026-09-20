@@ -3,7 +3,10 @@ const TIMEOUT_MS = 60000;
 
 (function(){
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./sw.js");
+    navigator.serviceWorker.register("./sw.js", { updateViaCache: "none" }).then(function(reg){
+      reg.update();
+    });
+    navigator.serviceWorker.addEventListener("controllerchange", function(){ window.location.reload(); });
   }
 
   var list = document.getElementById("race-list");
@@ -14,7 +17,7 @@ const TIMEOUT_MS = 60000;
   var racesSection = document.getElementById("races");
 
   function esc(s){
-    return String(s == null ? "" : s).replace(/[&<>"\x27]/g, function(c){
+    return String(s == null ? "" : s).replace(/[&<>\x27]/g, function(c){
       return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","\x27":"&#39;"}[c];
     });
   }
@@ -23,8 +26,8 @@ const TIMEOUT_MS = 60000;
     if (!races || !races.length) { list.textContent = "本日のレースはありません"; return; }
     var html = "";
     races.forEach(function(r){
-      var no = r.race_number || 1;
-      var venue = r.venue || "";
+      var no = r.race_number || r.race_no || 1;
+      var venue = r.venue || r.course || "";
       var surface = r.surface || "";
       var dist = r.distance || "";
       var time = (r.start_at || "").slice(11, 16);
@@ -32,7 +35,7 @@ const TIMEOUT_MS = 60000;
       var waku = KeibaTheme.wakuClass(no);
       html += "<div class=\"race\" data-race-id=\"" + esc(r.race_id) + "\" role=\"button\" tabindex=\"0\">"
             + "<span class=\"" + waku + "\">" + no + "</span> "
-            + "<strong>" + esc(venue) + "</strong> "
+            + "<strong>" + esc(venue) + "</strong> " + no + "R "
             + esc(surface) + " " + esc(dist) + "m "
             + esc(time) + " 発走 / " + runners + "頭"
             + "</div>";
