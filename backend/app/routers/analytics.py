@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from backend.app.services.race_fetcher import get_races
 from backend.app.services.prediction import predict_race
-from backend.app.services.ev_calc import calc_ev, mock_trifecta_odds
+from backend.app.services.ev_calc import calc_ev, mock_odds
 from backend.app.services.result_fetcher import fetch_result
 from backend.app.services import bet_store
 
@@ -145,7 +145,7 @@ def get_analytics():
         except Exception:
             winner = None
         for tri in pred.trifecta_probs:
-            odds = mock_trifecta_odds(tri.prob, race.race_id, tri.combo)
+            odds = mock_odds(tri.prob, race.race_id, tri.combo, "trifecta")
             ev = calc_ev(tri.prob, odds)
             hit = 0
             parts = tri.combo.split("-")
