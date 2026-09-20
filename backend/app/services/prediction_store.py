@@ -1,5 +1,6 @@
 """予想スナップショット保存。storage.py と同じ環境変数を参照。"""
 import os
+import atexit
 import json
 from datetime import datetime
 from pathlib import Path

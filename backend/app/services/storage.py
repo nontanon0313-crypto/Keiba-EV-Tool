@@ -1,5 +1,6 @@
 """ストレージ抽象。優先順: Postgres -> Turso -> file。"""
 import os
+import atexit
 import json
 from pathlib import Path
 from urllib.parse import urlparse

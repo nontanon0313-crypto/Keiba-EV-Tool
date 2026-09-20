@@ -1,5 +1,6 @@
 """スクレイプしたレースを保存。Turso / file の2バックエンド。"""
 import os
+import atexit
 import json
 from pathlib import Path
 from datetime import datetime
