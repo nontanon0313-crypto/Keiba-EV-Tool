@@ -63,7 +63,29 @@ def summary():
     profit = sum(r["profit"] for r in rows)
     hits = sum(1 for r in rows if r["status"] == "hit")
     settled = sum(1 for r in rows if r["status"] in ("hit", "miss"))
-    return {"total_bets": len(rows), "total_stake": stake, "total_return": ret, "total_profit": profit, "roi": (profit / stake) if stake else 0.0, "hits": hits, "settled": settled, "hit_rate": (hits / settled) if settled else 0.0}
+    expected_profit = sum((r["amount"] * r["ev"]) for r in rows if r.get("ev") is not None)
+    probs = [r["prob"] for r in rows if r.get("prob") is not None]
+    expected_hit_rate = (sum(probs) / len(probs)) if probs else 0.0
+    expected_return = sum((r["amount"] * (1 + (r["ev"] or 0))) for r in rows if r.get("ev") is not None)
+    return {"total_bets": len(rows), "total_stake": stake, "total_return": ret, "total_profit": profit, "roi": (profit / stake) if stake else 0.0, "hits": hits, "settled": settled, "hit_rate": (hits / settled) if settled else 0.0, "expected_hit_rate": expected_hit_rate, "expected_profit": expected_profit, "expected_return": expected_return, "expected_roi": (expected_profit / stake) if stake else 0.0}
+
+
+def curve():
+    rows = sorted(list_bets(), key=lambda r: r.get("created_at") or "")
+    actual = [{"x": 0, "y": 0}]
+    expected = [{"x": 0, "y": 0}]
+    ax = 0
+    ay = 0
+    ex = 0
+    ey = 0
+    for r in rows:
+        ax += r["amount"]
+        ay += r["profit"]
+        actual.append({"x": ax, "y": ay})
+        ex += r["amount"]
+        ey += r["amount"] * (r.get("ev") or 0)
+        expected.append({"x": ex, "y": ey})
+    return {"actual": actual, "expected": expected}
 
 
 def delete_bet(bet_id):

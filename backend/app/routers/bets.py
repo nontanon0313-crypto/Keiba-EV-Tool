@@ -30,6 +30,11 @@ def get_summary():
     return bet_store.summary()
 
 
+@router.get("/curve")
+def get_curve():
+    return bet_store.curve()
+
+
 @router.delete("/{bet_id}")
 def delete(bet_id: int):
     return bet_store.delete_bet(bet_id)
