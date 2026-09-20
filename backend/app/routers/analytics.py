@@ -31,15 +31,34 @@ def _odds_bins():
     return bins
 
 
+def _ev_bins():
+    return [
+        (-1.0, 0.0), (0.0, 0.05), (0.05, 0.10), (0.10, 0.15),
+        (0.15, 0.20), (0.20, 0.30), (0.30, 0.50), (0.50, 1.0),
+        (1.0, 5.0), (5.0, 99999.0),
+    ]
+
+
 def _features_conf():
-    return {"popularity": {"label": "1着予想馬の人気", "ranges": [("1", 1, 1), ("2", 2, 2), ("3", 3, 3), ("4-6", 4, 6), ("7-9", 7, 9), ("10+", 10, 99)]}, "weight": {"label": "1着予想馬の斤量", "ranges": [("-53", 0, 53), ("53-55", 53, 55), ("55-57", 55, 57), ("57+", 57, 99)]}, "frame": {"label": "1着予想馬の枠番", "ranges": [("1-2", 1, 2), ("3-4", 3, 4), ("5-6", 5, 6), ("7-8", 7, 8)]}, "odds_win": {"label": "1着予想馬の単勝", "ranges": [("-5", 0, 5), ("5-10", 5, 10), ("10-20", 10, 20), ("20-50", 20, 50), ("50+", 50, 99999)]}}
+    return {
+        "popularity": {"label": "1着予想馬の人気", "ranges": [("1", 1, 1), ("2", 2, 2), ("3", 3, 3), ("4-6", 4, 6), ("7-9", 7, 9), ("10+", 10, 99)]},
+        "weight": {"label": "1着予想馬の斤量", "ranges": [("-53", 0, 53), ("53-55", 53, 55), ("55-57", 55, 57), ("57+", 57, 99)]},
+        "frame": {"label": "1着予想馬の枠番", "ranges": [("1-2", 1, 2), ("3-4", 3, 4), ("5-6", 5, 6), ("7-8", 7, 8)]},
+        "odds_win": {"label": "1着予想馬の単勝", "ranges": [("-5", 0, 5), ("5-10", 5, 10), ("10-20", 10, 20), ("20-50", 20, 50), ("50+", 50, 99999)]},
+    }
 
 
 def _empty_bucket():
     pb = _prob_bins()
     ob = _odds_bins()
+    eb = _ev_bins()
     fc = _features_conf()
-    return {"prob_samples": {i: [] for i in range(len(pb))}, "odds_samples": {i: [] for i in range(len(ob))}, "feat_agg": {k: {r[0]: [] for r in c["ranges"]} for k, c in fc.items()}}
+    return {
+        "prob_samples": {i: [] for i in range(len(pb))},
+        "odds_samples": {i: [] for i in range(len(ob))},
+        "ev_samples": {i: [] for i in range(len(eb))},
+        "feat_agg": {k: {r[0]: [] for r in c["ranges"]} for k, c in fc.items()},
+    }
 
 
 def _format(bins, samples, kind):
@@ -53,8 +72,13 @@ def _format(bins, samples, kind):
         avg_odds = sum(x[1] for x in s) / n
         avg_ev = sum(x[2] for x in s) / n
         hits = sum(x[3] for x in s)
-        label = "{:.3f}-{:.3f}".format(lo, hi) if kind == "prob" else ("{}-{}".format(lo, hi) if hi < 999999 else "{}+".format(lo))
-        rows.append({"range": label, "count": n, "avg_prob": avg_prob, "avg_odds": avg_odds, "expected_profit_pct": avg_ev * 100, "actual_hits": hits, "actual_attempts": n, "actual_rate": (hits / n) if n else None})
+        if kind == "prob":
+            label = "{:.3f}-{:.3f}".format(lo, hi)
+        elif kind == "odds":
+            label = "{}-{}".format(lo, hi) if hi < 999999 else "{}+".format(lo)
+        else:
+            label = "{:.2f}-{:.2f}".format(lo, hi) if hi < 99999 else "{:.2f}+".format(lo)
+        rows.append({"range": label, "count": n, "avg_prob": avg_prob, "avg_odds": avg_odds, "avg_ev": avg_ev, "expected_profit_pct": avg_ev * 100, "actual_hits": hits, "actual_attempts": n, "actual_rate": (hits / n) if n else None, "actual_profit_pct": (hits * avg_odds / n - 1) * 100 if n else None})
     return rows
 
 
@@ -70,7 +94,7 @@ def _format_features(features, agg):
             avg_prob = sum(x[0] for x in s) / n
             avg_odds = sum(x[1] for x in s) / n
             hits = sum(x[2] for x in s)
-            rows.append({"range": label, "count": n, "avg_prob": avg_prob, "avg_odds": avg_odds, "expected_profit_pct": (avg_prob * avg_odds - 1.0) * 100, "actual_hits": hits, "actual_attempts": n, "actual_rate": (hits / n) if n else None})
+            rows.append({"range": label, "count": n, "avg_prob": avg_prob, "avg_odds": avg_odds, "expected_profit_pct": (avg_prob * avg_odds - 1.0) * 100, "actual_hits": hits, "actual_attempts": n, "actual_rate": (hits / n) if n else None, "actual_profit_pct": (hits * avg_odds / n - 1) * 100 if n else None})
         out.append({"feature": key, "label": conf["label"], "rows": rows})
     return out
 
@@ -88,13 +112,11 @@ def _get(runner, key):
 
 
 def _scope_summary(bucket):
-    prob_s = bucket["prob_samples"]
-    odds_s = bucket["odds_samples"]
     total = 0
     hits = 0
     ev_sum = 0.0
-    for i in range(len(prob_s)):
-        for s in prob_s[i]:
+    for i in range(len(bucket["prob_samples"])):
+        for s in bucket["prob_samples"][i]:
             total += 1
             hits += s[3]
             ev_sum += s[2]
@@ -106,6 +128,7 @@ def _scope_summary(bucket):
 def get_analytics():
     pb = _prob_bins()
     ob = _odds_bins()
+    eb = _ev_bins()
     fc = _features_conf()
     scopes = {"all": _empty_bucket(), "voted": _empty_bucket(), "excluded": _empty_bucket()}
     bets_data = bet_store.list_bets()
@@ -118,7 +141,7 @@ def get_analytics():
             continue
         runner_map = {r.horse_number: r for r in race.runners}
         try:
-            winner = fetch_result(race.race_id, len(race.runners))
+            winner = fetch_result(race.race_id, len(race.runners), pred)
         except Exception:
             winner = None
         for tri in pred.trifecta_probs:
@@ -147,6 +170,10 @@ def get_analytics():
                     if lo <= odds < hi:
                         b["odds_samples"][i].append(sample)
                         break
+                for i, (lo, hi) in enumerate(eb):
+                    if lo <= ev < hi:
+                        b["ev_samples"][i].append(sample)
+                        break
                 if len(parts) == 3:
                     try:
                         first_num = int(parts[0])
@@ -173,5 +200,13 @@ def get_analytics():
                                     b["feat_agg"]["odds_win"][label].append((tri.prob, odds, hit))
     scopes_out = {}
     for name, b in scopes.items():
-        scopes_out[name] = {"summary": _scope_summary(b), "prob_bins": _format(pb, b["prob_samples"], "prob"), "odds_bins": _format(ob, b["odds_samples"], "odds"), "features": _format_features(fc, b["feat_agg"])}
-    return {"by_ticket": [{"ticket": "3連単", "scopes": scopes_out}], "prob_bins": scopes_out["all"]["prob_bins"], "odds_bins": scopes_out["all"]["odds_bins"], "features": scopes_out["all"]["features"]}
+        scopes_out[name] = {"summary": _scope_summary(b), "prob_bins": _format(pb, b["prob_samples"], "prob"), "odds_bins": _format(ob, b["odds_samples"], "odds"), "ev_bins": _format(eb, b["ev_samples"], "ev"), "features": _format_features(fc, b["feat_agg"])}
+    all_count = scopes_out["all"]["summary"]["count"]
+    voted_count = scopes_out["voted"]["summary"]["count"]
+    scopes_out["all"]["summary"]["voted_count"] = voted_count
+    scopes_out["all"]["summary"]["total_count"] = all_count
+    scopes_out["voted"]["summary"]["voted_count"] = voted_count
+    scopes_out["voted"]["summary"]["total_count"] = all_count
+    scopes_out["excluded"]["summary"]["voted_count"] = voted_count
+    scopes_out["excluded"]["summary"]["total_count"] = all_count
+    return {"by_ticket": [{"ticket": "3連単", "scopes": scopes_out}], "prob_bins": scopes_out["all"]["prob_bins"], "odds_bins": scopes_out["all"]["odds_bins"], "ev_bins": scopes_out["all"]["ev_bins"], "features": scopes_out["all"]["features"]}

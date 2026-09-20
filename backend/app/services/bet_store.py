@@ -2,6 +2,8 @@ import json
 from pathlib import Path
 from datetime import datetime
 from backend.app.services.result_fetcher import fetch_result
+from backend.app.services.prediction import predict_race
+from backend.app.services.race_fetcher import get_races
 
 STORE = Path("bets.json")
 
@@ -30,7 +32,11 @@ def add_bet(race_id, combo, amount, odds, prob=None, ev=None):
 
 def _resolve(rec):
     try:
-        winner = fetch_result(rec["race_id"])
+        pred = None
+        race = next((r for r in get_races() if r.race_id == rec["race_id"]), None)
+        if race is not None:
+            pred = predict_race(race)
+        winner = fetch_result(rec["race_id"], len(race.runners) if race else 18, pred)
     except Exception:
         winner = None
     if winner is None:
