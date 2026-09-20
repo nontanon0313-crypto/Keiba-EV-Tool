@@ -1,1 +1,12 @@
-:root{--navy:#0B1426;--gold:#D4AF37}body{background:#0B1426;color:white;font-family:sans-serif}
+:root{--navy:#0B1426;--navy-light:#162544;--gold:#D4AF37;--gold-dim:rgba(212,175,55,0.2);--bg:#0F1A2E}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:white;font-family:sans-serif}
+.header{background:linear-gradient(135deg,var(--navy),var(--navy-light));border-bottom:3px solid var(--gold);position:sticky;top:0;z-index:10}
+.header-inner{display:flex;justify-content:space-between;align-items:center;padding:12px 16px}
+.header h1{margin:0;font-size:20px}.gold{color:var(--gold)}.badge{background:var(--gold);color:var(--navy);padding:2px 8px;border-radius:10px;font-size:12px;font-weight:bold}
+.tabs{display:flex;gap:8px;padding:0 16px 12px}.tab{background:rgba(255,255,255,0.08);border:1px solid var(--gold-dim);color:white;padding:8px 14px;border-radius:20px}
+.tab.active{background:var(--gold);color:var(--navy)}.tab-panel{display:none;padding:16px}.tab-panel.active{display:block}
+.card{background:rgba(255,255,255,0.06);border:1px solid var(--gold-dim);border-radius:12px;padding:16px;margin-bottom:12px}
+.race-list{display:grid;gap:8px}.race-card{border-left:4px solid var(--gold);cursor:pointer}
+.btn{background:var(--navy-light);border:1px solid var(--gold);color:var(--gold);padding:8px 16px;border-radius:8px}
+.btn.primary{background:var(--gold);color:var(--navy);font-weight:bold}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--navy);border:1px solid var(--gold);padding:12px 20px;border-radius:8px;display:none}
