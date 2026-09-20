@@ -1,6 +1,7 @@
 [tool.ruff]
 line-length = 140
 target-version = "py311"
+exclude = [".venv", "node_modules", "frontend"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W"]
@@ -17,4 +18,4 @@ ignore_missing_imports = true
 warn_unused_ignores = false
 explicit_package_bases = true
 mypy_path = "."
-exclude = "(^|/)(\.venv|node_modules|frontend)/"
+exclude = ["\\.venv", "node_modules", "frontend"]

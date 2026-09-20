@@ -2,7 +2,7 @@ import os, httpx
 from backend.app.models.schemas import VotePlan
 from dotenv import load_dotenv
 load_dotenv()
-MOCK_DB=[]
+MOCK_DB: list = []
 def send_plan(plan: VotePlan):
     url=os.getenv("VOTE_MANAGER_URL")
     api_key=os.getenv("VOTE_MANAGER_API_KEY")
