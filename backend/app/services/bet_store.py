@@ -67,7 +67,10 @@ def summary():
     probs = [r["prob"] for r in rows if r.get("prob") is not None]
     expected_hit_rate = (sum(probs) / len(probs)) if probs else 0.0
     expected_return = sum((r["amount"] * (1 + (r["ev"] or 0))) for r in rows if r.get("ev") is not None)
-    return {"total_bets": len(rows), "total_stake": stake, "total_return": ret, "total_profit": profit, "roi": (profit / stake) if stake else 0.0, "hits": hits, "settled": settled, "hit_rate": (hits / settled) if settled else 0.0, "expected_hit_rate": expected_hit_rate, "expected_profit": expected_profit, "expected_return": expected_return, "expected_roi": (expected_profit / stake) if stake else 0.0}
+    odds_list = [r["odds"] for r in rows if r.get("odds") is not None]
+    avg_odds = (sum(odds_list) / len(odds_list)) if odds_list else 0.0
+    weighted_odds = (sum(r["amount"] * r["odds"] for r in rows if r.get("odds") is not None) / stake) if stake else 0.0
+    return {"total_bets": len(rows), "total_stake": stake, "total_return": ret, "total_profit": profit, "roi": (profit / stake) if stake else 0.0, "hits": hits, "settled": settled, "hit_rate": (hits / settled) if settled else 0.0, "expected_hit_rate": expected_hit_rate, "expected_profit": expected_profit, "expected_return": expected_return, "expected_roi": (expected_profit / stake) if stake else 0.0, "avg_odds": avg_odds, "weighted_avg_odds": weighted_odds}
 
 
 def curve():
