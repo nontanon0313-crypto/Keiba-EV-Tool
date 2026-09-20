@@ -21,6 +21,8 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   var currentTicket = "trifecta";
   var ticketStats = null;
   var currentModelVersion = null;
+  var anaModelFilter = null;
+  var currentModelFilter = "";
   var currentRaceRunners = [];
   var runnerSort = "num";
   var storageBadge = $("storage-badge");
@@ -294,7 +296,8 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   }
 
   function loadTicketStats(){
-    fetchWithTimeout(API_BASE + "/analytics/tickets?scope=" + encodeURIComponent(currentScope), TIMEOUT_MS)
+    var mq = currentModelFilter ? "&model_version=" + encodeURIComponent(currentModelFilter) : "";
+    fetchWithTimeout(API_BASE + "/analytics/tickets?scope=" + encodeURIComponent(currentScope) + mq, TIMEOUT_MS)
       .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
       .then(function(data){ ticketStats = data; if (currentView === "tickets") renderTicketStats(); })
       .catch(function(err){ if (currentView === "tickets") anaView.textContent = "取得失敗: " + err.message; });
@@ -312,9 +315,24 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     anaView.innerHTML = tableRows(s.ev_bins || [], "期待値帯");
   }
 
+  function loadModelOptions(){
+    if (!anaModelFilter) return;
+    fetchWithTimeout(API_BASE + "/models", TIMEOUT_MS).then(function(res){ return res.json(); }).then(function(d){
+      var cur = anaModelFilter.value;
+      var html = "<option value=\"\">すべて</option>";
+      (d.models || []).forEach(function(m){
+        html += "<option value=\"" + esc(m.model_version) + "\">" + esc(m.model_version) + " (" + m.count + ")</option>";
+      });
+      anaModelFilter.innerHTML = html;
+      if (cur) anaModelFilter.value = cur;
+    }).catch(function(){});
+  }
+
   function loadAnalytics(){
     anaSummary.textContent = "読み込み中..."; anaView.textContent = "読み込み中...";
-    fetchWithTimeout(API_BASE + "/analytics", TIMEOUT_MS)
+    loadModelOptions();
+    var q = currentModelFilter ? "?model_version=" + encodeURIComponent(currentModelFilter) : "";
+    fetchWithTimeout(API_BASE + "/analytics" + q, TIMEOUT_MS)
       .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
       .then(function(data){ analyticsData = data; if (!ticketStats) loadTicketStats(); renderView(); })
       .catch(function(err){ anaSummary.textContent = "取得失敗: " + err.message; anaView.textContent = ""; });
@@ -513,6 +531,8 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   if (settingsModal) settingsModal.addEventListener("click", function(e){ if (e.target === settingsModal) settingsModal.hidden = true; });
 
   loadFiltersFromStorage();
+  anaModelFilter = document.getElementById("ana-model-filter");
+  if (anaModelFilter) anaModelFilter.addEventListener("change", function(){ currentModelFilter = anaModelFilter.value || ""; ticketStats = null; if (currentView === "tickets") loadTicketStats(); renderView(); });
   var ticketTabs = document.getElementById("ticket-tabs");
   if (ticketTabs) ticketTabs.querySelectorAll(".subtab").forEach(function(t){
     t.addEventListener("click", function(){
