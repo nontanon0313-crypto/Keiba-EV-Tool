@@ -6,4 +6,8 @@
     return "ev-high";
   }
   function wakuClass(n){
-    var i = ((n - 1) 
+    var i = ((n - 1) % 8 + 8) % 8 + 1;
+    return "waku waku-" + i;
+  }
+  global.KeibaTheme = { evClass: evClass, wakuClass: wakuClass };
+})(typeof window !== "undefined" ? window : this);
