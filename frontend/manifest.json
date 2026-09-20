@@ -2,6 +2,7 @@
   "name": "Keiba-EV-Tool",
   "short_name": "KeibaEV",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#0B1426",
   "theme_color": "#D4AF37",
