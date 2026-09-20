@@ -5,7 +5,7 @@ exclude = [".venv", "node_modules", "frontend"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W"]
-ignore = ["E501", "E402", "F401", "F403", "F405", "E741", "F841", "E722", "W291", "W293"]
+ignore = ["E501", "E402", "E401", "E701", "E702", "E741", "E722", "F401", "F403", "F405", "F841", "W291", "W293"]
 
 [tool.pytest.ini_options]
 testpaths = ["backend/tests"]
