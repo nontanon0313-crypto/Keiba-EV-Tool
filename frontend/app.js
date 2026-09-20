@@ -311,6 +311,22 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     });
   }
 
+  function settleAllZero(){
+    fetchWithTimeout(API_BASE + "/bets", TIMEOUT_MS).then(function(res){ return res.json(); }).then(function(rows){
+      var pending = (rows || []).filter(function(r){ return r.status === "pending"; });
+      if (!pending.length) { alert("未確定はありません"); return; }
+      var chain = Promise.resolve();
+      var ok = 0, fail = 0;
+      pending.forEach(function(r){
+        chain = chain.then(function(){
+          return fetchWithTimeout(API_BASE + "/bets/" + r.id + "/settle", TIMEOUT_MS, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ payout: 0 }) })
+            .then(function(){ ok++; }).catch(function(){ fail++; });
+        });
+      });
+      chain.then(function(){ alert("一括0円確定: 成功 " + ok + " / 失敗 " + fail); loadBets(); });
+    }).catch(function(err){ alert("取得失敗: " + err.message); });
+  }
+
   function loadBets(){
     betsSummary.textContent = "読み込み中..."; betsList.textContent = "読み込み中...";
     fetchWithTimeout(API_BASE + "/bets/summary", TIMEOUT_MS).then(function(res){ return res.json(); }).then(renderBetsSummary).catch(function(err){ betsSummary.textContent = "取得失敗: " + err.message; });
@@ -371,6 +387,8 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   list.addEventListener("click", function(e){ var el = e.target.closest(".race"); if (!el) return; detail.dataset.raceId = el.getAttribute("data-race-id"); loadDetail(el.getAttribute("data-race-id")); });
   list.addEventListener("keydown", function(e){ if (e.key !== "Enter" && e.key !== " ") return; var el = e.target.closest(".race"); if (!el) return; e.preventDefault(); detail.dataset.raceId = el.getAttribute("data-race-id"); loadDetail(el.getAttribute("data-race-id")); });
   backBtn.addEventListener("click", showList);
+  var sAllZero = document.getElementById("settle-all-zero");
+  if (sAllZero) sAllZero.addEventListener("click", settleAllZero);
 
   readFilters();
   list.textContent = "読み込み中... (サーバー起動待ちの場合があります)";
