@@ -79,3 +79,7 @@ h2{color:var(--keiba-gold);font-size:16px;margin:8px 0 12px;}
 
 .payout-input{width:80px;box-sizing:border-box;background:#0f1a30;color:var(--keiba-text);border:1px solid rgba(212,175,55,0.4);border-radius:4px;padding:4px;font-size:12px;text-align:right;}
 .settle-btn{background:transparent;color:var(--keiba-gold);border:1px solid var(--keiba-gold);border-radius:4px;padding:4px 8px;font-size:12px;cursor:pointer;margin-left:4px;}
+
+.row-actions{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+.bulk-btn.inline{display:inline-block;width:auto;padding:8px 12px;font-size:13px;margin:0;}
+label.bulk-btn.inline{cursor:pointer;}

@@ -338,6 +338,51 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     });
   }
 
+  function exportBets(){
+    fetchWithTimeout(API_BASE + "/bets/export", TIMEOUT_MS)
+      .then(function(res){
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.json();
+      })
+      .then(function(data){
+        var blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = "keiba-bets-" + new Date().toISOString().slice(0, 10) + ".json";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      })
+      .catch(function(err){ alert("バックアップ失敗: " + err.message); });
+  }
+
+  function importBets(file){
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e){
+      try {
+        var payload = JSON.parse(e.target.result);
+        if (!Array.isArray(payload)) throw new Error("JSONは配列である必要があります");
+        fetchWithTimeout(API_BASE + "/bets/import", TIMEOUT_MS, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        }).then(function(res){
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          return res.json();
+        }).then(function(r){
+          alert("復元完了: " + (r.imported || 0) + "件");
+          loadBets();
+        }).catch(function(err){ alert("復元失敗: " + err.message); });
+      } catch (err) {
+        alert("読み込み失敗: " + err.message);
+      }
+    };
+    reader.readAsText(file);
+  }
+
   function settleAllZero(){
     fetchWithTimeout(API_BASE + "/bets", TIMEOUT_MS).then(function(res){ return res.json(); }).then(function(rows){
       var pending = (rows || []).filter(function(r){ return r.status === "pending"; });
@@ -416,6 +461,10 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   backBtn.addEventListener("click", showList);
   var sAllZero = document.getElementById("settle-all-zero");
   if (sAllZero) sAllZero.addEventListener("click", settleAllZero);
+  var expBtn = document.getElementById("export-bets");
+  if (expBtn) expBtn.addEventListener("click", exportBets);
+  var impInput = document.getElementById("import-bets");
+  if (impInput) impInput.addEventListener("change", function(e){ importBets(e.target.files && e.target.files[0]); e.target.value = ""; });
 
   readFilters();
   list.textContent = "読み込み中... (サーバー起動待ちの場合があります)";
