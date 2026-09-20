@@ -260,10 +260,13 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     ctx.fillStyle = "#E8E8E8"; ctx.font = "11px sans-serif";
     ctx.fillText("投資 " + fmtInt(maxX) + "円", W - 130, H - 10);
     ctx.fillText("損益 " + fmtInt(maxY) + "円", 4, sy(maxY) + 12);
-    function line(points, color){ if (!points.length) return; ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.beginPath(); points.forEach(function(p, i){ var x = sx(p.x), y = sy(p.y); if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y); }); ctx.stroke(); }
+    function line(points, color){ if (!points.length) return; ctx.strokeStyle = color; ctx.lineWidth = 2.5; ctx.beginPath(); points.forEach(function(p, i){ var x = sx(p.x), y = sy(p.y); if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y); }); ctx.stroke(); var last = points[points.length - 1]; ctx.fillStyle = color; ctx.beginPath(); ctx.arc(sx(last.x), sy(last.y), 4, 0, Math.PI * 2); ctx.fill(); }
     line(exp, "#D4AF37"); line(act, "#ff4d4d");
-    ctx.fillStyle = "#D4AF37"; ctx.fillText("想定", W - 60, 20);
-    ctx.fillStyle = "#ff4d4d"; ctx.fillText("実績", W - 60, 36);
+    var expLast = exp.length ? exp[exp.length - 1] : { x: 0, y: 0 };
+    var actLast = act.length ? act[act.length - 1] : { x: 0, y: 0 };
+    ctx.font = "11px sans-serif";
+    ctx.fillStyle = "#D4AF37"; ctx.fillText("想定 " + (expLast.y >= 0 ? "+" : "") + fmtInt(expLast.y) + "円", 4, H - 24);
+    ctx.fillStyle = "#ff4d4d"; ctx.fillText("実績 " + (actLast.y >= 0 ? "+" : "") + fmtInt(actLast.y) + "円", 4, H - 8);
   }
 
   function renderBetsSummary(s){
@@ -272,7 +275,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     betsSummary.innerHTML = "<div>投票数: " + s.total_bets + "</div>"
       + "<div>投資: " + fmtYen(s.total_stake) + " / 払戻: " + fmtYen(s.total_return) + "</div>"
       + "<div class=\"" + cls + "\">損益: " + (s.total_profit >= 0 ? "+" : "") + fmtYen(s.total_profit) + " (想定: " + fmtSigned(s.expected_profit, 0) + "円)</div>"
-      + "<div>実的中率: " + fmtPct(s.hit_rate, 1) + " / 想定的中率: " + fmtPct(s.expected_hit_rate, 1) + "</div>"
+      + "<div>実的中率: " + fmtPct(s.hit_rate, 1) + " (" + s.hits + "/" + s.total_bets + ") / 想定的中率: " + fmtPct(s.expected_hit_rate, 1) + "</div>"
       + "<div>実ROI: " + fmtPct(s.roi, 1) + " / 想定ROI: " + fmtPct(s.expected_roi, 1) + "</div>"
       + "<div>平均オッズ: " + fmtNum(s.avg_odds, 1) + " / 加重平均: " + fmtNum(s.weighted_avg_odds, 1) + "</div>";
   }
