@@ -1,0 +1,35 @@
+from fastapi import APIRouter
+from pydantic import BaseModel
+from typing import Optional
+from backend.app.services import bet_store
+
+router = APIRouter(prefix="/bets")
+
+
+class BetIn(BaseModel):
+    race_id: str
+    combo: str
+    amount: int
+    odds: float
+    prob: Optional[float] = None
+    ev: Optional[float] = None
+
+
+@router.post("")
+def create(b: BetIn):
+    return bet_store.add_bet(b.race_id, b.combo, b.amount, b.odds, b.prob, b.ev)
+
+
+@router.get("")
+def list_all():
+    return bet_store.list_bets()
+
+
+@router.get("/summary")
+def get_summary():
+    return bet_store.summary()
+
+
+@router.delete("/{bet_id}")
+def delete(bet_id: int):
+    return bet_store.delete_bet(bet_id)
