@@ -7,3 +7,6 @@ bets.json
 results.json
 predictions.json
 *.local.json
+
+# predictions snapshot
+predictions.json
