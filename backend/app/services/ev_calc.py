@@ -34,7 +34,7 @@ def build_bets(race, prediction, threshold_3rentan=0.12, min_prob=0.0, min_odds=
         if odds < min_odds:
             continue
         ev = calc_ev(tri.prob, odds)
-        if ev < threshold_rentan if False else ev < threshold_3rentan:
+        if ev < threshold_3rentan:
             continue
         amount = suggest_amount(tri.prob, odds, collateral, max_investment)
         bets.append(Bet(type="3連単", combination=tri.combo, amount=amount, ev=ev, prob=tri.prob, odds=odds))
