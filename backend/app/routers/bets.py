@@ -1,7 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, UploadFile, File
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List, Any
 from backend.app.services import bet_store
+import json
 
 router = APIRouter(prefix="/bets")
 
@@ -28,6 +30,17 @@ def create(b: BetIn):
 @router.get("")
 def list_all():
     return bet_store.list_bets()
+
+
+@router.get("/export")
+def export_bets():
+    data = bet_store._load()
+    return JSONResponse(content=data, headers={"Content-Disposition": "attachment; filename=bets.json"})
+
+
+@router.post("/import")
+def import_bets(payload: List[Any]):
+    return bet_store.replace_all(payload)
 
 
 @router.get("/summary")

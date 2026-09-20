@@ -120,3 +120,31 @@ def delete_bet(bet_id):
     data = [d for d in data if d.get("id") != int(bet_id)]
     _save(data)
     return {"deleted": int(bet_id)}
+
+
+def replace_all(items):
+    """エクスポート/インポート用: 全件置換。"""
+    clean = []
+    for it in items or []:
+        if not isinstance(it, dict):
+            continue
+        clean.append({
+            "id": int(it.get("id", 0)),
+            "race_id": str(it.get("race_id", "")),
+            "combo": str(it.get("combo", "")),
+            "amount": int(it.get("amount", 0)),
+            "odds": float(it.get("odds", 0.0)),
+            "prob": float(it["prob"]) if it.get("prob") is not None else None,
+            "ev": float(it["ev"]) if it.get("ev") is not None else None,
+            "ticket_type": str(it.get("ticket_type", "trifecta")),
+            "payout": int(it["payout"]) if it.get("payout") is not None else None,
+            "created_at": str(it.get("created_at", "")),
+        })
+    # id 重複を再採番
+    seen = set()
+    for c in clean:
+        if c["id"] in seen or c["id"] <= 0:
+            c["id"] = max(seen) + 1 if seen else 1
+        seen.add(c["id"])
+    _save(clean)
+    return {"imported": len(clean)}
