@@ -41,3 +41,11 @@ uvicorn backend.main:app --reload --port 8000
 - [ ] JRAVANAdapter 本番化
 - [ ] フロント枠番色 / EV 色分け
 - [ ] 本番デプロイ
+
+## 追加ドキュメント
+- docs/deploy.md : デプロイ手順
+
+## 追加モジュール
+- backend/adapters/jravan_adapter.py : JRA-VAN 骨組み
+- frontend/theme.css : 枠番色 + EV 色テーマ
+- frontend/ev-theme.js : evClass / wakuClass ユーティリティ
