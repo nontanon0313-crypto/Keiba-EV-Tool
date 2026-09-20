@@ -16,6 +16,7 @@ class BetIn(BaseModel):
     prob: Optional[float] = None
     ev: Optional[float] = None
     ticket_type: Optional[str] = "trifecta"
+    model_version: Optional[str] = None
 
 
 class SettleIn(BaseModel):
@@ -24,7 +25,7 @@ class SettleIn(BaseModel):
 
 @router.post("")
 def create(b: BetIn):
-    return bet_store.add_bet(b.race_id, b.combo, b.amount, b.odds, b.prob, b.ev, b.ticket_type or "trifecta")
+    return bet_store.add_bet(b.race_id, b.combo, b.amount, b.odds, b.prob, b.ev, b.ticket_type or "trifecta", b.model_version)
 
 
 @router.get("")

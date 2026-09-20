@@ -12,6 +12,6 @@ class TrifectaProb(BaseModel):
 class Prediction(BaseModel):
     race_id:str; created_at:datetime; probabilities:List[Probability]; trifecta_probs:List[TrifectaProb]; model_version:str="plackett-luce-v1"
 class Bet(BaseModel):
-    type:str; combination:str; amount:int; ev:Optional[float]=None; prob:Optional[float]=None; odds:Optional[float]=None
+    type:str; combination:str; amount:int; ev:Optional[float]=None; prob:Optional[float]=None; odds:Optional[float]=None; model_version:Optional[str]=None
 class VotePlan(BaseModel):
     client_plan_id:str; source:str="jra"; venue:str; race_number:int; start_at:datetime; deadline_at:datetime; bets:List[Bet]; total_amount:int; created_at:datetime; race_id:Optional[str]=None

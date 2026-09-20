@@ -10,7 +10,7 @@ def _save(data):
     get_storage().save_all(data)
 
 
-def add_bet(race_id, combo, amount, odds, prob=None, ev=None, ticket_type="trifecta"):
+def add_bet(race_id, combo, amount, odds, prob=None, ev=None, ticket_type="trifecta", model_version=None):
     data = _load()
     nid = (max([d.get("id", 0) for d in data]) + 1) if data else 1
     rec = {
@@ -22,6 +22,7 @@ def add_bet(race_id, combo, amount, odds, prob=None, ev=None, ticket_type="trife
         "prob": float(prob) if prob is not None else None,
         "ev": float(ev) if ev is not None else None,
         "ticket_type": ticket_type,
+        "model_version": model_version,
         "payout": None,
         "created_at": datetime.now().isoformat(),
     }
@@ -120,6 +121,7 @@ def replace_all(items):
             "prob": float(it["prob"]) if it.get("prob") is not None else None,
             "ev": float(it["ev"]) if it.get("ev") is not None else None,
             "ticket_type": str(it.get("ticket_type", "trifecta")),
+            "model_version": it.get("model_version"),
             "payout": int(it["payout"]) if it.get("payout") is not None else None,
             "created_at": str(it.get("created_at", "")),
         })

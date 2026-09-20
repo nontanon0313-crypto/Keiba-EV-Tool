@@ -3,6 +3,7 @@ from backend.app.services.race_fetcher import get_races
 from backend.app.services.prediction import predict_race
 from backend.app.services.ev_calc import build_bets, TICKET_TYPES
 from backend.app.services.vote_manager import send_plan
+from backend.app.services.prediction_store import save_prediction
 from backend.app.models.schemas import VotePlan
 from datetime import datetime
 import uuid
@@ -20,6 +21,10 @@ def create_vote_plan(race_id: str, ticket_type: str = "trifecta", min_prob: floa
     if race.has_critical_change:
         raise HTTPException(409, "critical change detected")
     pred = predict_race(race)
+    try:
+        save_prediction(race.race_id, pred.model_version, pred.model_dump(mode="json"))
+    except Exception as e:
+        print("[vote_plans] save_prediction failed:", e)
     bets = build_bets(race, pred, ticket_type=ticket_type, min_prob=min_prob, min_odds=min_odds, collateral=collateral, max_investment=max_investment)
     if not bets:
         raise HTTPException(204, "no EV positive")

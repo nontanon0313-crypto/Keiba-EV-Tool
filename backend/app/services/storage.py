@@ -93,6 +93,7 @@ class PostgresStorage:
                     ev DOUBLE PRECISION,
                     ticket_type TEXT DEFAULT 'trifecta',
                     payout INT,
+                    model_version TEXT,
                     created_at TEXT
                 )
             """)
@@ -104,7 +105,7 @@ class PostgresStorage:
         conn = self._conn()
         try:
             cur = conn.cursor()
-            cur.execute("SELECT id, race_id, combo, amount, odds, prob, ev, ticket_type, payout, created_at FROM bets ORDER BY id")
+            cur.execute("SELECT id, race_id, combo, amount, odds, prob, ev, ticket_type, payout, model_version, created_at FROM bets ORDER BY id")
             rows = cur.fetchall()
         finally:
             conn.close()
@@ -120,7 +121,8 @@ class PostgresStorage:
                 "ev": float(r[6]) if r[6] is not None else None,
                 "ticket_type": r[7] or "trifecta",
                 "payout": int(r[8]) if r[8] is not None else None,
-                "created_at": r[9] or "",
+                "model_version": r[9],
+                "created_at": r[10] or "",
             })
         return out
 
@@ -131,10 +133,10 @@ class PostgresStorage:
             cur.execute("DELETE FROM bets")
             for it in items:
                 cur.execute(
-                    "INSERT INTO bets (id, race_id, combo, amount, odds, prob, ev, ticket_type, payout, created_at) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                    "INSERT INTO bets (id, race_id, combo, amount, odds, prob, ev, ticket_type, payout, model_version, created_at) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
                     (it.get("id"), it["race_id"], it["combo"], int(it["amount"]), float(it["odds"]),
                      it.get("prob"), it.get("ev"), it.get("ticket_type", "trifecta"),
-                     it.get("payout"), it.get("created_at", "")),
+                     it.get("payout"), it.get("model_version"), it.get("created_at", "")),
                 )
             conn.commit()
         finally:
@@ -152,6 +154,10 @@ class TursoStorage:
         self._ensure_schema()
 
     def _ensure_schema(self):
+        try:
+            self.client.execute("ALTER TABLE bets ADD COLUMN model_version TEXT")
+        except Exception:
+            pass
         self.client.execute("""
             CREATE TABLE IF NOT EXISTS bets (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -163,12 +169,13 @@ class TursoStorage:
                 ev REAL,
                 ticket_type TEXT DEFAULT 'trifecta',
                 payout INTEGER,
+                model_version TEXT,
                 created_at TEXT
             )
         """)
 
     def load_all(self):
-        r = self.client.execute("SELECT id, race_id, combo, amount, odds, prob, ev, ticket_type, payout, created_at FROM bets ORDER BY id")
+        r = self.client.execute("SELECT id, race_id, combo, amount, odds, prob, ev, ticket_type, payout, model_version, created_at FROM bets ORDER BY id")
         out = []
         for row in r.rows:
             out.append({
@@ -181,7 +188,8 @@ class TursoStorage:
                 "ev": float(row[6]) if row[6] is not None else None,
                 "ticket_type": row[7] or "trifecta",
                 "payout": int(row[8]) if row[8] is not None else None,
-                "created_at": row[9] or "",
+                "model_version": row[9],
+                "created_at": row[10] or "",
             })
         return out
 
@@ -189,10 +197,10 @@ class TursoStorage:
         self.client.execute("DELETE FROM bets")
         for it in items:
             self.client.execute(
-                "INSERT INTO bets (id, race_id, combo, amount, odds, prob, ev, ticket_type, payout, created_at) VALUES (?,?,?,?,?,?,?,?,?,?)",
+                "INSERT INTO bets (id, race_id, combo, amount, odds, prob, ev, ticket_type, payout, model_version, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
                 [it.get("id"), it["race_id"], it["combo"], int(it["amount"]), float(it["odds"]),
                  it.get("prob"), it.get("ev"), it.get("ticket_type", "trifecta"),
-                 it.get("payout"), it.get("created_at", "")],
+                 it.get("payout"), it.get("model_version"), it.get("created_at", "")],
             )
 
 
