@@ -136,7 +136,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   }
 
   function postBet(raceId, b, amount){
-    return fetchWithTimeout(API_BASE + "/bets", TIMEOUT_MS, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ race_id: raceId, combo: b.combination, amount: amount, odds: b.odds, prob: b.prob, ev: b.ev }) })
+    return fetchWithTimeout(API_BASE + "/bets", TIMEOUT_MS, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ race_id: raceId, combo: b.combination, amount: amount, odds: b.odds, prob: b.prob, ev: b.ev, ticket_type: currentTicket }) })
       .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); });
   }
 
@@ -277,18 +277,34 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
       + "<div>平均オッズ: " + fmtNum(s.avg_odds, 1) + " / 加重平均: " + fmtNum(s.weighted_avg_odds, 1) + "</div>";
   }
 
+  function settleCell(r){
+    if (r.status !== "pending") {
+      var p = r.payout;
+      return p == null ? "-" : fmtYen(p);
+    }
+    return "<input type=\"number\" class=\"payout-input\" step=\"10\" min=\"0\" placeholder=\"0\" data-id=\"" + r.id + "\"><button class=\"settle-btn\" data-id=\"" + r.id + "\" type=\"button\">確定</button>";
+  }
+
   function renderBetsList(rows){
     if (!rows || !rows.length) { betsList.textContent = "投票履歴はありません"; return; }
-    var html = "<table class=\"ev-table\"><thead><tr><th>レース</th><th>買い目</th><th>金額</th><th>オッズ</th><th>状態</th><th>損益</th><th></th></tr></thead><tbody>";
+    var html = "<table class=\"ev-table\"><thead><tr><th>レース</th><th>買い目</th><th>金額</th><th>オッズ</th><th>状態</th><th>損益</th><th>払戻</th><th></th></tr></thead><tbody>";
     rows.forEach(function(r){
       var cls = r.profit > 0 ? "ev-mid" : r.profit < 0 ? "ev-neg" : "";
       var statusLabel = r.status === "hit" ? "的中" : r.status === "miss" ? "不的中" : r.status === "pending" ? "確定待ち" : r.status;
-      html += "<tr class=\"" + cls + "\"><td>" + esc(r.race_id) + "</td><td>" + esc(r.combo) + "</td><td>" + fmtYen(r.amount) + "</td><td>" + fmtNum(r.odds, 1) + "</td><td>" + statusLabel + "</td><td>" + (r.profit >= 0 ? "+" : "") + fmtYen(r.profit) + "</td><td><button class=\"del-btn\" data-id=\"" + r.id + "\" type=\"button\">削除</button></td></tr>";
+      html += "<tr class=\"" + cls + "\"><td>" + esc(r.race_id) + "</td><td>" + esc(r.combo) + "</td><td>" + fmtYen(r.amount) + "</td><td>" + fmtNum(r.odds, 1) + "</td><td>" + statusLabel + "</td><td>" + (r.profit >= 0 ? "+" : "") + fmtYen(r.profit) + "</td><td>" + settleCell(r) + "</td><td><button class=\"del-btn\" data-id=\"" + r.id + "\" type=\"button\">削除</button></td></tr>";
     });
     html += "</tbody></table>";
     betsList.innerHTML = html;
     betsList.querySelectorAll(".del-btn").forEach(function(btn){
       btn.addEventListener("click", function(){ var id = btn.getAttribute("data-id"); fetchWithTimeout(API_BASE + "/bets/" + id, TIMEOUT_MS, { method: "DELETE" }).then(function(){ loadBets(); }).catch(function(){ alert("削除失敗"); }); });
+    });
+    betsList.querySelectorAll(".settle-btn").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var id = btn.getAttribute("data-id");
+        var inp = betsList.querySelector(".payout-input[data-id=\"" + id + "\"]");
+        var v = Math.max(0, Math.round(Number(inp && inp.value || 0)));
+        fetchWithTimeout(API_BASE + "/bets/" + id + "/settle", TIMEOUT_MS, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ payout: v }) }).then(function(){ loadBets(); }).catch(function(){ alert("確定失敗"); });
+      });
     });
   }
 
