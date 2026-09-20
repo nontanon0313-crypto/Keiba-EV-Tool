@@ -82,20 +82,52 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     html += "<table class=\"ev-table\"><thead><tr><th>買い目</th><th>確率</th><th>オッズ</th><th>EV</th><th>金額</th><th></th></tr></thead><tbody>";
     currentBets.forEach(function(b, idx){
       var cls = KeibaTheme.evClass(b.ev, EV_THRESHOLD);
-      html += "<tr class=\"" + cls + "\"><td>" + esc(b.combination) + "</td><td>" + fmtPct(b.prob) + "</td><td>" + fmtNum(b.odds, 1) + "</td><td>" + fmtSigned(b.ev, 3) + "</td><td>" + fmtYen(b.amount) + "</td><td><button class=\"bet-btn\" data-idx=\"" + idx + "\" type=\"button\">投票</button></td></tr>";
+      html += "<tr class=\"" + cls + "\"><td>" + esc(b.combination) + "</td><td>" + fmtPct(b.prob) + "</td><td>" + fmtNum(b.odds, 1) + "</td><td>" + fmtSigned(b.ev, 3) + "</td><td>" + "<input type=\"number\" class=\"amt-input\" step=\"100\" min=\"100\" value=\"" + b.amount + "\" data-idx=\"" + idx + "\">" + "</td><td><button class=\"bet-btn\" data-idx=\"" + idx + "\" type=\"button\">投票</button></td></tr>";
     });
     html += "</tbody></table>";
+    html += "<button class=\"bulk-btn\" id=\"bulk-bet\" type=\"button\">全買い目を一括投票</button>";
     box.innerHTML = html;
     box.querySelectorAll(".bet-btn").forEach(function(btn){
-      btn.addEventListener("click", function(){ recordBet(raceId, currentBets[Number(btn.getAttribute("data-idx"))]); });
+      btn.addEventListener("click", function(){
+        var idx = Number(btn.getAttribute("data-idx"));
+        var amt = readAmt(box, idx, currentBets[idx].amount);
+        recordBet(raceId, currentBets[idx], amt);
+      });
+    });
+    var bulkBtn = box.querySelector("#bulk-bet");
+    if (bulkBtn) bulkBtn.addEventListener("click", function(){
+      var items = currentBets.map(function(b, i){ return { bet: b, amt: readAmt(box, i, b.amount) }; });
+      recordBulk(raceId, items);
     });
   }
 
-  function recordBet(raceId, b){
-    fetchWithTimeout(API_BASE + "/bets", TIMEOUT_MS, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ race_id: raceId, combo: b.combination, amount: b.amount, odds: b.odds, prob: b.prob, ev: b.ev }) })
-      .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
-      .then(function(){ alert("投票を記録しました"); })
-      .catch(function(err){ alert("記録失敗: " + err.message); });
+  function readAmt(box, idx, fallback){
+    var el = box.querySelector(".amt-input[data-idx=\"" + idx + "\"]");
+    if (!el) return fallback;
+    var v = Math.round(Number(el.value || fallback));
+    if (!(v > 0)) return fallback;
+    return v;
+  }
+
+  function postBet(raceId, b, amount){
+    return fetchWithTimeout(API_BASE + "/bets", TIMEOUT_MS, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ race_id: raceId, combo: b.combination, amount: amount, odds: b.odds, prob: b.prob, ev: b.ev }) })
+      .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); });
+  }
+
+  function recordBet(raceId, b, amount){
+    postBet(raceId, b, amount).then(function(){ alert("投票を記録しました"); }).catch(function(err){ alert("記録失敗: " + err.message); });
+  }
+
+  function recordBulk(raceId, items){
+    if (!items.length) { alert("投票対象なし"); return; }
+    var chain = Promise.resolve();
+    var okCount = 0, failCount = 0;
+    items.forEach(function(it){
+      chain = chain.then(function(){
+        return postBet(raceId, it.bet, it.amt).then(function(){ okCount++; }).catch(function(){ failCount++; });
+      });
+    });
+    chain.then(function(){ alert("一括投票完了: 成功 " + okCount + " / 失敗 " + failCount); });
   }
 
   function showList(){ detail.hidden = true; racesSection.hidden = false; window.scrollTo(0, 0); }
