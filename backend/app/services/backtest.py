@@ -126,8 +126,9 @@ def run_backtest(tickets=None, ev_threshold_override=None, amount=100, min_prob=
             for combo, prob in _candidates(pred, t):
                 if prob < min_prob:
                     continue
-                real = _real_odds(odds_payload, t, combo)
-                odds = real if real is not None else mock_odds(prob, race_id, combo, t)
+                odds = _real_odds(odds_payload, t, combo)
+                if odds is None or odds <= 0:
+                    continue
                 ev = calc_ev(prob, odds)
                 if ev < threshold:
                     continue
