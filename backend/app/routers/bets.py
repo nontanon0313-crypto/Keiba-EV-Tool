@@ -13,11 +13,16 @@ class BetIn(BaseModel):
     odds: float
     prob: Optional[float] = None
     ev: Optional[float] = None
+    ticket_type: Optional[str] = "trifecta"
+
+
+class SettleIn(BaseModel):
+    payout: int
 
 
 @router.post("")
 def create(b: BetIn):
-    return bet_store.add_bet(b.race_id, b.combo, b.amount, b.odds, b.prob, b.ev)
+    return bet_store.add_bet(b.race_id, b.combo, b.amount, b.odds, b.prob, b.ev, b.ticket_type or "trifecta")
 
 
 @router.get("")
@@ -33,6 +38,11 @@ def get_summary():
 @router.get("/curve")
 def get_curve():
     return bet_store.curve()
+
+
+@router.post("/{bet_id}/settle")
+def settle(bet_id: int, body: SettleIn):
+    return bet_store.settle_bet(bet_id, body.payout)
 
 
 @router.delete("/{bet_id}")

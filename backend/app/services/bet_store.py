@@ -1,9 +1,6 @@
 import json
 from pathlib import Path
 from datetime import datetime
-from backend.app.services.result_fetcher import fetch_result
-from backend.app.services.prediction import predict_race
-from backend.app.services.race_fetcher import get_races
 
 STORE = Path("bets.json")
 
@@ -21,37 +18,43 @@ def _save(data):
     STORE.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
-def add_bet(race_id, combo, amount, odds, prob=None, ev=None):
+def add_bet(race_id, combo, amount, odds, prob=None, ev=None, ticket_type="trifecta"):
     data = _load()
     nid = (max([d.get("id", 0) for d in data]) + 1) if data else 1
-    rec = {"id": nid, "race_id": race_id, "combo": combo, "amount": int(amount), "odds": float(odds), "prob": float(prob) if prob is not None else None, "ev": float(ev) if ev is not None else None, "created_at": datetime.now().isoformat()}
+    rec = {
+        "id": nid,
+        "race_id": race_id,
+        "combo": combo,
+        "amount": int(amount),
+        "odds": float(odds),
+        "prob": float(prob) if prob is not None else None,
+        "ev": float(ev) if ev is not None else None,
+        "ticket_type": ticket_type,
+        "payout": None,
+        "created_at": datetime.now().isoformat(),
+    }
     data.append(rec)
     _save(data)
     return rec
 
 
+def settle_bet(bet_id, payout):
+    data = _load()
+    for d in data:
+        if d.get("id") == int(bet_id):
+            d["payout"] = int(payout)
+    _save(data)
+    return {"settled": int(bet_id), "payout": int(payout)}
+
+
 def _resolve(rec):
-    try:
-        pred = None
-        race = next((r for r in get_races() if r.race_id == rec["race_id"]), None)
-        if race is not None:
-            pred = predict_race(race)
-        winner = fetch_result(rec["race_id"], len(race.runners) if race else 18, pred)
-    except Exception:
-        winner = None
-    if winner is None:
+    payout = rec.get("payout")
+    if payout is None:
         return ("pending", 0, 0)
-    parts = rec["combo"].split("-")
-    if len(parts) != 3:
-        return ("invalid", 0, 0)
-    try:
-        nums = [int(parts[0]), int(parts[1]), int(parts[2])]
-    except ValueError:
-        return ("invalid", 0, 0)
-    if nums == list(winner):
-        ret = int(rec["amount"] * rec["odds"])
-        return ("hit", ret, ret - rec["amount"])
-    return ("miss", 0, -rec["amount"])
+    ret = int(payout)
+    profit = ret - int(rec["amount"])
+    status = "hit" if ret > 0 else "miss"
+    return (status, ret, profit)
 
 
 def list_bets():
@@ -76,7 +79,22 @@ def summary():
     odds_list = [r["odds"] for r in rows if r.get("odds") is not None]
     avg_odds = (sum(odds_list) / len(odds_list)) if odds_list else 0.0
     weighted_odds = (sum(r["amount"] * r["odds"] for r in rows if r.get("odds") is not None) / stake) if stake else 0.0
-    return {"total_bets": len(rows), "total_stake": stake, "total_return": ret, "total_profit": profit, "roi": (profit / stake) if stake else 0.0, "hits": hits, "settled": settled, "hit_rate": (hits / settled) if settled else 0.0, "expected_hit_rate": expected_hit_rate, "expected_profit": expected_profit, "expected_return": expected_return, "expected_roi": (expected_profit / stake) if stake else 0.0, "avg_odds": avg_odds, "weighted_avg_odds": weighted_odds}
+    return {
+        "total_bets": len(rows),
+        "total_stake": stake,
+        "total_return": ret,
+        "total_profit": profit,
+        "roi": (profit / stake) if stake else 0.0,
+        "hits": hits,
+        "settled": settled,
+        "hit_rate": (hits / settled) if settled else 0.0,
+        "expected_hit_rate": expected_hit_rate,
+        "expected_profit": expected_profit,
+        "expected_return": expected_return,
+        "expected_roi": (expected_profit / stake) if stake else 0.0,
+        "avg_odds": avg_odds,
+        "weighted_avg_odds": weighted_odds,
+    }
 
 
 def curve():
