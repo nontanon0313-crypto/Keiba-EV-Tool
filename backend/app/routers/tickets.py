@@ -48,8 +48,10 @@ def _hit(ticket_type, combo, winner):
     return 0
 
 
-@router.get("")
-def get_ticket_stats():
+def _collect(scope="all"):
+    from backend.app.services import bet_store
+    bets_data = bet_store.list_bets()
+    voted_keys = set((b["race_id"], b["combo"], b.get("ticket_type", "trifecta")) for b in bets_data)
     races = get_races()
     stats = {}
     for t in TICKET_TYPES:
@@ -70,6 +72,11 @@ def get_ticket_stats():
                 odds = mock_odds(prob, race.race_id, combo, t)
                 ev = calc_ev(prob, odds)
                 if ev < THRESHOLDS.get(t, 0.12):
+                    continue
+                is_voted = (race.race_id, combo, t) in voted_keys
+                if scope == "voted" and not is_voted:
+                    continue
+                if scope == "excluded" and is_voted:
                     continue
                 amount = 100
                 hit = _hit(t, combo, winner)
@@ -100,4 +107,11 @@ def get_ticket_stats():
             "roi": ((ret - stake) / stake) if stake else 0.0,
             "expected_roi": (s["ev_sum"] / n) if n else 0.0,
         })
-    return {"tickets": out}
+    return out
+
+
+@router.get("")
+def get_ticket_stats(scope: str = "all"):
+    if scope not in ("all", "voted", "excluded"):
+        scope = "all"
+    return {"scope": scope, "tickets": _collect(scope)}
