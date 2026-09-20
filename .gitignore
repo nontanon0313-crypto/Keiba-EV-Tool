@@ -14,3 +14,4 @@ predictions.json
 # debug
 race_debug.html
 *.debug.html
+scraped_races.json
