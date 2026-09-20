@@ -3,7 +3,7 @@ from backend.app.services.race_fetcher import get_races
 from backend.app.services.prediction import predict_race
 from backend.app.services.ev_calc import calc_ev, mock_odds, _candidates, TICKET_TYPES, _TICKET_LABEL
 from backend.app.services.result_fetcher import fetch_result
-from backend.app.config import settings
+from backend.config import settings
 
 router = APIRouter(prefix="/analytics/tickets")
 
