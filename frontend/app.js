@@ -18,8 +18,10 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   var anaScopeTabs = $("ana-scope-tabs"), anaViewTabs = $("ana-view-tabs");
   var betsSummary = $("bets-summary"), betsList = $("bets-list"), curveCanvas = $("curve-chart");
   var analyticsData = null, currentScope = "all", currentView = "ev", filters = {}, currentBets = [];
+  var currentTicket = "trifecta";
 
   function esc(s){ return String(s == null ? "" : s).replace(/[&<>\x27]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","\x27":"&#39;"}[c]; }); }
+  function ticketLabel(t){ return ({trifecta:"3連単",trio:"3連複",exacta:"馬単",quinella:"馬連",wide:"ワイド",win:"単勝",place:"複勝"}[t] || t); }
   function fmtPct(v, d){ return (v * 100).toFixed(d == null ? 2 : d) + "%"; }
   function fmtNum(v, d){ return Number(v).toFixed(d == null ? 2 : d); }
   function fmtInt(v){ return String(Math.round(v)); }
@@ -53,7 +55,9 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
 
   function renderDetail(race){
     detailTitle.textContent = (race.venue || "") + " " + (race.race_number || "") + "R";
-    var html = "<h3 class=\"ev-title\">EV上位の買い目 (3連単)</h3><div id=\"ev-table\">読み込み中...</div>";
+    var evLabel = document.getElementById("ev-title-label");
+    if (evLabel) evLabel.textContent = "EV上位の買い目 (" + ticketLabel(currentTicket) + ")";
+    var html = "<h3 class=\"ev-title\" id=\"ev-title-label\">EV上位の買い目</h3><div id=\"ev-table\">読み込み中...</div>";
     html += "<h3 class=\"ev-title\">出走馬</h3>";
     var runners = race.runners || [];
     if (!runners.length) { html += "<p>出走馬データがありません</p>"; }
@@ -144,7 +148,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     if (!box) return;
     box.textContent = "EV計算中...";
     readFilters();
-    var qs = "?race_id=" + encodeURIComponent(raceId) + "&min_prob=" + encodeURIComponent(filters.minProb) + "&min_odds=" + encodeURIComponent(filters.minOdds) + "&collateral=" + encodeURIComponent(filters.collateral) + "&max_investment=" + encodeURIComponent(filters.maxInvestment);
+    var qs = "?race_id=" + encodeURIComponent(raceId) + "&ticket_type=" + encodeURIComponent(currentTicket) + "&min_prob=" + encodeURIComponent(filters.minProb) + "&min_odds=" + encodeURIComponent(filters.minOdds) + "&collateral=" + encodeURIComponent(filters.collateral) + "&max_investment=" + encodeURIComponent(filters.maxInvestment);
     fetchWithTimeout(API_BASE + "/vote-plans" + qs, TIMEOUT_MS, { method: "POST" })
       .then(function(res){ if (res.status === 204) { renderEvTable(raceId, [], 0); return null; } if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
       .then(function(data){ if (!data) return; var plan = data.plan || {}; renderEvTable(raceId, plan.bets || [], plan.total_amount || 0); })
@@ -297,6 +301,17 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     });
   });
   [fMinProb, fMinOdds, fCollateral, fMaxInv].forEach(function(el){ el.addEventListener("change", function(){ if (detail && !detail.hidden && detail.dataset.raceId) loadEvTable(detail.dataset.raceId); }); });
+  var ticketTabs = document.getElementById("ticket-tabs");
+  if (ticketTabs) ticketTabs.querySelectorAll(".subtab").forEach(function(t){
+    t.addEventListener("click", function(){
+      ticketTabs.querySelectorAll(".subtab").forEach(function(x){ x.classList.remove("active"); });
+      t.classList.add("active");
+      currentTicket = t.getAttribute("data-ticket");
+      var lbl = document.getElementById("ev-title-label");
+      if (lbl) lbl.textContent = "EV上位の買い目 (" + ticketLabel(currentTicket) + ")";
+      if (detail && !detail.hidden && detail.dataset.raceId) loadEvTable(detail.dataset.raceId);
+    });
+  });
   list.addEventListener("click", function(e){ var el = e.target.closest(".race"); if (!el) return; detail.dataset.raceId = el.getAttribute("data-race-id"); loadDetail(el.getAttribute("data-race-id")); });
   list.addEventListener("keydown", function(e){ if (e.key !== "Enter" && e.key !== " ") return; var el = e.target.closest(".race"); if (!el) return; e.preventDefault(); detail.dataset.raceId = el.getAttribute("data-race-id"); loadDetail(el.getAttribute("data-race-id")); });
   backBtn.addEventListener("click", showList);
