@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from backend.app.services.race_fetcher import get_races
 from backend.app.services.prediction import predict_race
 from backend.app.services.ev_calc import calc_ev, mock_trifecta_odds
+from backend.app.services.result_store import all_results
 
 router = APIRouter(prefix="/analytics")
 
@@ -39,19 +40,21 @@ def _format(bins, samples, kind):
         avg_prob = sum(x[0] for x in s) / n
         avg_odds = sum(x[1] for x in s) / n
         avg_ev = sum(x[2] for x in s) / n
+        attempts = sum(1 for x in s if x[3])
+        hits = sum(x[4] for x in s)
         if kind == "prob":
-            label = f"{lo:.3f}-{hi:.3f}"
+            label = "{:.3f}-{:.3f}".format(lo, hi)
         else:
-            label = f"{lo}-{hi}" if hi < 999999 else f"{lo}+"
+            label = "{}-{}".format(lo, hi) if hi < 999999 else "{}+".format(lo)
         rows.append({
             "range": label,
             "count": n,
             "avg_prob": avg_prob,
             "avg_odds": avg_odds,
             "expected_profit_pct": avg_ev * 100,
-            "actual_hits": 0,
-            "actual_attempts": 0,
-            "actual_rate": None,
+            "actual_hits": hits,
+            "actual_attempts": attempts,
+            "actual_rate": (hits / attempts) if attempts > 0 else None,
         })
     return rows
 
@@ -62,24 +65,35 @@ def get_analytics():
     ob = _odds_bins()
     prob_samples = {i: [] for i in range(len(pb))}
     odds_samples = {i: [] for i in range(len(ob))}
+    results = all_results()
     races = get_races()
     for race in races:
         try:
             pred = predict_race(race)
         except Exception:
             continue
+        winner = results.get(race.race_id)
         for tri in pred.trifecta_probs:
-            odds = mock_trifecta_odds(tri.prob)
+            odds = mock_trifecta_odds(tri.prob, race.race_id, tri.combo)
             ev = calc_ev(tri.prob, odds)
+            has_result = winner is not None
+            hit = 0
+            if has_result:
+                parts = tri.combo.split("-")
+                if len(parts) == 3:
+                    try:
+                        nums = [int(parts[0]), int(parts[1]), int(parts[2])]
+                        if nums == list(winner[:3]):
+                            hit = 1
+                    except ValueError:
+                        pass
+            sample = (tri.prob, odds, ev, has_result, hit)
             for i, (lo, hi) in enumerate(pb):
                 if lo <= tri.prob < hi:
-                    prob_samples[i].append((tri.prob, odds, ev))
+                    prob_samples[i].append(sample)
                     break
             for i, (lo, hi) in enumerate(ob):
                 if lo <= odds < hi:
-                    odds_samples[i].append((tri.prob, odds, ev))
+                    odds_samples[i].append(sample)
                     break
-    return {
-        "prob_bins": _format(pb, prob_samples, "prob"),
-        "odds_bins": _format(ob, odds_samples, "odds"),
-    }
+    return {"prob_bins": _format(pb, prob_samples, "prob"), "odds_bins": _format(ob, odds_samples, "odds")}
