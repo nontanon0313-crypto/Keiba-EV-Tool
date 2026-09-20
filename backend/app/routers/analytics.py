@@ -1,8 +1,10 @@
+"""検証: prediction_store に保存された予想を使って集計。
+モデルが変わっても過去の予想はそのまま。"""
 from fastapi import APIRouter
 from backend.app.services.race_fetcher import get_races
-from backend.app.services.prediction import predict_race
 from backend.app.services.ev_calc import calc_ev, mock_odds
 from backend.app.services.result_fetcher import fetch_result
+from backend.app.services.prediction_store import list_all as list_predictions
 from backend.app.services import bet_store
 
 router = APIRouter(prefix="/analytics")
@@ -32,11 +34,7 @@ def _odds_bins():
 
 
 def _ev_bins():
-    return [
-        (-1.0, 0.0), (0.0, 0.05), (0.05, 0.10), (0.10, 0.15),
-        (0.15, 0.20), (0.20, 0.30), (0.30, 0.50), (0.50, 1.0),
-        (1.0, 5.0), (5.0, 99999.0),
-    ]
+    return [(-1.0, 0.0), (0.0, 0.05), (0.05, 0.10), (0.10, 0.15), (0.15, 0.20), (0.20, 0.30), (0.30, 0.50), (0.50, 1.0), (1.0, 5.0), (5.0, 99999.0)]
 
 
 def _features_conf():
@@ -78,7 +76,10 @@ def _format(bins, samples, kind):
             label = "{}-{}".format(lo, hi) if hi < 999999 else "{}+".format(lo)
         else:
             label = "{:.2f}-{:.2f}".format(lo, hi) if hi < 99999 else "{:.2f}+".format(lo)
-        rows.append({"range": label, "count": n, "avg_prob": avg_prob, "avg_odds": avg_odds, "avg_ev": avg_ev, "expected_profit_pct": avg_ev * 100, "actual_hits": hits, "actual_attempts": n, "actual_rate": (hits / n) if n else None, "actual_profit_pct": (hits * avg_odds / n - 1) * 100 if n else None})
+        rows.append({"range": label, "count": n, "avg_prob": avg_prob, "avg_odds": avg_odds, "avg_ev": avg_ev,
+                     "expected_profit_pct": avg_ev * 100, "actual_hits": hits, "actual_attempts": n,
+                     "actual_rate": (hits / n) if n else None,
+                     "actual_profit_pct": (hits * avg_odds / n - 1) * 100 if n else None})
     return rows
 
 
@@ -94,7 +95,11 @@ def _format_features(features, agg):
             avg_prob = sum(x[0] for x in s) / n
             avg_odds = sum(x[1] for x in s) / n
             hits = sum(x[2] for x in s)
-            rows.append({"range": label, "count": n, "avg_prob": avg_prob, "avg_odds": avg_odds, "expected_profit_pct": (avg_prob * avg_odds - 1.0) * 100, "actual_hits": hits, "actual_attempts": n, "actual_rate": (hits / n) if n else None, "actual_profit_pct": (hits * avg_odds / n - 1) * 100 if n else None})
+            rows.append({"range": label, "count": n, "avg_prob": avg_prob, "avg_odds": avg_odds,
+                         "expected_profit_pct": (avg_prob * avg_odds - 1.0) * 100,
+                         "actual_hits": hits, "actual_attempts": n,
+                         "actual_rate": (hits / n) if n else None,
+                         "actual_profit_pct": (hits * avg_odds / n - 1) * 100 if n else None})
         out.append({"feature": key, "label": conf["label"], "rows": rows})
     return out
 
@@ -121,7 +126,8 @@ def _scope_summary(bucket):
             hits += s[3]
             ev_sum += s[2]
     avg_ev = (ev_sum / total) if total else 0.0
-    return {"count": total, "hits": hits, "actual_rate": (hits / total) if total else None, "avg_expected_profit_pct": avg_ev * 100}
+    return {"count": total, "hits": hits, "actual_rate": (hits / total) if total else None,
+            "avg_expected_profit_pct": avg_ev * 100}
 
 
 @router.get("")
@@ -131,26 +137,34 @@ def get_analytics(model_version: str = None):
     eb = _ev_bins()
     fc = _features_conf()
     scopes = {"all": _empty_bucket(), "voted": _empty_bucket(), "excluded": _empty_bucket()}
+    predictions = list_predictions()
+    if model_version:
+        predictions = [p for p in predictions if p.get("model_version") == model_version]
     bets_data = bet_store.list_bets()
     if model_version:
         bets_data = [b for b in bets_data if b.get("model_version") == model_version]
     voted_keys = set((b["race_id"], b["combo"]) for b in bets_data)
-    races = get_races()
-    for race in races:
-        try:
-            pred = predict_race(race)
-        except Exception:
+    races_map = {r.race_id: r for r in get_races()}
+    for pred in predictions:
+        race = races_map.get(pred.get("race_id"))
+        if race is None:
             continue
         runner_map = {r.horse_number: r for r in race.runners}
         try:
-            winner = fetch_result(race.race_id, len(race.runners), pred)
+            winner = fetch_result(race.race_id, len(race.runners))
         except Exception:
             winner = None
-        for tri in pred.trifecta_probs:
-            odds = mock_odds(tri.prob, race.race_id, tri.combo, "trifecta")
-            ev = calc_ev(tri.prob, odds)
+        payload = pred.get("payload") or {}
+        tri_list = payload.get("trifecta_probs") or []
+        for tri in tri_list:
+            combo = tri.get("combo")
+            prob = tri.get("prob")
+            if combo is None or prob is None:
+                continue
+            odds = mock_odds(prob, race.race_id, combo, "trifecta")
+            ev = calc_ev(prob, odds)
             hit = 0
-            parts = tri.combo.split("-")
+            parts = combo.split("-")
             if winner is not None and len(parts) == 3:
                 try:
                     nums = [int(parts[0]), int(parts[1]), int(parts[2])]
@@ -158,14 +172,14 @@ def get_analytics(model_version: str = None):
                         hit = 1
                 except ValueError:
                     pass
-            sample = (tri.prob, odds, ev, hit)
-            key = (race.race_id, tri.combo)
+            sample = (prob, odds, ev, hit)
+            key = (race.race_id, combo)
             is_voted = key in voted_keys
             targets = ["all", "voted" if is_voted else "excluded"]
             for scope in targets:
                 b = scopes[scope]
                 for i, (lo, hi) in enumerate(pb):
-                    if lo <= tri.prob < hi:
+                    if lo <= prob < hi:
                         b["prob_samples"][i].append(sample)
                         break
                 for i, (lo, hi) in enumerate(ob):
@@ -190,25 +204,30 @@ def get_analytics(model_version: str = None):
                             ow = _get(r, "odds_win")
                             for (label, lo, hi) in fc["popularity"]["ranges"]:
                                 if pop is not None and lo <= pop <= hi:
-                                    b["feat_agg"]["popularity"][label].append((tri.prob, odds, hit))
+                                    b["feat_agg"]["popularity"][label].append((prob, odds, hit))
                             for (label, lo, hi) in fc["weight"]["ranges"]:
                                 if w is not None and lo <= w < hi:
-                                    b["feat_agg"]["weight"][label].append((tri.prob, odds, hit))
+                                    b["feat_agg"]["weight"][label].append((prob, odds, hit))
                             for (label, lo, hi) in fc["frame"]["ranges"]:
                                 if fr is not None and lo <= fr <= hi:
-                                    b["feat_agg"]["frame"][label].append((tri.prob, odds, hit))
+                                    b["feat_agg"]["frame"][label].append((prob, odds, hit))
                             for (label, lo, hi) in fc["odds_win"]["ranges"]:
                                 if ow is not None and lo <= ow < hi:
-                                    b["feat_agg"]["odds_win"][label].append((tri.prob, odds, hit))
+                                    b["feat_agg"]["odds_win"][label].append((prob, odds, hit))
     scopes_out = {}
     for name, b in scopes.items():
-        scopes_out[name] = {"summary": _scope_summary(b), "prob_bins": _format(pb, b["prob_samples"], "prob"), "odds_bins": _format(ob, b["odds_samples"], "odds"), "ev_bins": _format(eb, b["ev_samples"], "ev"), "features": _format_features(fc, b["feat_agg"])}
+        scopes_out[name] = {"summary": _scope_summary(b),
+                            "prob_bins": _format(pb, b["prob_samples"], "prob"),
+                            "odds_bins": _format(ob, b["odds_samples"], "odds"),
+                            "ev_bins": _format(eb, b["ev_samples"], "ev"),
+                            "features": _format_features(fc, b["feat_agg"])}
     all_count = scopes_out["all"]["summary"]["count"]
     voted_count = scopes_out["voted"]["summary"]["count"]
-    scopes_out["all"]["summary"]["voted_count"] = voted_count
-    scopes_out["all"]["summary"]["total_count"] = all_count
-    scopes_out["voted"]["summary"]["voted_count"] = voted_count
-    scopes_out["voted"]["summary"]["total_count"] = all_count
-    scopes_out["excluded"]["summary"]["voted_count"] = voted_count
-    scopes_out["excluded"]["summary"]["total_count"] = all_count
-    return {"by_ticket": [{"ticket": "3連単", "scopes": scopes_out}], "prob_bins": scopes_out["all"]["prob_bins"], "odds_bins": scopes_out["all"]["odds_bins"], "ev_bins": scopes_out["all"]["ev_bins"], "features": scopes_out["all"]["features"]}
+    for k in scopes_out:
+        scopes_out[k]["summary"]["voted_count"] = voted_count
+        scopes_out[k]["summary"]["total_count"] = all_count
+    return {"by_ticket": [{"ticket": "3連単", "scopes": scopes_out}],
+            "prob_bins": scopes_out["all"]["prob_bins"],
+            "odds_bins": scopes_out["all"]["odds_bins"],
+            "ev_bins": scopes_out["all"]["ev_bins"],
+            "features": scopes_out["all"]["features"]}
