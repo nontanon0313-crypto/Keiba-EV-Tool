@@ -5,7 +5,7 @@ def calc_ev(prob, odds):
 def build_bets(race: Race, prediction, threshold_3rentan=0.12, budget=2000):
     bets=[]
     for tri in prediction.trifecta_probs:
-        odds=round(1.0/max(tri.prob,0.001)*random.uniform(0.7,0.9),1)
+        odds=round(1.0/max(tri.prob,0.001)*random.uniform(1.1,1.5),1)
         ev=calc_ev(tri.prob, odds)
         if ev>=threshold_3rentan:
             bets.append(Bet(type="3連単", combination=tri.combo, amount=0, ev=ev, prob=tri.prob, odds=odds))
