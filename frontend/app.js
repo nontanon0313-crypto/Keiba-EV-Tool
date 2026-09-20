@@ -226,7 +226,9 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     if (!ticketStats) { anaView.textContent = "読み込み中..."; return; }
     var rows = ticketStats.tickets || [];
     if (!rows.length) { anaView.textContent = "データなし"; return; }
-    var html = "<table class=\"ev-table\"><thead><tr><th>券種</th><th>件数</th><th>的中率</th><th>想定的中率</th><th>ROI</th><th>想定ROI</th><th>損益</th></tr></thead><tbody>";
+    var scopeLabel = ticketStats.scope === "voted" ? "投票済み" : ticketStats.scope === "excluded" ? "除外" : "全体";
+    var html = "<p class=\"ev-total\">スコープ: " + scopeLabel + "</p>";
+    html += "<table class=\"ev-table\"><thead><tr><th>券種</th><th>件数</th><th>的中率</th><th>想定的中率</th><th>ROI</th><th>想定ROI</th><th>損益</th></tr></thead><tbody>";
     rows.forEach(function(r){
       var cls = KeibaTheme.evClass(r.roi, EV_THRESHOLD);
       var hit = fmtPct(r.hit_rate, 2);
@@ -241,7 +243,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   }
 
   function loadTicketStats(){
-    fetchWithTimeout(API_BASE + "/analytics/tickets", TIMEOUT_MS)
+    fetchWithTimeout(API_BASE + "/analytics/tickets?scope=" + encodeURIComponent(currentScope), TIMEOUT_MS)
       .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
       .then(function(data){ ticketStats = data; if (currentView === "tickets") renderTicketStats(); })
       .catch(function(err){ if (currentView === "tickets") anaView.textContent = "取得失敗: " + err.message; });
@@ -435,7 +437,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   anaScopeTabs.querySelectorAll(".subtab").forEach(function(t){
     t.addEventListener("click", function(){
       anaScopeTabs.querySelectorAll(".subtab").forEach(function(x){ x.classList.remove("active"); });
-      t.classList.add("active"); currentScope = t.getAttribute("data-scope"); renderView();
+      t.classList.add("active"); currentScope = t.getAttribute("data-scope"); ticketStats = null; if (currentView === "tickets") loadTicketStats(); renderView();
     });
   });
   anaViewTabs.querySelectorAll(".subtab").forEach(function(t){
