@@ -1,5 +1,7 @@
+import os
 """指定日範囲のレース結果・オッズを一括取得。中断しても再開可能。"""
 import sys
+import atexit
 import time
 from datetime import datetime, timedelta
 
@@ -12,6 +14,9 @@ def daterange(d0, d1):
     while d <= d1:
         yield d
         d += timedelta(days=1)
+
+
+atexit.register(lambda: os._exit(0))
 
 
 def main():
@@ -54,6 +59,7 @@ def main():
                 print("  [{}] {} fail: {}".format(date_str, rid, str(e)[:80]), flush=True)
                 time.sleep(sleep_sec)
     print("ALL DONE", flush=True)
+    os._exit(0)
 
 
 if __name__ == "__main__":
