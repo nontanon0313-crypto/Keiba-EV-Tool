@@ -102,7 +102,10 @@ def run_backtest(tickets=None, ev_threshold_override=None, amount=100, min_prob=
         stats[t] = {"ticket": t, "label": _TICKET_LABEL.get(t, t), "count": 0, "hits": 0,
                     "stake": 0, "ret": 0, "prob_sum": 0.0, "ev_sum": 0.0, "races": 0}
     per_race = []
-    for it in items:
+    total = len(items)
+    for idx, it in enumerate(items):
+        if (idx + 1) % 20 == 0 or idx == 0:
+            print("[backtest] {}/{}".format(idx + 1, total), flush=True)
         race_id = it.get("race_id")
         payload = it.get("payload") or {}
         finish = payload.get("finish_order") or []
