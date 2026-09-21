@@ -15,7 +15,7 @@ def plackett_luce_win_probs(race):
     probs = []
     for hn, s in scores:
         wp = s / total
-        pp = min(wp * 2.8, 0.95)
+        pp = 1.0 - (1.0 - wp) ** 3.231
         probs.append(Probability(horse_number=hn, win_prob=wp, place_prob=pp))
     probs.sort(key=lambda x: x.win_prob, reverse=True)
     return probs
@@ -52,4 +52,4 @@ def predict_race(race):
     random.seed(seed_for(race.race_id))
     win_probs = plackett_luce_win_probs(race)
     tri = trifecta_probs(race, win_probs)
-    return Prediction(race_id=race.race_id, created_at=datetime.now(), probabilities=win_probs, trifecta_probs=tri, model_version="plackett-luce-v3-market")
+    return Prediction(race_id=race.race_id, created_at=datetime.now(), probabilities=win_probs, trifecta_probs=tri, model_version="plackett-luce-v4-place-k")
