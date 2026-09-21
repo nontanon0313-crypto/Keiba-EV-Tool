@@ -97,6 +97,7 @@ def run_backtest(tickets=None, ev_threshold_override=None, amount=100, min_prob=
     if tickets is None:
         tickets = list(TICKET_TYPES)
     items = race_store.list_races()
+    odds_map = {o["race_id"]: o.get("payload") for o in odds_store.list_odds()}
     stats = {}
     for t in tickets:
         stats[t] = {"ticket": t, "label": _TICKET_LABEL.get(t, t), "count": 0, "hits": 0,
@@ -112,7 +113,7 @@ def run_backtest(tickets=None, ev_threshold_override=None, amount=100, min_prob=
         if len(finish) < 3:
             continue
         race = _race_from_payload(race_id, payload)
-        odds_payload = odds_store.get_odds(race_id)
+        odds_payload = odds_map.get(race_id)
         try:
             pred = predict_race(race)
         except Exception:
