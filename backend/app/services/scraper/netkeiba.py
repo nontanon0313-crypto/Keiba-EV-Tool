@@ -32,7 +32,7 @@ VENUE_CODE = {
 
 
 def _sleep():
-    time.sleep(random.uniform(1.2, 2.2))
+    time.sleep(random.uniform(0.6, 1.0))
 
 
 def parse_race_id(race_id: str) -> Dict:

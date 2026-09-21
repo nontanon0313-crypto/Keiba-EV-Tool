@@ -42,17 +42,24 @@ def main():
         print("[{}] {} races, {} todo".format(date_str, len(ids), len(todo)), flush=True)
         for i, rid in enumerate(todo):
             try:
-                data = netkeiba.fetch_race_result(rid)
-                if data and data.get("finish_order"):
-                    race_store.save_race(rid, data)
-                    existing_races.add(rid)
-                time.sleep(sleep_sec)
-                if rid not in existing_odds:
+                if rid not in existing_races:
+                    data = netkeiba.fetch_race_result(rid)
+                    if data and data.get("finish_order"):
+                        race_store.save_race(rid, data)
+                        existing_races.add(rid)
+                    time.sleep(sleep_sec)
+                # 既存オッズを確認して、足りない券種だけ追加取得
+                cur = odds_store.get_odds(rid) or {}
+                need = [t for t in ["win","place","quinella","wide","exacta","trio","trifecta"] if not cur.get(t)]
+                if need:
                     o = netkeiba.fetch_odds(rid)
                     if o:
-                        odds_store.save_odds(rid, o)
+                        merged = dict(cur)
+                        for k, v in o.items():
+                            merged[k] = v
+                        odds_store.save_odds(rid, merged)
                         existing_odds.add(rid)
-                time.sleep(sleep_sec)
+                    time.sleep(sleep_sec)
                 if (i + 1) % 3 == 0:
                     print("  [{}/{}] {} ok (races:{} odds:{})".format(i + 1, len(todo), rid, len(existing_races), len(existing_odds)), flush=True)
             except Exception as e:
