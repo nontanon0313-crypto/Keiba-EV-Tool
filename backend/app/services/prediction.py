@@ -9,7 +9,7 @@ def plackett_luce_win_probs(race):
     for runner in race.runners:
         inv_odds = 1.0 / (runner.odds_win or 10.0)
         weight_penalty = (runner.weight - 54.0) * 0.02
-        score = inv_odds - weight_penalty + random.uniform(0, 0.05)
+        score = inv_odds - weight_penalty
         scores.append((runner.horse_number, max(score, 0.001)))
     total = sum(s for _, s in scores)
     probs = []
@@ -52,4 +52,4 @@ def predict_race(race):
     random.seed(seed_for(race.race_id))
     win_probs = plackett_luce_win_probs(race)
     tri = trifecta_probs(race, win_probs)
-    return Prediction(race_id=race.race_id, created_at=datetime.now(), probabilities=win_probs, trifecta_probs=tri, model_version="plackett-luce-v1")
+    return Prediction(race_id=race.race_id, created_at=datetime.now(), probabilities=win_probs, trifecta_probs=tri, model_version="plackett-luce-v2-noNoise")
