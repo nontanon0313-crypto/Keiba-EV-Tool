@@ -373,7 +373,10 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   function renderBetsSummary(s){
     if (!s) { betsSummary.textContent = "データなし"; return; }
     var cls = s.total_profit >= 0 ? "ev-mid" : "ev-neg";
-    betsSummary.innerHTML = "<div>投票数: " + s.total_bets + "</div>"
+    var bankroll = 50000 + (s.total_profit || 0);
+    var betUnit = Math.max(100, Math.floor(bankroll * 0.005 / 100) * 100);
+    betsSummary.innerHTML = "<div>現在の資金: " + fmtYen(bankroll) + " (賭け金: " + fmtYen(betUnit) + ")</div>"
+      + "<div>投票数: " + s.total_bets + "</div>"
       + "<div>投資: " + fmtYen(s.total_stake) + " / 払戻: " + fmtYen(s.total_return) + "</div>"
       + "<div class=\"" + cls + "\">損益: " + (s.total_profit >= 0 ? "+" : "") + fmtYen(s.total_profit) + " (想定: " + fmtSigned(s.expected_profit, 0) + "円)</div>"
       + "<div>実的中率: " + fmtPct(s.hit_rate, 1) + " (" + s.hits + "/" + s.total_bets + ") / 想定的中率: " + fmtPct(s.expected_hit_rate, 1) + "</div>"
