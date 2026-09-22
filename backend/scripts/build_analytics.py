@@ -279,7 +279,41 @@ def build():
     }
     CACHE_FILE.write_text(json.dumps(result, ensure_ascii=False), encoding="utf-8")
     print("[build] done in {:.1f}s".format(time.time() - t0), flush=True)
-    print("[build] saved:", CACHE_FILE, flush=True)
+    print("[build] saved local:", CACHE_FILE, flush=True)
+
+    try:
+        _save_to_turso(result)
+        print("[build] saved turso", flush=True)
+    except Exception as e:
+        print("[build] turso save failed:", e, flush=True)
+
+
+def _save_to_turso(result):
+    import os
+    from datetime import datetime
+    url = os.getenv("TURSO_URL")
+    token = os.getenv("TURSO_TOKEN")
+    if not url or not token:
+        raise RuntimeError("TURSO_URL/TURSO_TOKEN not set")
+    import libsql_client
+    http_url = url.replace("libsql://", "https://").replace("wss://", "https://")
+    client = libsql_client.create_client_sync(url=http_url, auth_token=token)
+    client.execute(
+        "CREATE TABLE IF NOT EXISTS analytics_cache ("
+        "id INTEGER PRIMARY KEY,"
+        "payload TEXT NOT NULL,"
+        "updated_at TEXT NOT NULL)"
+    )
+    payload = json.dumps(result, ensure_ascii=False)
+    client.execute(
+        "INSERT INTO analytics_cache (id, payload, updated_at) VALUES (1, ?, ?) "
+        "ON CONFLICT (id) DO UPDATE SET payload=EXCLUDED.payload, updated_at=EXCLUDED.updated_at",
+        [payload, datetime.now().isoformat()],
+    )
+    try:
+        client.close()
+    except Exception:
+        pass
 
 
 if __name__ == "__main__":
