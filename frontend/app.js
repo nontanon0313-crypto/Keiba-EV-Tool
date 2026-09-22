@@ -15,7 +15,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   var tabPredict = $("tab-predict"), tabAnalytics = $("tab-analytics"), tabBets = $("tab-bets");
   var fMinProb = $("f-minprob"), fMinOdds = $("f-minodds"), fCollateral = $("f-collateral"), fMaxInv = $("f-maxinv"), fBetUnit = $("f-betunit"), fBetMode = $("f-betmode");
   var anaSummary = $("ana-summary"), anaView = $("ana-view");
-  var anaScopeTabs = $("ana-scope-tabs"), anaViewTabs = $("ana-view-tabs");
+  var anaViewTabs = $("ana-view-tabs");
   var betsSummary = $("bets-summary"), betsList = $("bets-list"), curveCanvas = $("curve-chart");
   var analyticsData = null, currentScope = "all", currentView = "ev", filters = {}, currentBets = [];
   var currentTicket = "mixed";
@@ -279,44 +279,35 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
       + "<div>想定利益%: " + fmtSigned(s.avg_expected_profit_pct, 2) + "</div>";
   }
 
-  function renderTicketStats(){
-    if (!ticketStats) { anaView.textContent = "読み込み中..."; return; }
-    var rows = ticketStats.tickets || [];
+  function renderTicketStatsFromData(){
+    if (!analyticsData) return;
+    var rows = analyticsData.ticket_stats || [];
     if (!rows.length) { anaView.textContent = "データなし"; return; }
-    var scopeLabel = ticketStats.scope === "voted" ? "投票済み" : ticketStats.scope === "excluded" ? "除外" : "全体";
-    var html = "<p class=\"ev-total\">スコープ: " + scopeLabel + "</p>";
-    html += "<table class=\"ev-table\"><thead><tr><th>券種</th><th>件数</th><th>的中率</th><th>想定的中率</th><th>ROI</th><th>想定ROI</th><th>損益</th></tr></thead><tbody>";
+    var html = "<table class=\"ev-table\"><thead><tr><th>券種</th><th>買い目数</th><th>的中</th><th>的中率</th><th>想定的中率</th><th>ROI</th><th>想定ROI</th></tr></thead><tbody>";
     rows.forEach(function(r){
       var cls = KeibaTheme.evClass(r.roi, EV_THRESHOLD);
-      var hit = fmtPct(r.hit_rate, 2);
-      var ehit = fmtPct(r.expected_hit_rate, 2);
-      var roi = fmtPct(r.roi, 1);
-      var eroi = fmtPct(r.expected_roi, 1);
-      html += "<tr class=\"" + cls + "\"><td>" + esc(r.label) + "</td><td>" + r.count + "</td><td>" + hit + "</td><td>" + ehit + "</td><td>" + roi + "</td><td>" + eroi + "</td><td>" + (r.profit >= 0 ? "+" : "") + fmtYen(r.profit) + "</td></tr>";
+      html += "<tr class=\"" + cls + "\"><td>" + esc(r.label) + "</td>"
+            + "<td>" + r.count + "</td>"
+            + "<td>" + r.hits + "</td>"
+            + "<td>" + fmtPct(r.hit_rate, 2) + "</td>"
+            + "<td>" + fmtPct(r.expected_hit_rate, 2) + "</td>"
+            + "<td>" + fmtPct(r.roi, 1) + "</td>"
+            + "<td>" + fmtPct(r.expected_roi, 1) + "</td></tr>";
     });
     html += "</tbody></table>";
-    html += "<p class=\"hint\">均等100円賭けで集計。想定ROIがプラスでも的中率が低い券種は分散が大きい点に注意。</p>";
     anaView.innerHTML = html;
   }
 
-  function loadTicketStats(){
-    var mq = currentModelFilter ? "&model_version=" + encodeURIComponent(currentModelFilter) : "";
-    fetchWithTimeout(API_BASE + "/analytics/tickets?scope=" + encodeURIComponent(currentScope) + mq, TIMEOUT_MS)
-      .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
-      .then(function(data){ ticketStats = data; if (currentView === "tickets") renderTicketStats(); })
-      .catch(function(err){ if (currentView === "tickets") anaView.textContent = "取得失敗: " + err.message; });
-  }
 
   function renderView(){
     if (!analyticsData) return;
-    var ticket = (analyticsData.by_ticket || [])[0] || { scopes: {} };
-    var s = (ticket.scopes || {})[currentScope] || { summary: null, prob_bins: [], odds_bins: [], ev_bins: [], features: [] };
-    renderAnaSummary(s.summary);
-    if (currentView === "prob") { anaView.innerHTML = tableRows(s.prob_bins || [], "確率帯"); return; }
-    if (currentView === "odds") { anaView.innerHTML = tableRows(s.odds_bins || [], "オッズ帯"); return; }
-    if (currentView === "features") { anaView.innerHTML = featuresView(s.features || []); return; }
-    if (currentView === "tickets") { renderTicketStats(); return; }
-    anaView.innerHTML = tableRows(s.ev_bins || [], "期待値帯");
+    var summary = analyticsData.summary || {};
+    renderAnaSummary(summary);
+    if (currentView === "prob") { anaView.innerHTML = tableRows(analyticsData.prob_bins || [], "確率帯"); return; }
+    if (currentView === "odds") { anaView.innerHTML = tableRows(analyticsData.odds_bins || [], "オッズ帯"); return; }
+    if (currentView === "features") { anaView.innerHTML = featuresView(analyticsData.features || []); return; }
+    if (currentView === "tickets") { renderTicketStatsFromData(); return; }
+    anaView.innerHTML = tableRows(analyticsData.ev_bins || [], "期待値帯");
   }
 
   function loadModelOptions(){
@@ -510,12 +501,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   }
 
   document.querySelectorAll(".tab").forEach(function(t){ t.addEventListener("click", function(){ switchTab(t.getAttribute("data-tab")); }); });
-  anaScopeTabs.querySelectorAll(".subtab").forEach(function(t){
-    t.addEventListener("click", function(){
-      anaScopeTabs.querySelectorAll(".subtab").forEach(function(x){ x.classList.remove("active"); });
-      t.classList.add("active"); currentScope = t.getAttribute("data-scope"); ticketStats = null; if (currentView === "tickets") loadTicketStats(); renderView();
-    });
-  });
+
   anaViewTabs.querySelectorAll(".subtab").forEach(function(t){
     t.addEventListener("click", function(){
       anaViewTabs.querySelectorAll(".subtab").forEach(function(x){ x.classList.remove("active"); });
@@ -539,7 +525,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
 
   loadFiltersFromStorage();
   anaModelFilter = document.getElementById("ana-model-filter");
-  if (anaModelFilter) anaModelFilter.addEventListener("change", function(){ currentModelFilter = anaModelFilter.value || ""; ticketStats = null; if (currentView === "tickets") loadTicketStats(); renderView(); });
+  if (anaModelFilter) anaModelFilter.addEventListener("change", function(){ currentModelFilter = anaModelFilter.value || ""; ticketStats = null; renderView(); });
   var ticketTabs = document.getElementById("ticket-tabs");
   if (ticketTabs) ticketTabs.querySelectorAll(".subtab").forEach(function(t){
     t.addEventListener("click", function(){
