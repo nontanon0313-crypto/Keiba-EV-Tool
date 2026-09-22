@@ -48,13 +48,14 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
         if (o.collateral != null) fCollateral.value = o.collateral;
         if (o.maxInvestment != null) fMaxInv.value = o.maxInvestment;
         if (o.betUnit != null) fBetUnit.value = o.betUnit;
+        if (o.betMode && fBetMode) fBetMode.value = o.betMode;
       }
     } catch (e) {}
   }
 
   function saveFiltersToStorage(){
     try {
-      localStorage.setItem(FILTER_KEY, JSON.stringify({ minProb: fMinProb.value, minOdds: fMinOdds.value, collateral: fCollateral.value, maxInvestment: fMaxInv.value, betUnit: fBetUnit.value }));
+      localStorage.setItem(FILTER_KEY, JSON.stringify({ minProb: fMinProb.value, minOdds: fMinOdds.value, collateral: fCollateral.value, maxInvestment: fMaxInv.value, betUnit: fBetUnit.value, betMode: (fBetMode ? fBetMode.value : "compound") }));
     } catch (e) {}
   }
 
@@ -64,6 +65,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     filters.collateral = Math.max(1000, Math.round(Number(fCollateral.value || 100000)));
     filters.maxInvestment = Math.max(100, Math.round(Number(fMaxInv.value || 10000)));
     filters.betUnit = Math.max(100, Math.round(Number(fBetUnit.value || 500)));
+    filters.betMode = fBetMode ? fBetMode.value : "compound";
   }
 
   function sortRaces(races){ return races.slice().sort(function(a, b){ var sa = a.start_at || "", sb = b.start_at || ""; return sa < sb ? -1 : sa > sb ? 1 : 0; }); }
@@ -227,7 +229,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     if (!box) return;
     box.textContent = "EV計算中...";
     readFilters();
-    var qs = "?race_id=" + encodeURIComponent(raceId) + "&ticket_type=" + encodeURIComponent(currentTicket) + "&min_prob=" + encodeURIComponent(filters.minProb) + "&min_odds=" + encodeURIComponent(filters.minOdds) + "&collateral=" + encodeURIComponent(filters.collateral) + "&max_investment=" + encodeURIComponent(filters.maxInvestment);
+    var qs = "?race_id=" + encodeURIComponent(raceId) + "&ticket_type=" + encodeURIComponent(currentTicket) + "&bet_mode=" + encodeURIComponent(filters.betMode || "compound") + "&min_prob=" + encodeURIComponent(filters.minProb) + "&min_odds=" + encodeURIComponent(filters.minOdds) + "&collateral=" + encodeURIComponent(filters.collateral) + "&max_investment=" + encodeURIComponent(filters.maxInvestment);
     fetchWithTimeout(API_BASE + "/vote-plans" + qs, TIMEOUT_MS, { method: "POST" })
       .then(function(res){ if (res.status === 204) { renderEvTable(raceId, [], 0); return null; } if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
       .then(function(data){ if (!data) return; var plan = data.plan || {}; renderEvTable(raceId, plan.bets || [], plan.total_amount || 0); })
@@ -520,7 +522,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
       t.classList.add("active"); currentView = t.getAttribute("data-view"); renderView();
     });
   });
-  [fMinProb, fMinOdds, fCollateral, fMaxInv, fBetUnit].forEach(function(el){
+  [fMinProb, fMinOdds, fCollateral, fMaxInv, fBetUnit, fBetMode].forEach(function(el){
     el.addEventListener("change", function(){
       saveFiltersToStorage();
       readFilters();
