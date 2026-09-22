@@ -19,6 +19,13 @@ class Settings(BaseSettings):
     MODEL_DIR: str = "models"
     LOG_DIR: str = "logs"
     LOG_LEVEL: str = "INFO"
+
+    # 混在モード (複数券種から EV順で上位N点)
+    MIXED_TICKETS: tuple = ("wide", "quinella")
+    MIXED_EV_MIN: float = 0.2
+    MIXED_ODDS_MIN: float = 10.0
+    MIXED_TOP_N: int = 2
+
     JRAVAN_SID: str = ""
     JRAVAN_DATA_DIR: str = ""
 
