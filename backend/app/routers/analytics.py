@@ -1,15 +1,41 @@
 """検証: 過去レース・実オッズ・実結果から独立して集計。
 予想ページ・収益ページの保存データは参照しない。
 race_store (過去レース) + odds_store (実オッズ) + predict_race + 実結果 で完結。
+結果はファイルキャッシュする (初回のみ計算、以後は保存結果)。
 """
 from fastapi import APIRouter
 from datetime import datetime
+from pathlib import Path
+import json
+import time
 from backend.app.services import race_store, odds_store
 from backend.app.services.prediction import predict_race
 from backend.app.services.ev_calc import calc_ev, _candidates, TICKET_TYPES, _TICKET_LABEL
 from backend.app.models.schemas import Race, Runner
 
 router = APIRouter(prefix="/analytics")
+
+CACHE_FILE = Path("analytics_cache.json")
+CACHE_TTL_SEC = 3600  # 1時間
+
+
+def _cache_valid():
+    if not CACHE_FILE.exists():
+        return False
+    age = time.time() - CACHE_FILE.stat().st_mtime
+    return age < CACHE_TTL_SEC
+
+
+def _load_cache():
+    try:
+        return json.loads(CACHE_FILE.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+
+def _save_cache(data):
+    CACHE_FILE.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+
 
 
 def _race_obj(rid, payload):
@@ -266,7 +292,12 @@ def _scan(tickets):
 
 
 @router.get("")
-def get_analytics():
+def get_analytics(force: bool = False):
+    if not force and _cache_valid():
+        cached = _load_cache()
+        if cached:
+            cached["_cached"] = True
+            return cached
     tickets = list(TICKET_TYPES)
     pb = _prob_bins()
     ob = _odds_bins()
@@ -292,7 +323,7 @@ def get_analytics():
 
     total_count = sum(ta["count"] for ta in ticket_agg.values())
     total_hits = sum(ta["hits"] for ta in ticket_agg.values())
-    return {
+    result = {
         "prob_bins": _format(pb, prob_samples, "prob"),
         "odds_bins": _format(ob, odds_samples, "odds"),
         "ev_bins": _format(eb, ev_samples, "ev"),
@@ -304,4 +335,11 @@ def get_analytics():
             "hit_rate": (total_hits / total_count) if total_count else 0.0,
             "races": len(race_store.list_races()),
         },
+        "generated_at": datetime.now().isoformat(),
+        "_cached": False,
     }
+    try:
+        _save_cache(result)
+    except Exception as e:
+        print("[analytics] cache save failed:", e)
+    return result

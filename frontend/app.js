@@ -326,7 +326,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     anaSummary.textContent = "読み込み中..."; anaView.textContent = "読み込み中...";
     loadModelOptions();
     var q = currentModelFilter ? "?model_version=" + encodeURIComponent(currentModelFilter) : "";
-    fetchWithTimeout(API_BASE + "/analytics" + q, TIMEOUT_MS)
+    fetchWithTimeout(API_BASE + "/analytics" + q, 120000)
       .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
       .then(function(data){ analyticsData = data; if (!ticketStats) loadTicketStats(); renderView(); })
       .catch(function(err){ anaSummary.textContent = "取得失敗: " + err.message; anaView.textContent = ""; });
