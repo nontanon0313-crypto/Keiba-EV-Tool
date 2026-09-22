@@ -47,13 +47,14 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
         if (o.minOdds != null) fMinOdds.value = o.minOdds;
         if (o.collateral != null) fCollateral.value = o.collateral;
         if (o.maxInvestment != null) fMaxInv.value = o.maxInvestment;
+        if (o.betUnit != null) fBetUnit.value = o.betUnit;
       }
     } catch (e) {}
   }
 
   function saveFiltersToStorage(){
     try {
-      localStorage.setItem(FILTER_KEY, JSON.stringify({ minProb: fMinProb.value, minOdds: fMinOdds.value, collateral: fCollateral.value, maxInvestment: fMaxInv.value }));
+      localStorage.setItem(FILTER_KEY, JSON.stringify({ minProb: fMinProb.value, minOdds: fMinOdds.value, collateral: fCollateral.value, maxInvestment: fMaxInv.value, betUnit: fBetUnit.value }));
     } catch (e) {}
   }
 
@@ -62,6 +63,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     filters.minOdds = Math.max(0, Number(fMinOdds.value || 0));
     filters.collateral = Math.max(1000, Math.round(Number(fCollateral.value || 100000)));
     filters.maxInvestment = Math.max(100, Math.round(Number(fMaxInv.value || 10000)));
+    filters.betUnit = Math.max(100, Math.round(Number(fBetUnit.value || 500)));
   }
 
   function sortRaces(races){ return races.slice().sort(function(a, b){ var sa = a.start_at || "", sb = b.start_at || ""; return sa < sb ? -1 : sa > sb ? 1 : 0; }); }
@@ -515,7 +517,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
       t.classList.add("active"); currentView = t.getAttribute("data-view"); renderView();
     });
   });
-  [fMinProb, fMinOdds, fCollateral, fMaxInv].forEach(function(el){
+  [fMinProb, fMinOdds, fCollateral, fMaxInv, fBetUnit].forEach(function(el){
     el.addEventListener("change", function(){
       saveFiltersToStorage();
       readFilters();
