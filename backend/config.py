@@ -21,10 +21,16 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
 
     # 混在モード (複数券種から EV順で上位N点)
-    MIXED_TICKETS: tuple = ("wide", "quinella")
-    MIXED_EV_MIN: float = 0.2
-    MIXED_ODDS_MIN: float = 10.0
+    MIXED_TICKETS: tuple = ("quinella", "trio", "wide")
+    MIXED_EV_MIN: float = 0.5
+    MIXED_ODDS_MIN: float = 30.0
     MIXED_TOP_N: int = 2
+
+    # 賭け金モード (fixed / compound)
+    BET_MODE: str = "compound"
+    BET_COMPOUND_RATIO: float = 0.005  # 資金の0.5%
+    BET_FIXED_UNIT: int = 500
+    BET_BANKROLL_INIT: int = 50000
 
     JRAVAN_SID: str = ""
     JRAVAN_DATA_DIR: str = ""
