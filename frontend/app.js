@@ -13,7 +13,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   var list = $("race-list"), detail = $("detail"), detailTitle = $("detail-title"), detailBody = $("detail-body");
   var backBtn = $("back-btn"), racesSection = $("races");
   var tabPredict = $("tab-predict"), tabAnalytics = $("tab-analytics"), tabBets = $("tab-bets");
-  var fMinProb = $("f-minprob"), fMinOdds = $("f-minodds"), fCollateral = $("f-collateral"), fMaxInv = $("f-maxinv");
+  var fMinProb = $("f-minprob"), fMinOdds = $("f-minodds"), fCollateral = $("f-collateral"), fMaxInv = $("f-maxinv"), fBetUnit = $("f-betunit"), fBetMode = $("f-betmode");
   var anaSummary = $("ana-summary"), anaView = $("ana-view");
   var anaScopeTabs = $("ana-scope-tabs"), anaViewTabs = $("ana-view-tabs");
   var betsSummary = $("bets-summary"), betsList = $("bets-list"), curveCanvas = $("curve-chart");
