@@ -14,7 +14,7 @@ router = APIRouter(prefix="/vote-plans")
 
 
 @router.post("")
-def create_vote_plan(race_id: str, ticket_type: str = "trifecta", min_prob: float = 0.0, min_odds: float = 0.0, collateral: int = 100000, max_investment: int = 10000):
+def create_vote_plan(race_id: str, ticket_type: str = "trifecta", min_prob: float = 0.0, min_odds: float = 0.0, collateral: int = 100000, max_investment: int = 10000, bet_mode: str = None):
     if ticket_type != "mixed" and ticket_type not in TICKET_TYPES:
         raise HTTPException(400, "unknown ticket_type")
     races = get_races()
@@ -31,7 +31,7 @@ def create_vote_plan(race_id: str, ticket_type: str = "trifecta", min_prob: floa
     if ticket_type == "mixed":
         summary = bet_store.summary()
         bankroll = settings.BET_BANKROLL_INIT + summary.get("total_profit", 0)
-        bets = build_mixed_bets(race, pred, odds_min=max(min_odds, 0) or None, collateral=collateral, max_investment=max_investment, bankroll=bankroll)
+        bets = build_mixed_bets(race, pred, odds_min=max(min_odds, 0) or None, collateral=collateral, max_investment=max_investment, bet_mode=bet_mode, bankroll=bankroll)
     else:
         bets = build_bets(race, pred, ticket_type=ticket_type, min_prob=min_prob, min_odds=min_odds, collateral=collateral, max_investment=max_investment)
     if not bets:
