@@ -289,7 +289,6 @@ def build():
 
 
 def _save_to_turso(result):
-    import os
     from datetime import datetime
     url = os.getenv("TURSO_URL")
     token = os.getenv("TURSO_TOKEN")

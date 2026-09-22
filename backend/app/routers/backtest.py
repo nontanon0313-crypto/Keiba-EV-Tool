@@ -56,7 +56,7 @@ def list_saved():
 
 
 @router.get("/run")
-def run(tickets: str = None, min_prob: float = 0.0, amount: int = 100):
+def run(tickets: str | None = None, min_prob: float = 0.0, amount: int = 100):
     """保存済みレースでバックテスト実行。tickets=trifecta,trio,... (カンマ区切り)。"""
     tl = None
     if tickets:

@@ -113,7 +113,7 @@ def _collect(scope="all", model_version=None):
 
 
 @router.get("")
-def get_ticket_stats(scope: str = "all", model_version: str = None):
+def get_ticket_stats(scope: str = "all", model_version: str | None = None):
     if scope not in ("all", "voted", "excluded"):
         scope = "all"
     return {"scope": scope, "model_version": model_version, "tickets": _collect(scope, model_version)}
