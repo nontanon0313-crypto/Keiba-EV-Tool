@@ -1,22 +1,58 @@
-const CACHE = "keiba-ev-v3";
-const ASSETS = ["./", "./index.html", "./theme.css", "./ev-theme.js", "./app.js", "./manifest.json", "./icon.svg"];
-self.addEventListener("install", function(e){
+// 修正のたびにこのバージョン文字列を更新すること
+const CACHE_NAME = "keiba-ev-v4";
+const ASSETS = [
+  "./",
+  "./index.html",
+  "./theme.css",
+  "./ev-theme.js",
+  "./app.js",
+  "./manifest.json",
+];
+
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)).catch(() => {})
+  );
   self.skipWaiting();
-  e.waitUntil(caches.open(CACHE).then(function(c){ return c.addAll(ASSETS); }));
 });
-self.addEventListener("activate", function(e){
-  e.waitUntil(caches.keys().then(function(keys){
-    return Promise.all(keys.filter(function(k){ return k !== CACHE; }).map(function(k){ return caches.delete(k); }));
-  }).then(function(){ return self.clients.claim(); }));
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key)))
+    ).then(() => self.clients.claim())
+  );
 });
-self.addEventListener("fetch", function(e){
-  if (e.request.mode === "navigate" || e.request.url.indexOf(".js") >= 0 || e.request.url.indexOf(".css") >= 0) {
-    e.respondWith(fetch(e.request).then(function(res){
-      var copy = res.clone();
-      caches.open(CACHE).then(function(c){ c.put(e.request, copy); });
-      return res;
-    }).catch(function(){ return caches.match(e.request); }));
+
+self.addEventListener("fetch", (event) => {
+  const url = event.request.url;
+  // APIは触らない
+  const isApi =
+    url.includes("/api/") ||
+    url.includes("keiba-ev-tool.onrender.com") ||
+    !url.includes(self.location.origin);
+  if (isApi || event.request.method !== "GET") {
     return;
   }
-  e.respondWith(caches.match(e.request).then(function(r){ return r || fetch(e.request); }));
+  // index / app.js / sw.js はネットワーク優先
+  const isCritical =
+    url.includes("index.html") ||
+    url.includes("/app.js") ||
+    url.endsWith("/") ||
+    url.includes("sw.js");
+  if (isCritical) {
+    event.respondWith(
+      fetch(event.request)
+        .then((res) => {
+          const copy = res.clone();
+          caches.open(CACHE_NAME).then((c) => c.put(event.request, copy)).catch(() => {});
+          return res;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+  event.respondWith(
+    caches.match(event.request).then((cached) => cached || fetch(event.request))
+  );
 });
