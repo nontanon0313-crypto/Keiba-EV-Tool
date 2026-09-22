@@ -18,7 +18,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   var anaScopeTabs = $("ana-scope-tabs"), anaViewTabs = $("ana-view-tabs");
   var betsSummary = $("bets-summary"), betsList = $("bets-list"), curveCanvas = $("curve-chart");
   var analyticsData = null, currentScope = "all", currentView = "ev", filters = {}, currentBets = [];
-  var currentTicket = "trifecta";
+  var currentTicket = "mixed";
   var ticketStats = null;
   var currentModelVersion = null;
   var anaModelFilter = null;
@@ -28,7 +28,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   var storageBadge = $("storage-badge");
 
   function esc(s){ return String(s == null ? "" : s).replace(/[&<>\x27]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","\x27":"&#39;"}[c]; }); }
-  function ticketLabel(t){ return ({trifecta:"3連単",trio:"3連複",exacta:"馬単",quinella:"馬連",wide:"ワイド",win:"単勝",place:"複勝"}[t] || t); }
+  function ticketLabel(t){ return ({mixed:"混在",trifecta:"3連単",trio:"3連複",exacta:"馬単",quinella:"馬連",wide:"ワイド",win:"単勝",place:"複勝"}[t] || t); }
   function fmtPct(v, d){ return (v * 100).toFixed(d == null ? 2 : d) + "%"; }
   function fmtNum(v, d){ return Number(v).toFixed(d == null ? 2 : d); }
   function fmtInt(v){ return String(Math.round(v)); }
