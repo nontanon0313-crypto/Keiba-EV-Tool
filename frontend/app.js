@@ -270,13 +270,12 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
 
   function renderAnaSummary(s){
     if (!s) { anaSummary.innerHTML = ""; return; }
-    var cnt = s.count || 0;
-    var voted = s.voted_count == null ? 0 : s.voted_count;
-    var total = s.total_count == null ? cnt : s.total_count;
-    var ratio = currentScope === "all" ? (voted + "/" + total + " が投票対象") : (cnt + " 件");
-    anaSummary.innerHTML = "<div>件数: " + cnt + " (" + ratio + ")</div>"
-      + "<div>実的中率: " + (s.actual_rate == null ? "-" : fmtPct(s.actual_rate)) + "</div>"
-      + "<div>想定利益%: " + fmtSigned(s.avg_expected_profit_pct, 2) + "</div>";
+    var cnt = s.total_count || 0;
+    var hits = s.total_hits || 0;
+    var hr = s.hit_rate || 0;
+    var races = s.races || 0;
+    anaSummary.innerHTML = "<div>対象レース: " + races + " / 買い目 " + cnt + " 件</div>"
+      + "<div>的中: " + hits + " (" + fmtPct(hr, 2) + ")</div>";
   }
 
   function renderTicketStatsFromData(){
