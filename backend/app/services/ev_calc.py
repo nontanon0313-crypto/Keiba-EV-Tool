@@ -83,3 +83,36 @@ def build_bets(race, prediction, ticket_type="trifecta", threshold=None, min_pro
         bets.append(Bet(type=_TICKET_LABEL.get(ticket_type, ticket_type), combination=combo, amount=amount, ev=ev, prob=prob, odds=odds))
     bets.sort(key=lambda x: x.ev or 0, reverse=True)
     return bets
+
+
+def build_mixed_bets(race, prediction, tickets=None, ev_min=None, odds_min=None, top_n=None,
+                     collateral=100000, max_investment=10000):
+    """複数券種を横断してEV順ソートし、上位N点を返す。"""
+    from backend.config import settings
+    if tickets is None:
+        tickets = settings.MIXED_TICKETS
+    if ev_min is None:
+        ev_min = settings.MIXED_EV_MIN
+    if odds_min is None:
+        odds_min = settings.MIXED_ODDS_MIN
+    if top_n is None:
+        top_n = settings.MIXED_TOP_N
+    candidates = []
+    for t in tickets:
+        for combo, prob in _candidates(prediction, t):
+            if prob <= 0:
+                continue
+            odds = mock_odds(prob, race.race_id, combo, t)
+            if odds < odds_min:
+                continue
+            ev = calc_ev(prob, odds)
+            if ev < ev_min:
+                continue
+            amount = suggest_amount(prob, odds, collateral, max_investment)
+            candidates.append((ev, prob, odds, combo, t, amount))
+    candidates.sort(key=lambda x: x[0], reverse=True)
+    picks = candidates[:top_n]
+    bets = []
+    for ev, prob, odds, combo, t, amount in picks:
+        bets.append(Bet(type=_TICKET_LABEL.get(t, t), combination=combo, amount=amount, ev=ev, prob=prob, odds=odds))
+    return bets
