@@ -28,6 +28,9 @@ def create_vote_plan(race_id: str, ticket_type: str = "trifecta", min_prob: floa
     if ticket_type == "mixed":
         bets = build_mixed_bets(race, pred, odds_min=max(min_odds, 0) or None, collateral=collateral, max_investment=max_investment)
     else:
+        if ticket_type == "mixed":
+        bets = build_mixed_bets(race, pred, odds_min=max(min_odds, 0) or None, collateral=collateral, max_investment=max_investment)
+    else:
         bets = build_bets(race, pred, ticket_type=ticket_type, min_prob=min_prob, min_odds=min_odds, collateral=collateral, max_investment=max_investment)
     if not bets:
         raise HTTPException(204, "no EV positive")
