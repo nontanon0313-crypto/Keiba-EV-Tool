@@ -22,17 +22,6 @@
 </header>
 <main>
 <section id="tab-predict">
-<div class="filters">
-<label>最低確率 %<input id="f-minprob" type="number" step="0.1" value="0"></label>
-<label>最低オッズ<input id="f-minodds" type="number" step="0.1" value="0"></label>
-<label>証拠金<input id="f-collateral" type="number" step="1000" value="100000"></label>
-<label>上限投資<input id="f-maxinv" type="number" step="1000" value="10000"></label>
-<label>賭け金モード<select id="f-betmode">
-<option value="compound">複利（資金×0.5%）</option>
-<option value="fixed">固定額</option>
-</select></label>
-<label>固定額（円）<input id="f-betunit" type="number" step="100" value="500"></label>
-</div>
 <section id="races">
 <h2>本日のレース</h2>
 <div id="race-list">読み込み中...</div>
@@ -107,6 +96,6 @@
 </div>
 </div>
 <script src="./ev-theme.js"></script>
-<script src="./app.js?v=5"></script>
+<script src="./app.js?v=6"></script>
 </body>
 </html>
