@@ -86,8 +86,9 @@ def build_bets(race, prediction, ticket_type="trifecta", threshold=None, min_pro
 
 
 def build_mixed_bets(race, prediction, tickets=None, ev_min=None, odds_min=None, top_n=None,
-                     collateral=100000, max_investment=10000):
-    """複数券種を横断してEV順ソートし、上位N点を返す。"""
+                     collateral=100000, max_investment=10000, bet_mode=None, bankroll=None):
+    """複数券種を横断してEV順ソートし、上位N点を返す。
+    bet_mode: fixed (固定額) / compound (資金の固定割合)"""
     from backend.config import settings
     if tickets is None:
         tickets = settings.MIXED_TICKETS
@@ -97,6 +98,8 @@ def build_mixed_bets(race, prediction, tickets=None, ev_min=None, odds_min=None,
         odds_min = settings.MIXED_ODDS_MIN
     if top_n is None:
         top_n = settings.MIXED_TOP_N
+    if bet_mode is None:
+        bet_mode = settings.BET_MODE
     candidates = []
     for t in tickets:
         for combo, prob in _candidates(prediction, t):
@@ -108,11 +111,22 @@ def build_mixed_bets(race, prediction, tickets=None, ev_min=None, odds_min=None,
             ev = calc_ev(prob, odds)
             if ev < ev_min:
                 continue
-            amount = suggest_amount(prob, odds, collateral, max_investment)
-            candidates.append((ev, prob, odds, combo, t, amount))
+            candidates.append((ev, prob, odds, combo, t))
     candidates.sort(key=lambda x: x[0], reverse=True)
     picks = candidates[:top_n]
+    if not picks:
+        return []
+    # 賭け金計算
+    if bet_mode == "compound":
+        if bankroll is None:
+            bankroll = settings.BET_BANKROLL_INIT
+        raw = bankroll * settings.BET_COMPOUND_RATIO
+        unit = int(raw // 100 * 100)
+        if unit < 100:
+            unit = 100
+    else:
+        unit = int(settings.BET_FIXED_UNIT // 100 * 100)
     bets = []
-    for ev, prob, odds, combo, t, amount in picks:
-        bets.append(Bet(type=_TICKET_LABEL.get(t, t), combination=combo, amount=amount, ev=ev, prob=prob, odds=odds))
+    for ev, prob, odds, combo, t in picks:
+        bets.append(Bet(type=_TICKET_LABEL.get(t, t), combination=combo, amount=unit, ev=ev, prob=prob, odds=odds))
     return bets
