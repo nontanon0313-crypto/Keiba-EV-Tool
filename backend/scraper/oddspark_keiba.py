@@ -176,3 +176,46 @@ if __name__ == "__main__":
         races = fetch_one_day(v["track_cd"], v["sponsor_cd"], date)
         print(f"    races: {len(races) if races else 0}")
         _sleep()
+
+
+def fetch_one_day_detail(track_cd: str, sponsor_cd: str, date: str) -> List[Dict]:
+    """1日出走表から各レースの発走時刻・距離・馬場を取得。"""
+    url = f"{BASE}/keiba/OneDayRaceList.do?raceDy={date}&opTrackCd={track_cd}&sponsorCd={sponsor_cd}"
+    with httpx.Client(headers=HEADERS, timeout=20, follow_redirects=True) as c:
+        r = c.get(url)
+        r.raise_for_status()
+        html = r.text
+    soup = BeautifulSoup(html, "html.parser")
+    out = []
+    seen = set()
+    for a in soup.find_all("a", href=True):
+        href = a["href"]
+        m = re.search(r"raceNb=(\d+)", href)
+        if not m:
+            continue
+        rn = int(m.group(1))
+        if rn in seen:
+            continue
+        parent = a.find_parent(["tr", "li", "div"])
+        if not parent:
+            continue
+        txt = parent.get_text(" ", strip=True)
+        t = re.search(r"(\d{1,2}):(\d{2})", txt)
+        start_hhmm = t.group(0) if t else None
+        # 距離
+        dist_m = re.search(r"(\d{3,4})m", txt)
+        distance = int(dist_m.group(1)) if dist_m else 0
+        # 馬場
+        surface = "ダート"
+        if "芝" in txt:
+            surface = "芝"
+        elif "障" in txt:
+            surface = "障害"
+        seen.add(rn)
+        out.append({
+            "race_nb": rn,
+            "start_hhmm": start_hhmm,
+            "distance": distance,
+            "surface": surface,
+        })
+    return sorted(out, key=lambda x: x["race_nb"])

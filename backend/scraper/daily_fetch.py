@@ -5,7 +5,7 @@ import time
 from datetime import datetime
 
 from backend.scraper.oddspark_keiba import (
-    fetch_race_list, fetch_one_day, fetch_shutuba,
+    fetch_race_list, fetch_one_day, fetch_one_day_detail, fetch_shutuba,
 )
 from backend.app.services import race_store
 
@@ -24,9 +24,22 @@ def parse_race_name(name: str):
     return venue, rn
 
 
-def build_payload(date: str, track_cd: str, sponsor_cd: str, race_nb: int, shutuba: dict) -> dict:
+def build_payload(date: str, track_cd: str, sponsor_cd: str, race_nb: int, shutuba: dict, detail: dict = None) -> dict:
     """race_store 用の payload を組み立てる。"""
     venue, rn = parse_race_name(shutuba.get("race_name", ""))
+    # 発走時刻
+    start_hhmm = (detail or {}).get("start_hhmm") or "12:00"
+    hh, mm = start_hhmm.split(":")[:2]
+    start_iso = f"{date[:4]}-{date[4:6]}-{date[6:8]}T{int(hh):02d}:{int(mm):02d}:00"
+    # 締切 = 発走 2分前
+    import datetime as dt
+    try:
+        st = dt.datetime.fromisoformat(start_iso)
+        deadline_iso = (st - dt.timedelta(minutes=2)).isoformat()
+    except Exception:
+        deadline_iso = start_iso
+    distance = (detail or {}).get("distance", 0) or 0
+    surface = (detail or {}).get("surface", "ダート") or "ダート"
     runners = []
     for r in shutuba.get("runners", []):
         runners.append({
@@ -49,10 +62,10 @@ def build_payload(date: str, track_cd: str, sponsor_cd: str, race_nb: int, shutu
         "venue": venue,
         "date": f"{date[:4]}-{date[4:6]}-{date[6:8]}",
         "race_number": rn,
-        "start_at": datetime.now().isoformat(),
-        "deadline_at": datetime.now().isoformat(),
-        "surface": "ダート",
-        "distance": 0,
+        "start_at": start_iso,
+        "deadline_at": deadline_iso,
+        "surface": surface,
+        "distance": distance,
         "runners": runners,
         "source": "oddspark",
         "track_cd": track_cd,
@@ -77,13 +90,19 @@ def main():
         if not races:
             print(f"  {venue}: no races", flush=True)
             continue
+        # 発走時刻・距離を取得
+        try:
+            details = {d["race_nb"]: d for d in fetch_one_day_detail(track_cd, sponsor_cd, date)}
+        except Exception:
+            details = {}
         print(f"  {venue} ({track_cd}/{sponsor_cd}): {len(races)} races", flush=True)
         for r in races:
             try:
                 shutuba = fetch_shutuba(date, track_cd, sponsor_cd, r["race_nb"])
                 if not shutuba or not shutuba.get("runners"):
                     continue
-                payload = build_payload(date, track_cd, sponsor_cd, r["race_nb"], shutuba)
+                detail = details.get(r["race_nb"], {})
+                payload = build_payload(date, track_cd, sponsor_cd, r["race_nb"], shutuba, detail)
                 race_store.save_race(payload["race_id"], payload)
                 total += 1
                 print(f"    saved {payload['race_id']} ({len(payload['runners'])}頭)", flush=True)
