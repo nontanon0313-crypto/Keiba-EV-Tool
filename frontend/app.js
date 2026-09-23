@@ -403,7 +403,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     rows.forEach(function(r){
       var cls = r.profit > 0 ? "ev-mid" : r.profit < 0 ? "ev-neg" : "";
       var statusLabel = r.status === "hit" ? "的中" : r.status === "miss" ? "不的中" : r.status === "pending" ? "確定待ち" : r.status;
-      html += "<tr class=\"" + cls + "\"><td>" + esc(r.race_id) + "</td><td>" + esc(r.combo) + "</td><td>" + esc(r.model_version || "-") + "</td><td>" + fmtYen(r.amount) + "</td><td>" + fmtNum(r.odds, 1) + "</td><td>" + statusLabel + "</td><td>" + (r.profit >= 0 ? "+" : "") + fmtYen(r.profit) + "</td><td>" + settleCell(r) + "</td><td><button class=\"del-btn\" data-id=\"" + r.id + "\" type=\"button\">削除</button></td></tr>";
+      html += "<tr class=\"" + cls + "\"><td>" + raceLabel(r.race_id) + "</td><td>" + esc(r.combo) + "</td><td>" + esc(r.model_version || "-") + "</td><td>" + fmtYen(r.amount) + "</td><td>" + fmtNum(r.odds, 1) + "</td><td>" + statusLabel + "</td><td>" + (r.profit >= 0 ? "+" : "") + fmtYen(r.profit) + "</td><td>" + settleCell(r) + "</td><td><button class=\"del-btn\" data-id=\"" + r.id + "\" type=\"button\">削除</button></td></tr>";
     });
     html += "</tbody></table>";
     betsList.innerHTML = html;
