@@ -121,7 +121,11 @@ def build_mixed_bets(race, prediction, tickets=None, ev_min=None, odds_min=None,
         if bankroll is None:
             bankroll = settings.BET_BANKROLL_INIT
         raw = bankroll * settings.BET_COMPOUND_RATIO
-        unit = int(raw // 100 * 100)
+        # 払戻1000万円上限を考慮
+        # 想定最大オッズ × 余裕係数 × 賭け金 <= PAYOUT_CAP
+        cap_odds = settings.PAYOUT_CAP_MAX_ODDS * settings.PAYOUT_CAP_SAFETY
+        cap_unit = settings.PAYOUT_CAP / cap_odds if cap_odds > 0 else raw
+        unit = int(min(raw, cap_unit) // 100 * 100)
         if unit < 100:
             unit = 100
     else:

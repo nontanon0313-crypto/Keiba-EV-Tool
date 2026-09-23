@@ -27,6 +27,9 @@ class Settings(BaseSettings):
     MIXED_TOP_N: int = 2
 
     # 賭け金モード (fixed / compound)
+    PAYOUT_CAP: int = 10_000_000  # 払戻上限 1000万円
+    PAYOUT_CAP_SAFETY: float = 1.5  # オッズ変動の余裕係数
+    PAYOUT_CAP_MAX_ODDS: float = 500.0  # 想定最大オッズ
     BET_MODE: str = "compound"
     BET_COMPOUND_RATIO: float = 0.005  # 資金の0.5%
     BET_FIXED_UNIT: int = 500
