@@ -399,7 +399,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
 
   function renderBetsList(rows){
     if (!rows || !rows.length) { betsList.textContent = "投票履歴はありません"; return; }
-    var html = "<table class=\"ev-table\"><thead><tr><th>レース</th><th>買い目</th><th>モデル</th><th>金額</th><th>オッズ</th><th>状態</th><th>損益</th><th>払戻</th><th></th></tr></thead><tbody>";
+    var html = "<table class=\"ev-table\"><thead><tr><th>レース</th><th>券種</th><th>買い目</th><th>金額</th><th>オッズ</th><th>状態</th><th>損益</th><th>払戻</th><th></th></tr></thead><tbody>";
     rows.forEach(function(r){
       var cls = r.profit > 0 ? "ev-mid" : r.profit < 0 ? "ev-neg" : "";
       var statusLabel = r.status === "hit" ? "的中" : r.status === "miss" ? "不的中" : r.status === "pending" ? "確定待ち" : r.status;
