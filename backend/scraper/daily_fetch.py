@@ -2,7 +2,7 @@
 import os
 import sys
 import time
-from datetime import datetime, date
+from datetime import datetime
 
 from backend.scraper.oddspark_keiba import (
     fetch_race_list, fetch_one_day, fetch_shutuba,
