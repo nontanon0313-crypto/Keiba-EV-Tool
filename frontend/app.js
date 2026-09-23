@@ -28,7 +28,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   var storageBadge = $("storage-badge");
 
   function esc(s){ return String(s == null ? "" : s).replace(/[&<>\x27]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","\x27":"&#39;"}[c]; }); }
-  function ticketLabel(t){ return ({mixed:"推奨",trifecta:"3連単",trio:"3連複",exacta:"馬単",quinella:"馬連",wide:"ワイド",win:"単勝",place:"複勝"}[t] || t); }
+  function ticketLabel(t){ return ({mixed:"馬連",trifecta:"3連単",trio:"3連複",exacta:"馬単",quinella:"馬連",wide:"ワイド",win:"単勝",place:"複勝"}[t] || t); }
   var TRACK_NAMES = {"12":"水沢","42":"笠松","51":"園田","31":"浦和","06":"水沢","20":"笠松","26":"園田","13":"浦和","11":"門別","55":"大井","61":"川崎","03":"船橋","41":"名古屋","43":"金沢"};
   function raceLabel(raceId, fallbackVenue, fallbackRn){
     if (!raceId) return "";
