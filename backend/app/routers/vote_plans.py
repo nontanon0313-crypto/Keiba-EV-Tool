@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from backend.app.services.race_fetcher import get_races
+from backend.app.services.race_fetcher import get_races, get_real_races
 from backend.app.services.prediction import predict_race
 from backend.app.services.ev_calc import build_bets, build_mixed_bets, TICKET_TYPES
 from backend.app.services.vote_manager import send_plan
@@ -17,7 +17,7 @@ router = APIRouter(prefix="/vote-plans")
 def create_vote_plan(race_id: str, ticket_type: str = "trifecta", min_prob: float = 0.0, min_odds: float = 0.0, collateral: int = 100000, max_investment: int = 10000, bet_mode: str | None = None):
     if ticket_type != "mixed" and ticket_type not in TICKET_TYPES:
         raise HTTPException(400, "unknown ticket_type")
-    races = get_races()
+    races = get_real_races() or get_races()
     race = next((r for r in races if r.race_id == race_id), None)
     if not race:
         raise HTTPException(404, "race not found")
