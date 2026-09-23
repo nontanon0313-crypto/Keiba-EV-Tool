@@ -29,6 +29,19 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
 
   function esc(s){ return String(s == null ? "" : s).replace(/[&<>\x27]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","\x27":"&#39;"}[c]; }); }
   function ticketLabel(t){ return ({mixed:"推奨",trifecta:"3連単",trio:"3連複",exacta:"馬単",quinella:"馬連",wide:"ワイド",win:"単勝",place:"複勝"}[t] || t); }
+  var TRACK_NAMES = {"12":"水沢","42":"笠松","51":"園田","31":"浦和","06":"水沢","20":"笠松","26":"園田","13":"浦和","11":"門別","55":"大井","61":"川崎","03":"船橋","41":"名古屋","43":"金沢"};
+  function raceLabel(raceId, fallbackVenue, fallbackRn){
+    if (!raceId) return "";
+    // nar-YYYYMMDD-trackcd-racenb 形式
+    var m = String(raceId).match(/^nar-(\d{8})-(\d+)-(\d+)$/);
+    if (m){
+      var track = m[2];
+      var rn = parseInt(m[3], 10);
+      var venue = TRACK_NAMES[track] || (fallbackVenue || "");
+      return venue + " " + rn + "R";
+    }
+    return raceId;
+  }
   function fmtPct(v, d){ return (v * 100).toFixed(d == null ? 2 : d) + "%"; }
   function fmtNum(v, d){ return Number(v).toFixed(d == null ? 2 : d); }
   function fmtInt(v){ return String(Math.round(v)); }
@@ -69,7 +82,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   }
 
   function sortRaces(races){ return races.slice().sort(function(a, b){ var sa = a.start_at || "", sb = b.start_at || ""; return sa < sb ? -1 : sa > sb ? 1 : 0; }); }
-  function isFinished(r){ if (!r.start_at) return false; var t = Date.parse(r.start_at); if (isNaN(t)) return false; return (Date.now() - t) > FINISH_GRACE_MS; }
+  function isFinished(r){ var t = null; if (r.deadline_at) t = Date.parse(r.deadline_at); else if (r.start_at) t = Date.parse(r.start_at) - 120000; if (t == null || isNaN(t)) return false; return Date.now() > t; }
 
   function renderList(races){
     var visible = sortRaces(races.filter(function(r){ return !isFinished(r); }));
