@@ -21,8 +21,8 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
 
     # 混在モード (複数券種から EV順で上位N点)
-    MIXED_TICKETS: tuple = ("quinella", "trio", "wide")
-    MIXED_EV_MIN: float = 0.5
+    MIXED_TICKETS: tuple = ("quinella",)
+    MIXED_EV_MIN: float = 0.0
     MIXED_ODDS_MIN: float = 30.0
     MIXED_TOP_N: int = 2
 
