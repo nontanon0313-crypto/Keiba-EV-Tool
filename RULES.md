@@ -44,3 +44,10 @@
 - `result_fetcher.py` の Mock 結果
 - `vote_manager.py` の `mock_saved`
 - `daily_fetch.py` は単勝のみ保存 → 全券種必要
+
+## ディレクトリの絶対ルール
+- Termuxでは `/tmp` に書き込めない（Permission denied）
+- 一時ファイルは `~/projects/Keiba-EV-Tool/` 配下に作る
+- 例: `debug_html/`, `tmp/`, `scratch/`
+- `.gitignore` に必ず追加してコミットしない
+- Python の `tempfile` も同様に注意
