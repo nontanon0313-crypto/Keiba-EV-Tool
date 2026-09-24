@@ -279,10 +279,13 @@ def build():
                 hit = hit_check(t, combo, finish)
                 sample = (prob, ro, ev, hit)
                 scopes_samples["all"].append(sample)
-                if (t, combo) in plan_set:
-                    scopes_samples["plan"].append(sample)
-                else:
-                    scopes_samples["non_plan"].append(sample)
+                # フィルタ通過候補のみがplan/non_plan対象
+                passes_filter = (ro >= settings.MIXED_ODDS_MIN) and (ev >= settings.MIXED_EV_MIN) and (t in settings.MIXED_TICKETS)
+                if passes_filter:
+                    if (t, combo) in plan_set:
+                        scopes_samples["plan"].append(sample)
+                    else:
+                        scopes_samples["non_plan"].append(sample)
                 # features は all のみ
                 parts = combo.split("-")
                 try:

@@ -47,13 +47,14 @@ def _candidates(prediction, ticket_type):
         return [(str(p.horse_number), p.place_prob) for p in prediction.probabilities]
     from backend.app.services import derived
     if ticket_type == "trio":
-        return [(x["combo"], x["prob"]) for x in derived.trio_probs(prediction.trifecta_probs)]
+        return [(x["combo"], x["prob"]) for x in derived.trio_probs_direct(prediction.probabilities)]
     if ticket_type == "exacta":
-        return [(x["combo"], x["prob"]) for x in derived.exacta_probs(prediction.trifecta_probs)]
+        return [(x["combo"], x["prob"]) for x in derived.exacta_probs_direct(prediction.probabilities)]
     if ticket_type == "quinella":
-        return [(x["combo"], x["prob"]) for x in derived.quinella_probs(prediction.trifecta_probs)]
+        # 単勝確率から直接計算（truncation回避）
+        return [(x["combo"], x["prob"]) for x in derived.quinella_probs_direct(prediction.probabilities)]
     if ticket_type == "wide":
-        return [(x["combo"], x["prob"]) for x in derived.wide_probs(prediction.trifecta_probs)]
+        return [(x["combo"], x["prob"]) for x in derived.wide_probs_direct(prediction.probabilities)]
     return []
 
 

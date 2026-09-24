@@ -23,7 +23,7 @@ def plackett_luce_win_probs(race):
 
 def trifecta_probs(race, win_probs):
     score_map = {p.horse_number: p.win_prob for p in win_probs}
-    nums = [r.horse_number for r in race.runners[:8]]
+    nums = [r.horse_number for r in race.runners]
     out = []
     for a in nums:
         for b in nums:
@@ -45,7 +45,7 @@ def trifecta_probs(race, win_probs):
                 combo = str(a) + "-" + str(b) + "-" + str(c)
                 out.append(TrifectaProb(combo=combo, prob=prob))
     out.sort(key=lambda x: x.prob, reverse=True)
-    return out[:30]
+    return out
 
 
 def predict_race(race):
