@@ -104,3 +104,15 @@ label.bulk-btn.inline{cursor:pointer;}
 /* 検証タブ・収益タブの表の右余白を確保 */
 .ev-table{padding-right:6px;}
 .ev-table th:last-child,.ev-table td:last-child{padding-right:8px;}
+
+
+/* 検証タブ・収益タブのテーブル横スクロール対応 */
+#ana-view { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+#ana-view .ev-table { width: 100%; min-width: 100%; }
+#ana-view .ev-table th,
+#ana-view .ev-table td { padding-right: 12px; }
+#ana-view .ev-table th:first-child,
+#ana-view .ev-table td:first-child { padding-left: 4px; }
+#bets-list { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+#bets-list .ev-table th,
+#bets-list .ev-table td { padding-right: 12px; }
