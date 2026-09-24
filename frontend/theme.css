@@ -100,3 +100,7 @@ label.bulk-btn.inline{cursor:pointer;}
 .model-filter-row{display:flex;gap:8px;margin-bottom:8px;align-items:center;}
 .model-filter{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--keiba-gold);}
 .model-filter select{background:#0f1a30;color:var(--keiba-text);border:1px solid rgba(212,175,55,0.4);border-radius:6px;padding:6px 8px;font-size:13px;}
+
+/* 検証タブ・収益タブの表の右余白を確保 */
+.ev-table{padding-right:6px;}
+.ev-table th:last-child,.ev-table td:last-child{padding-right:8px;}

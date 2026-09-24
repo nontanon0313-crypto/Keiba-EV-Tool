@@ -246,12 +246,13 @@ def build():
     races = race_store.list_races()
     print("[build] races:", len(races), flush=True)
 
-    # 1レースずつオッズを取得 (Turso応答サイズ制限回避)
+    # バッチで全オッズを一括取得（100件ずつ）
+    rids = [it["race_id"] for it in races]
+    odds_map = odds_store.get_odds_batch(rids)
+    print("[build] odds fetched:", len(odds_map), flush=True)
+
     def get_odds_for(rid):
-        try:
-            return odds_store.get_odds(rid) or {}
-        except Exception:
-            return {}
+        return odds_map.get(rid) or {}
 
     for i, it in enumerate(races):
         rid = it["race_id"]

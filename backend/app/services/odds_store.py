@@ -136,3 +136,52 @@ def list_race_ids():
             return []
     # Fileの場合
     return [it.get("race_id") for it in backend.load() if it.get("race_id")]
+
+
+def get_odds_single(race_id):
+    """1レース分のpayloadを単一クエリで取得（Turso応答サイズ問題回避）。"""
+    backend = _get()
+    if hasattr(backend, "client"):
+        try:
+            r = backend.client.execute("SELECT payload FROM scraped_odds WHERE race_id = ?", [race_id])
+            rows = list(r.rows)
+            if not rows:
+                return None
+            import json as _json
+            return _json.loads(rows[0][0])
+        except Exception as e:
+            print("[odds_store] get_odds_single failed:", e)
+            return None
+    for it in backend.load():
+        if it.get("race_id") == race_id:
+            return it.get("payload")
+    return None
+
+
+def get_odds_batch(race_ids):
+    """race_id のリストで複数レースの payload をバッチ取得。
+    Tursoの応答サイズ制限を回避するため100件ずつ。"""
+    import json as _json
+    backend = _get()
+    if hasattr(backend, "client"):
+        out = {}
+        for i in range(0, len(race_ids), 100):
+            chunk = list(race_ids[i:i+100])
+            placeholders = ",".join(["?"] * len(chunk))
+            try:
+                r = backend.client.execute(
+                    f"SELECT race_id, payload FROM scraped_odds WHERE race_id IN ({placeholders})",
+                    chunk,
+                )
+                for row in r.rows:
+                    try:
+                        out[row[0]] = _json.loads(row[1])
+                    except Exception:
+                        pass
+            except Exception as e:
+                print(f"[odds_store] batch chunk {i} failed:", e)
+        return out
+    # file backend
+    items = backend.load()
+    idset = set(race_ids)
+    return {it.get("race_id"): it.get("payload") for it in items if it.get("race_id") in idset}
