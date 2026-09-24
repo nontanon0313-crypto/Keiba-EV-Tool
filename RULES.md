@@ -16,3 +16,9 @@
   2. frontend/index.html の app.js?v=N も同じ番号に更新
 - 片方だけ忘れるとキャッシュが効いて変更が反映されない
 - コミット前に `grep CACHE_NAME frontend/sw.js` と `grep app.js frontend/index.html` で確認する
+
+## スクレイピングの性能ルール
+- 複数URL/レースを取得する処理は最初から asyncio + セマフォで並列化する
+- 逐次処理で書かない。並列度8〜12が目安
+- 1レース内の複数券種も asyncio.gather で並列化
+- 待機は1リクエスト0.5秒（並列前提）、券種間は不要
