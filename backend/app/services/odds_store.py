@@ -121,3 +121,18 @@ def get_odds(race_id):
 
 def list_odds():
     return _get().load()
+
+
+def list_race_ids():
+    """race_id のリストだけを軽量に取得（payloadなし）。"""
+    backend = _get()
+    # Tursoの場合: SELECT race_id のみ
+    if hasattr(backend, "client"):
+        try:
+            r = backend.client.execute("SELECT race_id FROM scraped_odds")
+            return [row[0] for row in r.rows]
+        except Exception as e:
+            print("[odds_store] list_race_ids failed:", e)
+            return []
+    # Fileの場合
+    return [it.get("race_id") for it in backend.load() if it.get("race_id")]

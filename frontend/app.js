@@ -19,6 +19,8 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   var betsSummary = $("bets-summary"), betsList = $("bets-list"), curveCanvas = $("curve-chart");
   var analyticsData = null, currentScope = "all", currentView = "ev", filters = {}, currentBets = [];
   var currentTicket = "mixed";
+  var currentAnaScope = "all";
+  var currentTabName = "predict";
   var ticketStats = null;
   var currentModelVersion = null;
   var anaModelFilter = null;
@@ -281,14 +283,28 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     return html;
   }
 
-  function renderAnaSummary(s){
+  function renderAnaSummary(s, races){
     if (!s) { anaSummary.innerHTML = ""; return; }
     var cnt = s.total_count || 0;
     var hits = s.total_hits || 0;
     var hr = s.hit_rate || 0;
-    var races = s.races || 0;
-    anaSummary.innerHTML = "<div>対象レース: " + races + " / 買い目 " + cnt + " 件</div>"
+    var racesN = races || 0;
+    anaSummary.innerHTML = "<div>対象レース: " + racesN + " / 買い目 " + cnt + " 件</div>"
       + "<div>的中: " + hits + " (" + fmtPct(hr, 2) + ")</div>";
+  }
+
+  function renderCumTable(rows, label){
+    if (!rows || !rows.length) return "<p>該当データなし</p>";
+    var html = "<h4 class=\"feature-title\">" + label + " (累積)</h4>";
+    html += "<table class=\"ev-table\"><thead><tr><th>範囲</th><th>件数</th><th>予想的中率</th><th>オッズ平均</th><th>想定利益%</th><th>実的中率</th><th>実利益%</th></tr></thead><tbody>";
+    rows.forEach(function(r){
+      var cls = KeibaTheme.evClass(r.expected_profit_pct / 100, EV_THRESHOLD);
+      var actual = r.actual_rate == null ? "-" : fmtPct(r.actual_rate);
+      var ap = r.actual_profit_pct == null ? "-" : fmtSigned(r.actual_profit_pct, 1);
+      html += "<tr class=\"" + cls + "\"><td>" + esc(r.range) + "</td><td>" + r.count + "</td><td>" + fmtPct(r.avg_prob) + "</td><td>" + fmtNum(r.avg_odds, 1) + "</td><td>" + fmtSigned(r.expected_profit_pct, 1) + "</td><td>" + actual + "</td><td>" + ap + "</td></tr>";
+    });
+    html += "</tbody></table>";
+    return html;
   }
 
   function renderTicketStatsFromData(){
@@ -313,13 +329,26 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
 
   function renderView(){
     if (!analyticsData) return;
-    var summary = analyticsData.summary || {};
-    renderAnaSummary(summary);
-    if (currentView === "prob") { anaView.innerHTML = tableRows(analyticsData.prob_bins || [], "確率帯"); return; }
-    if (currentView === "odds") { anaView.innerHTML = tableRows(analyticsData.odds_bins || [], "オッズ帯"); return; }
-    if (currentView === "features") { anaView.innerHTML = featuresView(analyticsData.features || []); return; }
-    if (currentView === "tickets") { renderTicketStatsFromData(); return; }
-    anaView.innerHTML = tableRows(analyticsData.ev_bins || [], "期待値帯");
+    var scopeData = (analyticsData.scopes || {})[currentAnaScope] || {};
+    var races = (analyticsData.meta || {}).races || 0;
+    renderAnaSummary(scopeData.summary, races);
+    if (currentView === "prob") {
+      anaView.innerHTML = tableRows(scopeData.prob_bins || [], "確率帯") + renderCumTable(scopeData.prob_cum || [], "確率帯");
+      return;
+    }
+    if (currentView === "odds") {
+      anaView.innerHTML = tableRows(scopeData.odds_bins || [], "オッズ帯") + renderCumTable(scopeData.odds_cum || [], "オッズ帯");
+      return;
+    }
+    if (currentView === "features") {
+      anaView.innerHTML = featuresView(scopeData.features || []);
+      return;
+    }
+    if (currentView === "tickets") {
+      renderTicketStatsFromData();
+      return;
+    }
+    anaView.innerHTML = tableRows(scopeData.ev_bins || [], "期待値帯") + renderCumTable(scopeData.ev_cum || [], "期待値帯");
   }
 
   function loadModelOptions(){
@@ -503,6 +532,8 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   }
 
   function switchTab(name){
+    currentTabName = name;
+    try { localStorage.setItem("keiba-current-tab", name); } catch (e) {}
     document.querySelectorAll(".tab").forEach(function(t){ t.classList.toggle("active", t.getAttribute("data-tab") === name); });
     tabPredict.hidden = name !== "predict";
     tabAnalytics.hidden = name !== "analytics";
@@ -513,6 +544,17 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   }
 
   document.querySelectorAll(".tab").forEach(function(t){ t.addEventListener("click", function(){ switchTab(t.getAttribute("data-tab")); }); });
+  var anaScopeTabs = document.getElementById("ana-scope-tabs");
+  if (anaScopeTabs) {
+    anaScopeTabs.querySelectorAll(".subtab").forEach(function(t){
+      t.addEventListener("click", function(){
+        anaScopeTabs.querySelectorAll(".subtab").forEach(function(x){ x.classList.remove("active"); });
+        t.classList.add("active");
+        currentAnaScope = t.getAttribute("data-ana-scope") || "all";
+        renderView();
+      });
+    });
+  }
 
   anaViewTabs.querySelectorAll(".subtab").forEach(function(t){
     t.addEventListener("click", function(){
@@ -560,6 +602,13 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   if (impInput) impInput.addEventListener("change", function(e){ importBets(e.target.files && e.target.files[0]); e.target.value = ""; });
 
   readFilters();
+
+  // タブ復元
+  try {
+    var savedTab = localStorage.getItem("keiba-current-tab") || "predict";
+    if (savedTab !== "predict") switchTab(savedTab);
+  } catch (e) {}
+
   list.textContent = "読み込み中... (サーバー起動待ちの場合があります)";
   fetchWithTimeout(API_BASE + "/races", TIMEOUT_MS).then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); }).then(function(data){ var races = Array.isArray(data) ? data : (data.races || data.items || []); renderList(races); }).catch(function(err){ list.textContent = "API取得失敗: " + err.message + " — 再読み込みしてください"; });
 })();

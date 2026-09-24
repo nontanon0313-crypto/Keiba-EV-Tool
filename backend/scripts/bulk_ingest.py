@@ -27,8 +27,8 @@ def main():
     d0 = datetime.strptime(start, "%Y-%m-%d")
     d1 = datetime.strptime(end, "%Y-%m-%d")
 
-    existing_races = {r["race_id"] for r in race_store.list_races()}
-    existing_odds = {r["race_id"] for r in odds_store.list_odds()}
+    existing_races = set(race_store.list_race_ids())
+    existing_odds = set(odds_store.list_race_ids())
     print("existing races:", len(existing_races), "odds:", len(existing_odds), flush=True)
 
     for d in daterange(d0, d1):
@@ -43,7 +43,18 @@ def main():
         for i, rid in enumerate(todo):
             try:
                 if rid not in existing_races:
-                    data = netkeiba.fetch_race_result(rid)
+                    data = None
+                    for attempt in range(3):
+                        try:
+                            data = netkeiba.fetch_race_result(rid)
+                            break
+                        except Exception as e:
+                            if "TransferEncoding" in str(e) or "400" in str(e) or "429" in str(e):
+                                wait = 10 * (attempt + 1)
+                                print(f"  rate-limit retry {attempt+1}/3 wait={wait}s", flush=True)
+                                time.sleep(wait)
+                            else:
+                                raise
                     if data and data.get("finish_order"):
                         race_store.save_race(rid, data)
                         existing_races.add(rid)

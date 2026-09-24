@@ -121,3 +121,16 @@ def get_race(race_id):
 
 def list_races():
     return _get().load()
+
+
+def list_race_ids():
+    """race_id のリストだけを軽量に取得。"""
+    backend = _get()
+    if hasattr(backend, "client"):
+        try:
+            r = backend.client.execute("SELECT race_id FROM scraped_races")
+            return [row[0] for row in r.rows]
+        except Exception as e:
+            print("[race_store] list_race_ids failed:", e)
+            return []
+    return [it.get("race_id") for it in backend.load() if it.get("race_id")]
