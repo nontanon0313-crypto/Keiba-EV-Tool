@@ -26,7 +26,7 @@ def parse_race_name(name: str):
     return venue, rn
 
 
-def build_payload(date: str, track_cd: str, sponsor_cd: str, race_nb: int, shutuba: dict, detail: dict = None) -> dict:
+def build_payload(date: str, track_cd: str, sponsor_cd: str, race_nb: int, shutuba: dict, detail: "dict | None" = None) -> dict:
     """race_store 用の payload を組み立てる。"""
     venue, rn = parse_race_name(shutuba.get("race_name", ""))
     # 発走時刻

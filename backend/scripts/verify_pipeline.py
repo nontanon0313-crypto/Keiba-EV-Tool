@@ -106,7 +106,7 @@ def verify_one(date, track_cd, sponsor_cd, race_nb):
         }
         race_store.save_race(rid, payload)
         odds_store.save_odds(rid, odds)
-        print(f"  ✓ Turso保存完了")
+        print("  ✓ Turso保存完了")
     except Exception as e:
         print(f"  ✗ 保存 ERROR: {e}")
         return False
