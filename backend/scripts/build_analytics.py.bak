@@ -1,20 +1,17 @@
-"""analytics_cache 生成。4スコープ + 券種別集計 + 出走表 features。"""
+"""analytics_cache 生成。3スコープ + 累積表対応。"""
 import os
 import json
 import time
 from pathlib import Path
 from datetime import datetime
-from collections import defaultdict
 
 from backend.app.services import race_store, odds_store
 from backend.app.services.prediction import predict_race
 from backend.app.services.ev_calc import calc_ev, _candidates, TICKET_TYPES, _TICKET_LABEL
 from backend.app.models.schemas import Race, Runner
 from backend.config import settings
-from backend.scraper.oddspark_keiba import extract_payouts
 
 CACHE_FILE = Path("analytics_cache.json")
-SCOPES = ("all", "plan", "non_plan", "all_combos")
 
 
 def race_obj(rid, payload):
@@ -31,18 +28,15 @@ def race_obj(rid, payload):
     surf = payload.get("surface") or "ダート"
     if surf not in ("芝", "ダート", "障害"):
         surf = "ダート"
-    return Race(
-        race_id=rid, venue=payload.get("venue", ""), date=payload.get("date", ""),
-        race_number=int(payload.get("race_number", 0) or 0),
-        start_at=datetime.now(), deadline_at=datetime.now(),
-        surface=surf, distance=payload.get("distance") or 1600, runners=runners,
-    )
+    return Race(race_id=rid, venue="中山", date="20240101", race_number=1,
+                start_at=datetime.now(), deadline_at=datetime.now(),
+                surface=surf, distance=payload.get("distance") or 1600, runners=runners)
 
 
-def real_odds(odds_payload, ticket, combo):
+def real_odds(payload, ticket, combo):
     """9999.9(表示上限)は投票プラン除外。"""
     from backend.app.services.ev_calc import is_bettable_odds
-    t = odds_payload.get(ticket) or {}
+    t = payload.get(ticket) or {}
     e = t.get(combo)
     if not e:
         return None
@@ -78,18 +72,6 @@ def hit_check(ticket, combo, finish):
     if ticket == "win": return 1 if len(nums) == 1 and nums[0] == w[0] else 0
     if ticket == "place": return 1 if len(nums) == 1 and nums[0] in w[:3] else 0
     return 0
-
-
-def payout_yen(payouts_dict, ticket_jp, combo):
-    """100円あたりの払戻円。的中時の払戻を返す。"""
-    m = payouts_dict.get(ticket_jp) or {}
-    if ticket_jp in ("馬連", "ワイド", "3連複", "枠連"):
-        parts = combo.split("-")
-        try:
-            combo = "-".join(sorted(parts, key=lambda x: int(x)))
-        except ValueError:
-            pass
-    return m.get(combo)
 
 
 def _prob_bins():
@@ -204,9 +186,9 @@ def fmt_cumulative(samples, thresholds, kind):
     return rows
 
 
-def fmt_features(features_conf, agg):
+def fmt_features(features, agg):
     out = []
-    for key, conf in features_conf.items():
+    for key, conf in features.items():
         rows = []
         for (label, lo, hi) in conf["ranges"]:
             s = agg.get(key, {}).get(label, [])
@@ -262,21 +244,24 @@ def build():
     ob = _odds_bins()
     eb = _ev_bins()
     fc = _features_conf()
+
     prob_th = [0.0, 0.005, 0.01, 0.015, 0.02, 0.03, 0.05, 0.08, 0.10, 0.15, 0.20]
     odds_th = [0, 10, 20, 30, 50, 80, 100, 150, 200, 300, 500]
     ev_th = [-1.0, 0.0, 0.2, 0.5, 1.0, 2.0, 5.0]
 
-    scopes_samples = {s: [] for s in SCOPES}
-    feat_agg = {s: {k: {r[0]: [] for r in c["ranges"]} for k, c in fc.items()} for s in SCOPES}
-    ticket_agg = defaultdict(lambda: {"count": 0, "hits": 0, "prob_sum": 0.0,
-                                      "odds_sum": 0.0, "stake": 0, "payout": 0})
+    scopes_samples = {"all": [], "plan": [], "non_plan": []}
+    feat_agg = {k: {r[0]: [] for r in c["ranges"]} for k, c in fc.items()}
 
     races = race_store.list_races()
     print("[build] races:", len(races), flush=True)
 
+    # バッチで全オッズを一括取得（100件ずつ）
     rids = [it["race_id"] for it in races]
     odds_map = odds_store.get_odds_batch(rids)
     print("[build] odds fetched:", len(odds_map), flush=True)
+
+    def get_odds_for(rid):
+        return odds_map.get(rid) or {}
 
     for i, it in enumerate(races):
         rid = it["race_id"]
@@ -284,8 +269,7 @@ def build():
         finish = payload.get("finish_order") or []
         if len(finish) < 3:
             continue
-        odds_p = odds_map.get(rid) or {}
-        payouts_dict = extract_payouts(payload.get("payouts") or {})
+        odds_p = get_odds_for(rid)
         race = race_obj(rid, payload)
         try:
             pred = predict_race(race)
@@ -293,7 +277,6 @@ def build():
             continue
         plan_set = compute_plan_set(race, pred, odds_p)
         runner_map = {r.horse_number: r for r in race.runners}
-
         for t in tickets:
             for combo, prob in _candidates(pred, t):
                 if prob <= 0:
@@ -304,23 +287,15 @@ def build():
                 ev = calc_ev(prob, ro)
                 hit = hit_check(t, combo, finish)
                 sample = (prob, ro, ev, hit)
-
-                # 全組み合わせスコープ
-                scopes_samples["all_combos"].append(sample)
-
-                # 券種別集計（全組み合わせベース）
-                ticket_jp = _TICKET_LABEL.get(t, t)
-                payout_per_100 = payout_yen(payouts_dict, ticket_jp, combo)
-                ta = ticket_agg[t]
-                ta["count"] += 1
-                ta["hits"] += hit
-                ta["prob_sum"] += prob
-                ta["odds_sum"] += ro
-                ta["stake"] += 100
-                if hit and payout_per_100:
-                    ta["payout"] += payout_per_100
-
-                # features（全スコープ分に追加）
+                # フィルタ通過候補のみが all/plan/non_plan 対象
+                passes_filter = (ro >= settings.MIXED_ODDS_MIN) and (ev >= settings.MIXED_EV_MIN) and (t in settings.MIXED_TICKETS)
+                if passes_filter:
+                    scopes_samples["all"].append(sample)
+                    if (t, combo) in plan_set:
+                        scopes_samples["plan"].append(sample)
+                    else:
+                        scopes_samples["non_plan"].append(sample)
+                # features は all のみ
                 parts = combo.split("-")
                 try:
                     first_num = int(parts[0])
@@ -333,54 +308,47 @@ def build():
                         wt = getattr(r, "weight", None)
                         fr = getattr(r, "frame_number", None)
                         ow = getattr(r, "odds_win", None)
-                        for scope in SCOPES:
-                            agg = feat_agg[scope]
-                            if pop is not None:
-                                for (label, lo, hi) in fc["popularity"]["ranges"]:
-                                    if lo <= pop <= hi:
-                                        agg["popularity"][label].append(sample)
-                            if wt is not None:
-                                for (label, lo, hi) in fc["weight"]["ranges"]:
-                                    if lo <= wt < hi:
-                                        agg["weight"][label].append(sample)
-                            if fr is not None:
-                                for (label, lo, hi) in fc["frame"]["ranges"]:
-                                    if lo <= fr <= hi:
-                                        agg["frame"][label].append(sample)
-                            if ow is not None:
-                                for (label, lo, hi) in fc["odds_win"]["ranges"]:
-                                    if lo <= ow < hi:
-                                        agg["odds_win"][label].append(sample)
-
-                # フィルタ通過 → all / plan / non_plan
-                passes_filter = (ro >= settings.MIXED_ODDS_MIN) and (ev >= settings.MIXED_EV_MIN) and (t in settings.MIXED_TICKETS)
-                if passes_filter:
-                    scopes_samples["all"].append(sample)
-                    if (t, combo) in plan_set:
-                        scopes_samples["plan"].append(sample)
-                    else:
-                        scopes_samples["non_plan"].append(sample)
-
+                        if pop is not None:
+                            for (label, lo, hi) in fc["popularity"]["ranges"]:
+                                if lo <= pop <= hi:
+                                    feat_agg["popularity"][label].append((prob, ro, hit))
+                        if wt is not None:
+                            for (label, lo, hi) in fc["weight"]["ranges"]:
+                                if lo <= wt < hi:
+                                    feat_agg["weight"][label].append((prob, ro, hit))
+                        if fr is not None:
+                            for (label, lo, hi) in fc["frame"]["ranges"]:
+                                if lo <= fr <= hi:
+                                    feat_agg["frame"][label].append((prob, ro, hit))
+                        if ow is not None:
+                            for (label, lo, hi) in fc["odds_win"]["ranges"]:
+                                if lo <= ow < hi:
+                                    feat_agg["odds_win"][label].append((prob, ro, hit))
         if (i + 1) % 200 == 0:
             print("[build] {}/{} {:.1f}s".format(i + 1, len(races), time.time() - t0), flush=True)
 
     scopes_out = {}
     for scope_name, samples in scopes_samples.items():
-        prob_s = {j: [] for j in range(len(pb))}
-        odds_s = {j: [] for j in range(len(ob))}
-        ev_s = {j: [] for j in range(len(eb))}
+        # bins
+        prob_s = {i: [] for i in range(len(pb))}
+        odds_s = {i: [] for i in range(len(ob))}
+        ev_s = {i: [] for i in range(len(eb))}
         for smp in samples:
-            for j, (lo, hi) in enumerate(pb):
+            for i, (lo, hi) in enumerate(pb):
                 if lo <= smp[0] < hi:
-                    prob_s[j].append(smp); break
-            for j, (lo, hi) in enumerate(ob):
+                    prob_s[i].append(smp)
+                    break
+            for i, (lo, hi) in enumerate(ob):
                 if lo <= smp[1] < hi:
-                    odds_s[j].append(smp); break
-            for j, (lo, hi) in enumerate(eb):
+                    odds_s[i].append(smp)
+                    break
+            for i, (lo, hi) in enumerate(eb):
                 if lo <= smp[2] < hi:
-                    ev_s[j].append(smp); break
+                    ev_s[i].append(smp)
+                    break
         total = len(samples)
         hits = sum(smp[3] for smp in samples)
+        features_out = fmt_features(fc, feat_agg) if scope_name == "all" else []
         scopes_out[scope_name] = {
             "summary": {
                 "total_count": total,
@@ -393,32 +361,11 @@ def build():
             "odds_cum": fmt_cumulative(samples, odds_th, "odds"),
             "ev_bins": fmt_band_rows(eb, ev_s, "ev"),
             "ev_cum": fmt_cumulative(samples, ev_th, "ev"),
-            "features": fmt_features(fc, feat_agg[scope_name]),
+            "features": features_out,
         }
-
-    # 券種別サマリ（全組み合わせベース）
-    ticket_stats = []
-    for t in tickets:
-        ta = ticket_agg[t]
-        if ta["count"] == 0:
-            continue
-        avg_prob = ta["prob_sum"] / ta["count"]
-        avg_odds = ta["odds_sum"] / ta["count"]
-        roi = (ta["payout"] / ta["stake"]) * 100 if ta["stake"] else 0.0
-        ticket_stats.append({
-            "ticket": t,
-            "label": _TICKET_LABEL.get(t, t),
-            "count": ta["count"],
-            "hits": ta["hits"],
-            "hit_rate": ta["hits"] / ta["count"],
-            "expected_hit_rate": avg_prob,
-            "roi": roi,
-            "expected_roi": avg_prob * avg_odds * 100,
-        })
 
     result = {
         "scopes": scopes_out,
-        "ticket_stats": ticket_stats,
         "meta": {"races": len(races)},
         "generated_at": datetime.now().isoformat(),
     }
