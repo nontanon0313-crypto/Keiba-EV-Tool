@@ -6,7 +6,7 @@ from datetime import datetime
 
 from backend.scraper.oddspark_keiba import (
     fetch_race_list, fetch_one_day, fetch_one_day_detail, fetch_shutuba,
-    fetch_odds_all_full,
+    fetch_odds_all_full, fetch_result,
 )
 from backend.app.services import odds_store
 from backend.app.services import race_store
@@ -112,6 +112,22 @@ def main():
                 odds = fetch_odds_all_full(date, track_cd, sponsor_cd, r["race_nb"], num_runners)
                 if odds:
                     odds_store.save_odds(payload["race_id"], odds)
+
+                # 結果取得 (発走後なら取得可能)
+                try:
+                    res = fetch_result(date, track_cd, sponsor_cd, r["race_nb"])
+                    if res and res.get("finish_order"):
+                        payload["finish_order"] = res["finish_order"]
+                        payload["payouts"] = res.get("payouts", {})
+                        if res.get("runners"):
+                            payload["result_runners"] = res["runners"]
+                        if res.get("surface"):
+                            payload["surface"] = res["surface"]
+                        if res.get("distance"):
+                            payload["distance"] = res["distance"]
+                        race_store.save_race(payload["race_id"], payload)
+                except Exception as e:
+                    print(f"    [result] {payload['race_id']} skip: {str(e)[:60]}", flush=True)
 
                 total += 1
                 print(f"    saved {payload['race_id']} ({len(payload['runners'])}頭)", flush=True)

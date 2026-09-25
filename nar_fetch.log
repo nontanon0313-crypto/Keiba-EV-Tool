@@ -1,0 +1,64 @@
+nohup: ignoring input
+[race_store] backend=turso
+[odds_store] backend=turso
+[nar] start 2023-01-01〜2024-12-31 target=5000 existing_races=242 existing_odds=195
+[20230101] venues=2
+  金沢 12R
+  高知 11R
+  [progress] total=20 skipped=0 elapsed=108s rate=0.19/s
+[20230102] venues=4
+  船橋 12R
+  水沢 10R
+  [progress] total=40 skipped=0 elapsed=219s rate=0.18/s
+  金沢 11R
+  園田 12R
+  [progress] total=60 skipped=0 elapsed=333s rate=0.18/s
+[20230103] venues=5
+  船橋 12R
+  [progress] total=80 skipped=0 elapsed=420s rate=0.19/s
+  水沢 10R
+  金沢 12R
+  [progress] total=100 skipped=0 elapsed=531s rate=0.19/s
+  園田 12R
+  川崎 10R
+  [progress] total=120 skipped=0 elapsed=647s rate=0.19/s
+[20230104] venues=4
+  船橋 12R
+  金沢 12R
+  [progress] total=140 skipped=0 elapsed=764s rate=0.18/s
+  園田 12R
+  [progress] total=160 skipped=0 elapsed=844s rate=0.19/s
+  川崎 10R
+[20230105] venues=1
+  川崎 10R
+  [progress] total=180 skipped=0 elapsed=954s rate=0.19/s
+[20230106] venues=1
+  金沢 12R
+[20230107] venues=2
+  船橋 12R
+  [progress] total=200 skipped=0 elapsed=1070s rate=0.19/s
+  川崎 10R
+[20230108] venues=2
+  船橋 12R
+  [progress] total=220 skipped=0 elapsed=1188s rate=0.19/s
+  高知 9R
+[20230109] venues=2
+  船橋 12R
+  [progress] total=240 skipped=0 elapsed=1304s rate=0.18/s
+  高知 9R
+[20230110] venues=3
+  笠松 11R
+  [progress] total=260 skipped=0 elapsed=1410s rate=0.18/s
+  園田 12R
+  高知 9R
+  [progress] total=280 skipped=0 elapsed=1520s rate=0.18/s
+[20230111] venues=3
+  笠松 11R
+  園田 12R
+  [progress] total=300 skipped=0 elapsed=1632s rate=0.18/s
+  高知 9R
+  [progress] total=320 skipped=0 elapsed=1710s rate=0.19/s
+[20230112] venues=3
+  笠松 11R
+  園田 12R
+  [progress] total=340 skipped=0 elapsed=1824s rate=0.19/s

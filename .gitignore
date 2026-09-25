@@ -18,3 +18,4 @@ scraped_races.json
 scraped_odds.json
 analytics_cache.json
 debug_html/
+grid_search_result.json
