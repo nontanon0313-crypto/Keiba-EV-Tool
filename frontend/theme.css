@@ -116,3 +116,36 @@ label.bulk-btn.inline{cursor:pointer;}
 #bets-list { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 #bets-list .ev-table th,
 #bets-list .ev-table td { padding-right: 12px; }
+
+/* Pixel 幅（412 CSS px）で 7 列テーブルを収める */
+#ana-view { padding-left: 6px; padding-right: 6px; box-sizing: border-box; }
+#ana-view .ev-table { font-size: 10.5px; table-layout: fixed; }
+#ana-view .ev-table th,
+#ana-view .ev-table td {
+  padding: 4px 2px;
+  white-space: normal;
+  word-break: break-all;
+  line-height: 1.15;
+  overflow: hidden;
+}
+#ana-view .ev-table th { font-size: 9.5px; vertical-align: bottom; }
+#ana-view .ev-table td:first-child,
+#ana-view .ev-table th:first-child { width: 16%; }
+#ana-view .ev-table td:nth-child(2),
+#ana-view .ev-table th:nth-child(2) { width: 11%; }
+#ana-view .ev-table td:nth-child(3),
+#ana-view .ev-table th:nth-child(3) { width: 15%; }
+#ana-view .ev-table td:nth-child(4),
+#ana-view .ev-table th:nth-child(4) { width: 15%; }
+#ana-view .ev-table td:nth-child(5),
+#ana-view .ev-table th:nth-child(5) { width: 15%; }
+#ana-view .ev-table td:nth-child(6),
+#ana-view .ev-table th:nth-child(6) { width: 14%; }
+#ana-view .ev-table td:nth-child(7),
+#ana-view .ev-table th:nth-child(7) { width: 14%; }
+@media (max-width: 420px) {
+  #ana-view .ev-table { font-size: 10px; }
+  #ana-view .ev-table th { font-size: 9px; }
+  #ana-view .ev-table th,
+  #ana-view .ev-table td { padding: 3px 1px; }
+}

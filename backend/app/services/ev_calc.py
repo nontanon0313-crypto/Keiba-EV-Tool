@@ -5,6 +5,22 @@ from backend.app.services.seeding import seed_for
 
 TICKET_TYPES = ("trifecta", "trio", "exacta", "quinella", "wide", "win", "place")
 
+# オッズパークの表示上限値。実数として保存するが、投票プラン候補からは除外する。
+ODDS_DISPLAY_MAX = 9999.9
+
+
+def is_bettable_odds(odds):
+    """投票プラン候補として扱えるオッズか。9999.9(上限張付)は除外。"""
+    try:
+        v = float(odds)
+    except (TypeError, ValueError):
+        return False
+    if v <= 1.0:
+        return False
+    if v >= ODDS_DISPLAY_MAX:
+        return False
+    return True
+
 _TICKET_LABEL = {
     "trifecta": "3連単",
     "trio": "3連複",
@@ -21,7 +37,8 @@ def calc_ev(prob, odds):
 
 
 def real_odds_for(race_id, ticket, combo):
-    """odds_store から実オッズを取得。なければ None。"""
+    """odds_store から実オッズを取得。なければ None。
+    表示上限値(9999.9)は投票プラン除外のため None を返す。"""
     from backend.app.services import odds_store
     p = odds_store.get_odds_single(race_id) or {}
     t = p.get(ticket) or {}
@@ -30,9 +47,14 @@ def real_odds_for(race_id, ticket, combo):
         return None
     if ticket == "wide":
         v = e.get("max") or e.get("min")
-        return float(v) if v is not None else None
-    v = e.get("odds")
-    return float(v) if v is not None else None
+    else:
+        v = e.get("odds")
+    if v is None:
+        return None
+    fv = float(v)
+    if not is_bettable_odds(fv):
+        return None
+    return fv
 
 
 def kelly_fraction(prob, odds):

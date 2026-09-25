@@ -64,14 +64,33 @@ def _hit(ticket, combo, finish):
     return 0
 
 
-def _build_candidates_all(race, pred):
-    """1レースの全券種候補を実オッズで返す。"""
+def _get_odds_from_map(odds_map, race_id, ticket, combo):
+    from backend.app.services.ev_calc import is_bettable_odds
+    p = odds_map.get(race_id) or {}
+    t = p.get(ticket) or {}
+    e = t.get(combo)
+    if not e:
+        return None
+    if ticket == "wide":
+        v = e.get("max") or e.get("min")
+    else:
+        v = e.get("odds")
+    if v is None:
+        return None
+    fv = float(v)
+    if not is_bettable_odds(fv):
+        return None
+    return fv
+
+
+def _build_candidates_all(race, pred, odds_map):
+    """1レースの全券種候補を、事前ロード済みオッズマップで返す。"""
     out = []
     for t in ["quinella", "wide", "exacta", "trio", "trifecta"]:
         for combo, prob in _candidates(pred, t):
             if prob <= 0:
                 continue
-            odds = real_odds_for(race.race_id, t, combo)
+            odds = _get_odds_from_map(odds_map, race.race_id, t, combo)
             if odds is None:
                 continue
             out.append({"ticket": t, "combo": combo, "prob": prob, "odds": odds, "ev": calc_ev(prob, odds)})
@@ -79,7 +98,8 @@ def _build_candidates_all(race, pred):
 
 
 def simulate(cands_per_race, tickets, min_prob, min_odds, ev_min, top_n, stake=100):
-    """1レースあたり上位N点を均等賭け。ROI・的中率を返す。"""
+    """1レースあたり上位N点を均等賭け。確定払戻ベースでROI・的中率を返す。"""
+    from backend.scraper.oddspark_keiba import get_payout
     total_bets = 0
     hits = 0
     stake_total = 0
@@ -92,13 +112,24 @@ def simulate(cands_per_race, tickets, min_prob, min_odds, ev_min, top_n, stake=1
         filtered.sort(key=lambda x: x["ev"], reverse=True)
         picks = filtered[:top_n]
         races_bet += 1
+        payouts_raw = r.get("payouts")
         for p in picks:
             total_bets += 1
             stake_total += stake
             hit = _hit(p["ticket"], p["combo"], r["finish"])
             if hit:
                 hits += 1
-                payout_total += int(stake * p["odds"])
+                # 確定払戻 (100円あたりの払戻円)
+                ticket_jp = {
+                    "quinella": "馬連", "wide": "ワイド",
+                    "exacta": "馬単", "trio": "3連複", "trifecta": "3連単",
+                }.get(p["ticket"])
+                payout_per_100 = get_payout(payouts_raw, ticket_jp, p["combo"]) if ticket_jp else None
+                if payout_per_100 is None:
+                    # 確定払戻が無い場合は賭け金をそのまま戻す扱い (払戻0)
+                    payout_total += 0
+                else:
+                    payout_total += int(payout_per_100 * stake / 100)
     roi = (payout_total - stake_total) / stake_total * 100 if stake_total else 0
     hr = hits / total_bets * 100 if total_bets else 0
     return {"races": races_bet, "bets": total_bets, "hits": hits, "hit_rate": hr, "roi": roi,
@@ -110,8 +141,12 @@ def main():
     items = race_store.list_races()
     print(f"races: {len(items)}", flush=True)
     rids = [it["race_id"] for it in items]
-    odds_map = odds_store.get_odds_batch(rids) if hasattr(odds_store, "get_odds_batch") else {}
-    print(f"odds: {len(odds_map)}", flush=True)
+    t_load = time.time()
+    if hasattr(odds_store, "get_odds_batch"):
+        odds_map = odds_store.get_odds_batch(rids)
+    else:
+        odds_map = {}
+    print(f"odds loaded: {len(odds_map)} in {time.time()-t_load:.0f}s", flush=True)
 
     cands_per_race = []
     for i, it in enumerate(items):
@@ -125,9 +160,10 @@ def main():
             pred = predict_race(race)
         except Exception:
             continue
-        cands = _build_candidates_all(race, pred)
+        cands = _build_candidates_all(race, pred, odds_map)
         if cands:
-            cands_per_race.append({"rid": rid, "finish": finish, "cands": cands})
+            cands_per_race.append({"rid": rid, "finish": finish, "cands": cands,
+                                   "payouts": payload.get("payouts") or {}})
         if (i + 1) % 200 == 0:
             print(f"  scan {i+1}/{len(items)} {time.time()-t0:.0f}s", flush=True)
     print(f"races with candidates: {len(cands_per_race)}", flush=True)

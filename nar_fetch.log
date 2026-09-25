@@ -62,3 +62,803 @@ nohup: ignoring input
   笠松 11R
   園田 12R
   [progress] total=340 skipped=0 elapsed=1824s rate=0.19/s
+  川崎 10R
+[20230113] venues=1
+  笠松 11R
+  [progress] total=360 skipped=0 elapsed=1930s rate=0.19/s
+[20230114] venues=1
+  船橋 12R
+[20230115] venues=3
+  船橋 12R
+  [progress] total=380 skipped=0 elapsed=2052s rate=0.19/s
+  高知 9R
+  川崎 10R
+  [progress] total=400 skipped=0 elapsed=2163s rate=0.18/s
+[20230116] venues=2
+  船橋 12R
+  金沢 11R
+  [progress] total=420 skipped=0 elapsed=2279s rate=0.18/s
+[20230117] venues=3
+  金沢 11R
+  [progress] total=440 skipped=0 elapsed=2361s rate=0.19/s
+  園田 12R
+  高知 10R
+  [progress] total=460 skipped=0 elapsed=2472s rate=0.19/s
+[20230118] venues=3
+  金沢 12R
+  園田 12R
+  [progress] total=480 skipped=0 elapsed=2589s rate=0.19/s
+  高知 10R
+[20230119] venues=2
+  金沢 12R
+  [progress] total=500 skipped=0 elapsed=2709s rate=0.18/s
+  園田 12R
+  [progress] total=520 skipped=0 elapsed=2789s rate=0.19/s
+[20230120] venues=1
+  金沢 12R
+[20230121] venues=2
+  船橋 12R
+  [progress] total=540 skipped=0 elapsed=2908s rate=0.19/s
+  川崎 11R
+[20230122] venues=3
+  船橋 12R
+  [progress] total=560 skipped=0 elapsed=3026s rate=0.19/s
+  高知 10R
+  川崎 11R
+  [progress] total=580 skipped=0 elapsed=3127s rate=0.19/s
+[20230123] venues=3
+  船橋 12R
+  [progress] total=600 skipped=0 elapsed=3212s rate=0.19/s
+  笠松 9R
+  川崎 12R
+  [progress] total=620 skipped=0 elapsed=3315s rate=0.19/s
+[20230124] venues=3
+  笠松 10R
+  園田 12R
+  [progress] total=640 skipped=0 elapsed=3423s rate=0.19/s
+  高知 11R
+[20230125] venues=4
+  33 12R
+  [progress] total=660 skipped=0 elapsed=3538s rate=0.19/s
+  笠松 10R
+  園田 12R
+  [progress] total=680 skipped=0 elapsed=3642s rate=0.19/s
+  高知 10R
+[20230126] venues=2
+  笠松 10R
+  [progress] total=700 skipped=0 elapsed=3754s rate=0.19/s
+  園田 12R
+  [progress] total=720 skipped=0 elapsed=3833s rate=0.19/s
+[20230127] venues=2
+  笠松 10R
+  園田 12R
+  [progress] total=740 skipped=0 elapsed=3941s rate=0.19/s
+[20230128] venues=2
+  船橋 12R
+  川崎 12R
+  [progress] total=760 skipped=0 elapsed=4059s rate=0.19/s
+[20230129] venues=3
+  船橋 12R
+  高知 11R
+  [progress] total=780 skipped=0 elapsed=4164s rate=0.19/s
+  川崎 11R
+  [progress] total=800 skipped=0 elapsed=4240s rate=0.19/s
+[20230130] venues=2
+  船橋 12R
+  金沢 11R
+  [progress] total=820 skipped=0 elapsed=4355s rate=0.19/s
+[20230131] venues=3
+  金沢 11R
+  園田 12R
+  [progress] total=840 skipped=0 elapsed=4465s rate=0.19/s
+  高知 11R
+[20230201] venues=4
+  34 12R
+  [progress] total=860 skipped=0 elapsed=4572s rate=0.19/s
+  金沢 12R
+  [progress] total=880 skipped=0 elapsed=4649s rate=0.19/s
+  園田 12R
+  高知 10R
+  [progress] total=900 skipped=0 elapsed=4753s rate=0.19/s
+[20230202] venues=2
+  金沢 12R
+  園田 12R
+  [progress] total=920 skipped=0 elapsed=4866s rate=0.19/s
+[20230203] venues=1
+  金沢 12R
+  [progress] total=940 skipped=0 elapsed=4942s rate=0.19/s
+[20230204] venues=2
+  船橋 12R
+  川崎 12R
+  [progress] total=960 skipped=0 elapsed=5055s rate=0.19/s
+[20230205] venues=3
+  船橋 12R
+  高知 10R
+  [progress] total=980 skipped=0 elapsed=5165s rate=0.19/s
+  川崎 11R
+[20230206] venues=2
+  船橋 12R
+  [progress] total=1000 skipped=0 elapsed=5275s rate=0.19/s
+  笠松 9R
+[20230207] venues=3
+  笠松 10R
+  [progress] total=1020 skipped=0 elapsed=5372s rate=0.19/s
+  園田 12R
+  [progress] total=1040 skipped=0 elapsed=5451s rate=0.19/s
+  高知 10R
+[20230208] venues=3
+  笠松 10R
+  [progress] total=1060 skipped=0 elapsed=5557s rate=0.19/s
+  園田 12R
+  高知 9R
+  [progress] total=1080 skipped=0 elapsed=5657s rate=0.19/s
+[20230209] venues=3
+  笠松 10R
+  園田 12R
+  [progress] total=1100 skipped=0 elapsed=5763s rate=0.19/s
+  川崎 12R
+[20230210] venues=1
+  笠松 10R
+  [progress] total=1120 skipped=0 elapsed=5873s rate=0.19/s
+[20230211] venues=2
+  船橋 12R
+  川崎 11R
+  [progress] total=1140 skipped=0 elapsed=5985s rate=0.19/s
+[20230212] venues=3
+  船橋 12R
+  [progress] total=1160 skipped=0 elapsed=6071s rate=0.19/s
+  高知 9R
+  川崎 11R
+  [progress] total=1180 skipped=0 elapsed=6174s rate=0.19/s
+[20230213] venues=3
+  船橋 12R
+  金沢 11R
+  [progress] total=1200 skipped=0 elapsed=6290s rate=0.19/s
+  高知 9R
+[20230214] venues=3
+  金沢 11R
+  [progress] total=1220 skipped=0 elapsed=6398s rate=0.19/s
+  園田 12R
+  高知 9R
+  [progress] total=1240 skipped=0 elapsed=6504s rate=0.19/s
+[20230215] venues=2
+  金沢 12R
+  園田 12R
+  [progress] total=1260 skipped=0 elapsed=6611s rate=0.19/s
+[20230216] venues=2
+  金沢 12R
+  [progress] total=1280 skipped=0 elapsed=6688s rate=0.19/s
+  園田 12R
+[20230217] venues=1
+  金沢 12R
+  [progress] total=1300 skipped=0 elapsed=6791s rate=0.19/s
+[20230218] venues=2
+  船橋 12R
+  川崎 12R
+  [progress] total=1320 skipped=0 elapsed=6899s rate=0.19/s
+[20230219] venues=3
+  船橋 12R
+  [progress] total=1340 skipped=0 elapsed=6978s rate=0.19/s
+  高知 10R
+  川崎 11R
+  [progress] total=1360 skipped=0 elapsed=7087s rate=0.19/s
+[20230220] venues=2
+  船橋 12R
+  笠松 9R
+  [progress] total=1380 skipped=0 elapsed=7184s rate=0.19/s
+[20230221] venues=3
+  笠松 9R
+  園田 12R
+  [progress] total=1400 skipped=0 elapsed=7290s rate=0.19/s
+  高知 9R
+[20230222] venues=3
+  笠松 10R
+  [progress] total=1420 skipped=0 elapsed=7397s rate=0.19/s
+  園田 12R
+  高知 9R
+  [progress] total=1440 skipped=0 elapsed=7501s rate=0.19/s
+[20230223] venues=3
+  笠松 10R
+  園田 12R
+  [progress] total=1460 skipped=0 elapsed=7618s rate=0.19/s
+  川崎 12R
+[20230224] venues=1
+  笠松 10R
+  [progress] total=1480 skipped=0 elapsed=7730s rate=0.19/s
+[20230225] venues=2
+  船橋 12R
+  川崎 11R
+  [progress] total=1500 skipped=0 elapsed=7842s rate=0.19/s
+[20230226] venues=3
+  船橋 12R
+  [progress] total=1520 skipped=0 elapsed=7932s rate=0.19/s
+  高知 10R
+  川崎 11R
+  [progress] total=1540 skipped=0 elapsed=8038s rate=0.19/s
+[20230227] venues=2
+  船橋 12R
+  金沢 11R
+  [progress] total=1560 skipped=0 elapsed=8153s rate=0.19/s
+[20230228] venues=3
+  金沢 11R
+  園田 12R
+  [progress] total=1580 skipped=0 elapsed=8267s rate=0.19/s
+  高知 10R
+[20230301] venues=4
+  34 12R
+  [progress] total=1600 skipped=0 elapsed=8381s rate=0.19/s
+  金沢 11R
+  [progress] total=1620 skipped=0 elapsed=8464s rate=0.19/s
+  園田 12R
+  高知 10R
+  [progress] total=1640 skipped=0 elapsed=8580s rate=0.19/s
+[20230302] venues=2
+  金沢 12R
+  園田 12R
+  [progress] total=1660 skipped=0 elapsed=8701s rate=0.19/s
+[20230303] venues=1
+  金沢 12R
+  [progress] total=1680 skipped=0 elapsed=8790s rate=0.19/s
+[20230304] venues=2
+  船橋 12R
+  川崎 11R
+  [progress] total=1700 skipped=0 elapsed=8915s rate=0.19/s
+[20230305] venues=3
+  船橋 12R
+  高知 8R
+  [progress] total=1720 skipped=0 elapsed=9025s rate=0.19/s
+  川崎 11R
+[20230306] venues=3
+  船橋 12R
+  [progress] total=1740 skipped=0 elapsed=9144s rate=0.19/s
+  笠松 9R
+  高知 9R
+  [progress] total=1760 skipped=0 elapsed=9250s rate=0.19/s
+[20230307] venues=3
+  笠松 9R
+  園田 12R
+  [progress] total=1780 skipped=0 elapsed=9367s rate=0.19/s
+  高知 8R
+[20230308] venues=2
+  笠松 9R
+  [progress] total=1800 skipped=0 elapsed=9478s rate=0.19/s
+  園田 12R
+[20230309] venues=2
+  笠松 10R
+  [progress] total=1820 skipped=0 elapsed=9604s rate=0.19/s
+  園田 12R
+[20230310] venues=2
+  笠松 10R
+  [progress] total=1840 skipped=0 elapsed=9721s rate=0.19/s
+  川崎 11R
+[20230311] venues=3
+  船橋 12R
+  [progress] total=1860 skipped=0 elapsed=9831s rate=0.19/s
+  水沢 12R
+  [progress] total=1880 skipped=0 elapsed=9907s rate=0.19/s
+  川崎 11R
+[20230312] venues=5
+  船橋 12R
+  [progress] total=1900 skipped=0 elapsed=10016s rate=0.19/s
+  水沢 12R
+  名古屋 12R
+  [progress] total=1920 skipped=0 elapsed=10132s rate=0.19/s
+  高知 9R
+  川崎 11R
+  [progress] total=1940 skipped=0 elapsed=10230s rate=0.19/s
+[20230313] venues=3
+  船橋 12R
+  [progress] total=1960 skipped=0 elapsed=10315s rate=0.19/s
+  水沢 12R
+  名古屋 12R
+  [progress] total=1980 skipped=0 elapsed=10422s rate=0.19/s
+[20230314] venues=5
+  水沢 12R
+  名古屋 12R
+  [progress] total=2000 skipped=0 elapsed=10534s rate=0.19/s
+  金沢 12R
+  [progress] total=2020 skipped=0 elapsed=10614s rate=0.19/s
+  園田 12R
+  高知 11R
+  [progress] total=2040 skipped=0 elapsed=10721s rate=0.19/s
+[20230315] venues=4
+  32 12R
+  金沢 12R
+  [progress] total=2060 skipped=0 elapsed=10829s rate=0.19/s
+  園田 12R
+  高知 10R
+  [progress] total=2080 skipped=0 elapsed=10929s rate=0.19/s
+[20230316] venues=2
+  金沢 12R
+  [progress] total=2100 skipped=0 elapsed=11012s rate=0.19/s
+  園田 12R
+[20230317] venues=1
+  金沢 12R
+  [progress] total=2120 skipped=0 elapsed=11124s rate=0.19/s
+[20230318] venues=2
+  船橋 12R
+  川崎 11R
+  [progress] total=2140 skipped=0 elapsed=11229s rate=0.19/s
+[20230319] venues=5
+  船橋 12R
+  [progress] total=2160 skipped=0 elapsed=11310s rate=0.19/s
+  水沢 12R
+  名古屋 9R
+  [progress] total=2180 skipped=0 elapsed=11407s rate=0.19/s
+  高知 10R
+  川崎 11R
+  [progress] total=2200 skipped=0 elapsed=11510s rate=0.19/s
+[20230320] venues=2
+  船橋 12R
+  水沢 12R
+  [progress] total=2220 skipped=0 elapsed=11616s rate=0.19/s
+[20230321] venues=5
+  水沢 11R
+  名古屋 9R
+  [progress] total=2240 skipped=0 elapsed=11716s rate=0.19/s
+  笠松 10R
+  園田 12R
+  [progress] total=2260 skipped=0 elapsed=11816s rate=0.19/s
+  高知 10R
+[20230322] venues=3
+  笠松 11R
+  [progress] total=2280 skipped=0 elapsed=11926s rate=0.19/s
+  園田 12R
+  [progress] total=2300 skipped=0 elapsed=12006s rate=0.19/s
+  高知 9R
+[20230323] venues=2
+  笠松 11R
+  [progress] total=2320 skipped=0 elapsed=12111s rate=0.19/s
+  園田 12R
+[20230324] venues=2
+  笠松 12R
+  [progress] total=2340 skipped=0 elapsed=12230s rate=0.19/s
+  川崎 11R
+[20230325] venues=2
+  名古屋 9R
+  [progress] total=2360 skipped=0 elapsed=12338s rate=0.19/s
+  川崎 11R
+[20230326] venues=3
+  水沢 11R
+  [progress] total=2380 skipped=0 elapsed=12445s rate=0.19/s
+  高知 12R
+  川崎 11R
+  [progress] total=2400 skipped=0 elapsed=12553s rate=0.19/s
+[20230327] venues=3
+  水沢 11R
+  [progress] total=2420 skipped=0 elapsed=12639s rate=0.19/s
+  名古屋 9R
+  金沢 12R
+  [progress] total=2440 skipped=0 elapsed=12747s rate=0.19/s
+[20230328] venues=4
+  水沢 12R
+  名古屋 8R
+  [progress] total=2460 skipped=0 elapsed=12850s rate=0.19/s
+  園田 12R
+  高知 12R
+  [progress] total=2480 skipped=0 elapsed=12961s rate=0.19/s
+[20230329] venues=3
+  金沢 12R
+  園田 12R
+  [progress] total=2500 skipped=0 elapsed=13081s rate=0.19/s
+  高知 12R
+  [progress] total=2520 skipped=0 elapsed=13160s rate=0.19/s
+[20230330] venues=2
+  金沢 12R
+  園田 12R
+  [progress] total=2540 skipped=0 elapsed=13267s rate=0.19/s
+[20230331] venues=2
+  金沢 12R
+  園田 12R
+  [progress] total=2560 skipped=0 elapsed=13383s rate=0.19/s
+[20230401] venues=1
+  川崎 11R
+  [progress] total=2580 skipped=0 elapsed=13465s rate=0.19/s
+[20230402] venues=3
+  水沢 11R
+  名古屋 11R
+  [progress] total=2600 skipped=0 elapsed=13576s rate=0.19/s
+  川崎 11R
+[20230403] venues=1
+  水沢 12R
+  [progress] total=2620 skipped=0 elapsed=13687s rate=0.19/s
+[20230404] venues=3
+  水沢 10R
+  名古屋 11R
+  [progress] total=2640 skipped=0 elapsed=13790s rate=0.19/s
+  園田 12R
+[20230405] venues=2
+  笠松 12R
+  [progress] total=2660 skipped=0 elapsed=13904s rate=0.19/s
+  園田 12R
+  [progress] total=2680 skipped=0 elapsed=13984s rate=0.19/s
+[20230406] venues=2
+  笠松 12R
+  園田 11R
+  [progress] total=2700 skipped=0 elapsed=14096s rate=0.19/s
+[20230407] venues=1
+  笠松 12R
+[20230408] venues=2
+  高知 11R
+  [progress] total=2720 skipped=0 elapsed=14217s rate=0.19/s
+  川崎 11R
+  [progress] total=2740 skipped=0 elapsed=14300s rate=0.19/s
+[20230409] venues=4
+  水沢 12R
+  名古屋 11R
+  [progress] total=2760 skipped=0 elapsed=14409s rate=0.19/s
+  高知 12R
+  川崎 11R
+  [progress] total=2780 skipped=0 elapsed=14516s rate=0.19/s
+[20230410] venues=2
+  水沢 12R
+  金沢 12R
+  [progress] total=2800 skipped=0 elapsed=14625s rate=0.19/s
+[20230411] venues=4
+  水沢 12R
+  [progress] total=2820 skipped=0 elapsed=14712s rate=0.19/s
+  名古屋 11R
+  金沢 12R
+  [progress] total=2840 skipped=0 elapsed=14825s rate=0.19/s
+  園田 12R
+[20230412] venues=3
+  32 12R
+  [progress] total=2860 skipped=0 elapsed=14935s rate=0.19/s
+  金沢 12R
+  [progress] total=2880 skipped=0 elapsed=15017s rate=0.19/s
+  園田 12R
+[20230413] venues=2
+  金沢 12R
+  [progress] total=2900 skipped=0 elapsed=15136s rate=0.19/s
+  園田 12R
+[20230414] venues=2
+  笠松 12R
+  [progress] total=2920 skipped=0 elapsed=15253s rate=0.19/s
+  園田 12R
+  [progress] total=2940 skipped=0 elapsed=15333s rate=0.19/s
+[20230415] venues=1
+  高知 12R
+[20230416] venues=3
+  水沢 11R
+  [progress] total=2960 skipped=0 elapsed=15452s rate=0.19/s
+  高知 12R
+  川崎 11R
+  [progress] total=2980 skipped=0 elapsed=15561s rate=0.19/s
+[20230417] venues=3
+  水沢 11R
+  名古屋 11R
+  [progress] total=3000 skipped=0 elapsed=15674s rate=0.19/s
+  笠松 12R
+  [progress] total=3020 skipped=0 elapsed=15754s rate=0.19/s
+[20230418] venues=4
+  水沢 11R
+  名古屋 11R
+  [progress] total=3040 skipped=0 elapsed=15864s rate=0.19/s
+  笠松 12R
+  園田 12R
+  [progress] total=3060 skipped=0 elapsed=15976s rate=0.19/s
+[20230419] venues=3
+  33 12R
+  金沢 12R
+  [progress] total=3080 skipped=0 elapsed=16088s rate=0.19/s
+  園田 12R
+  [progress] total=3100 skipped=0 elapsed=16170s rate=0.19/s
+[20230420] venues=2
+  金沢 12R
+  園田 12R
+  [progress] total=3120 skipped=0 elapsed=16290s rate=0.19/s
+[20230421] venues=2
+  船橋 12R
+  金沢 12R
+  [progress] total=3140 skipped=0 elapsed=16410s rate=0.19/s
+[20230422] venues=3
+  船橋 12R
+  [progress] total=3160 skipped=0 elapsed=16496s rate=0.19/s
+  高知 11R
+  川崎 11R
+  [progress] total=3180 skipped=0 elapsed=16611s rate=0.19/s
+[20230423] venues=5
+  船橋 12R
+  水沢 11R
+  [progress] total=3200 skipped=0 elapsed=16720s rate=0.19/s
+  名古屋 11R
+  高知 11R
+  [progress] total=3220 skipped=0 elapsed=16830s rate=0.19/s
+  川崎 11R
+  [progress] total=3240 skipped=0 elapsed=16914s rate=0.19/s
+[20230424] venues=4
+  船橋 12R
+  水沢 12R
+  [progress] total=3260 skipped=0 elapsed=17034s rate=0.19/s
+  金沢 12R
+  川崎 11R
+  [progress] total=3280 skipped=0 elapsed=17145s rate=0.19/s
+[20230425] venues=3
+  船橋 12R
+  [progress] total=3300 skipped=0 elapsed=17225s rate=0.19/s
+  水沢 12R
+  名古屋 11R
+  [progress] total=3320 skipped=0 elapsed=17342s rate=0.19/s
+[20230426] venues=2
+  笠松 12R
+  園田 12R
+  [progress] total=3340 skipped=0 elapsed=17452s rate=0.19/s
+[20230427] venues=2
+  笠松 12R
+  園田 12R
+  [progress] total=3360 skipped=0 elapsed=17569s rate=0.19/s
+[20230428] venues=2
+  笠松 12R
+  [progress] total=3380 skipped=0 elapsed=17655s rate=0.19/s
+  園田 12R
+[20230429] venues=3
+  船橋 12R
+  [progress] total=3400 skipped=0 elapsed=17773s rate=0.19/s
+  高知 11R
+  川崎 11R
+  [progress] total=3420 skipped=0 elapsed=17895s rate=0.19/s
+[20230430] venues=4
+  船橋 12R
+  [progress] total=3440 skipped=0 elapsed=17990s rate=0.19/s
+  水沢 11R
+  高知 12R
+  [progress] total=3460 skipped=0 elapsed=18115s rate=0.19/s
+  川崎 11R
+[20230501] venues=3
+  船橋 12R
+  [progress] total=3480 skipped=0 elapsed=18233s rate=0.19/s
+  水沢 11R
+  名古屋 11R
+  [progress] total=3500 skipped=0 elapsed=18343s rate=0.19/s
+[20230502] venues=4
+  水沢 11R
+  [progress] total=3520 skipped=0 elapsed=18424s rate=0.19/s
+  名古屋 11R
+  金沢 12R
+  [progress] total=3540 skipped=0 elapsed=18524s rate=0.19/s
+  園田 12R
+[20230503] venues=2
+  金沢 12R
+  [progress] total=3560 skipped=0 elapsed=18636s rate=0.19/s
+  園田 12R
+[20230504] venues=3
+  32 12R
+  [progress] total=3580 skipped=0 elapsed=18748s rate=0.19/s
+  金沢 12R
+  [progress] total=3600 skipped=0 elapsed=18828s rate=0.19/s
+  園田 12R
+[20230505] venues=2
+  金沢 12R
+  [progress] total=3620 skipped=0 elapsed=18950s rate=0.19/s
+  園田 12R
+[20230506] venues=3
+  船橋 12R
+  [progress] total=3640 skipped=0 elapsed=19067s rate=0.19/s
+  高知 11R
+  [progress] total=3660 skipped=0 elapsed=19153s rate=0.19/s
+  川崎 11R
+[20230507] venues=5
+  船橋 12R
+  [progress] total=3680 skipped=0 elapsed=19274s rate=0.19/s
+  水沢 11R
+  名古屋 11R
+  [progress] total=3700 skipped=0 elapsed=19389s rate=0.19/s
+  高知 11R
+  川崎 11R
+  [progress] total=3720 skipped=0 elapsed=19508s rate=0.19/s
+[20230508] venues=3
+  船橋 12R
+  [progress] total=3740 skipped=0 elapsed=19596s rate=0.19/s
+  水沢 12R
+  川崎 11R
+  [progress] total=3760 skipped=0 elapsed=19709s rate=0.19/s
+[20230509] venues=2
+  水沢 12R
+  名古屋 11R
+  [progress] total=3780 skipped=0 elapsed=19817s rate=0.19/s
+[20230510] venues=2
+  笠松 12R
+  園田 12R
+  [progress] total=3800 skipped=0 elapsed=19937s rate=0.19/s
+[20230511] venues=2
+  笠松 12R
+  [progress] total=3820 skipped=0 elapsed=20019s rate=0.19/s
+  園田 12R
+[20230512] venues=2
+  笠松 12R
+  [progress] total=3840 skipped=0 elapsed=20130s rate=0.19/s
+  園田 12R
+  fail nar-20230512-51-9: [Errno 104] Connection reset by peer
+[20230513] venues=3
+  船橋 12R
+  [progress] total=3860 skipped=0 elapsed=20257s rate=0.19/s
+  高知 11R
+  [progress] total=3880 skipped=0 elapsed=20340s rate=0.19/s
+  川崎 11R
+[20230514] venues=5
+  船橋 12R
+  [progress] total=3900 skipped=0 elapsed=20456s rate=0.19/s
+  水沢 11R
+  名古屋 11R
+  [progress] total=3920 skipped=0 elapsed=20565s rate=0.19/s
+  高知 12R
+  川崎 11R
+  [progress] total=3940 skipped=0 elapsed=20680s rate=0.19/s
+[20230515] venues=2
+  船橋 12R
+  [progress] total=3960 skipped=0 elapsed=20765s rate=0.19/s
+  水沢 12R
+[20230516] venues=3
+  水沢 11R
+  [progress] total=3980 skipped=0 elapsed=20876s rate=0.19/s
+  名古屋 12R
+  金沢 12R
+  [progress] total=4000 skipped=0 elapsed=20989s rate=0.19/s
+[20230517] venues=2
+  金沢 12R
+  [progress] total=4020 skipped=0 elapsed=21075s rate=0.19/s
+  園田 12R
+[20230518] venues=2
+  金沢 12R
+  [progress] total=4040 skipped=0 elapsed=21191s rate=0.19/s
+  園田 12R
+[20230519] venues=2
+  金沢 12R
+  [progress] total=4060 skipped=0 elapsed=21305s rate=0.19/s
+  園田 12R
+  [progress] total=4080 skipped=0 elapsed=21391s rate=0.19/s
+[20230520] venues=3
+  船橋 12R
+  高知 11R
+  [progress] total=4100 skipped=0 elapsed=21499s rate=0.19/s
+  川崎 11R
+[20230521] venues=5
+  船橋 12R
+  [progress] total=4120 skipped=0 elapsed=21617s rate=0.19/s
+  水沢 11R
+  名古屋 11R
+  [progress] total=4140 skipped=0 elapsed=21724s rate=0.19/s
+  高知 11R
+  川崎 11R
+  [progress] total=4160 skipped=0 elapsed=21831s rate=0.19/s
+[20230522] venues=3
+  船橋 12R
+  [progress] total=4180 skipped=0 elapsed=21913s rate=0.19/s
+  水沢 12R
+  川崎 11R
+  [progress] total=4200 skipped=0 elapsed=22020s rate=0.19/s
+[20230523] venues=2
+  水沢 12R
+  名古屋 12R
+  [progress] total=4220 skipped=0 elapsed=22133s rate=0.19/s
+[20230524] venues=2
+  笠松 12R
+  [progress] total=4240 skipped=0 elapsed=22220s rate=0.19/s
+  園田 12R
+[20230525] venues=2
+  笠松 12R
+  [progress] total=4260 skipped=0 elapsed=22343s rate=0.19/s
+  園田 12R
+[20230526] venues=2
+  笠松 12R
+  [progress] total=4280 skipped=0 elapsed=22460s rate=0.19/s
+  園田 12R
+  [progress] total=4300 skipped=0 elapsed=22544s rate=0.19/s
+[20230527] venues=2
+  船橋 12R
+  川崎 11R
+  [progress] total=4320 skipped=0 elapsed=22671s rate=0.19/s
+[20230528] venues=5
+  船橋 12R
+  水沢 11R
+  [progress] total=4340 skipped=0 elapsed=22795s rate=0.19/s
+  41 11R
+  高知 12R
+  [progress] total=4360 skipped=0 elapsed=22906s rate=0.19/s
+  川崎 11R
+  [progress] total=4380 skipped=0 elapsed=22990s rate=0.19/s
+[20230529] venues=2
+  船橋 12R
+  水沢 12R
+  [progress] total=4400 skipped=0 elapsed=23109s rate=0.19/s
+[20230530] venues=4
+  水沢 12R
+  41 12R
+  [progress] total=4420 skipped=0 elapsed=23224s rate=0.19/s
+  金沢 12R
+  [progress] total=4440 skipped=0 elapsed=23305s rate=0.19/s
+  高知 11R
+[20230531] venues=3
+  浦和 12R
+  [progress] total=4460 skipped=0 elapsed=23413s rate=0.19/s
+  金沢 12R
+  園田 12R
+  [progress] total=4480 skipped=0 elapsed=23525s rate=0.19/s
+[20230601] venues=3
+  06 12R
+  [progress] total=4500 skipped=0 elapsed=23606s rate=0.19/s
+  金沢 12R
+  園田 12R
+  [progress] total=4520 skipped=0 elapsed=23726s rate=0.19/s
+[20230602] venues=2
+  金沢 12R
+  園田 11R
+  [progress] total=4540 skipped=0 elapsed=23842s rate=0.19/s
+[20230603] venues=2
+  船橋 12R
+  川崎 11R
+  [progress] total=4560 skipped=0 elapsed=23961s rate=0.19/s
+[20230604] venues=4
+  船橋 12R
+  [progress] total=4580 skipped=0 elapsed=24051s rate=0.19/s
+  水沢 12R
+  41 12R
+  [progress] total=4600 skipped=0 elapsed=24162s rate=0.19/s
+  川崎 11R
+[20230605] venues=3
+  船橋 12R
+  [progress] total=4620 skipped=0 elapsed=24274s rate=0.19/s
+  水沢 12R
+  [progress] total=4640 skipped=0 elapsed=24354s rate=0.19/s
+  川崎 11R
+[20230606] venues=2
+  水沢 12R
+  [progress] total=4660 skipped=0 elapsed=24465s rate=0.19/s
+  41 12R
+[20230607] venues=1
+  園田 12R
+  [progress] total=4680 skipped=0 elapsed=24578s rate=0.19/s
+[20230608] venues=2
+  笠松 12R
+  [progress] total=4700 skipped=0 elapsed=24654s rate=0.19/s
+  園田 12R
+[20230609] venues=2
+  笠松 12R
+  [progress] total=4720 skipped=0 elapsed=24762s rate=0.19/s
+  園田 12R
+[20230610] venues=3
+  船橋 12R
+  [progress] total=4740 skipped=0 elapsed=24870s rate=0.19/s
+  高知 11R
+  川崎 11R
+  [progress] total=4760 skipped=0 elapsed=24978s rate=0.19/s
+[20230611] venues=5
+  船橋 12R
+  [progress] total=4780 skipped=0 elapsed=25057s rate=0.19/s
+  水沢 11R
+  名古屋 12R
+  [progress] total=4800 skipped=0 elapsed=25154s rate=0.19/s
+  高知 12R
+  川崎 11R
+  [progress] total=4820 skipped=0 elapsed=25254s rate=0.19/s
+[20230612] venues=3
+  船橋 12R
+  [progress] total=4840 skipped=0 elapsed=25331s rate=0.19/s
+  水沢 12R
+  笠松 12R
+  [progress] total=4860 skipped=0 elapsed=25440s rate=0.19/s
+[20230613] venues=3
+  水沢 12R
+  名古屋 12R
+  [progress] total=4880 skipped=0 elapsed=25543s rate=0.19/s
+  金沢 12R
+  [progress] total=4900 skipped=0 elapsed=25627s rate=0.19/s
+[20230614] venues=3
+  34 12R
+  金沢 12R
+  [progress] total=4920 skipped=0 elapsed=25737s rate=0.19/s
+  園田 12R
+[20230615] venues=2
+  金沢 12R
+  [progress] total=4940 skipped=0 elapsed=25852s rate=0.19/s
+  園田 12R
+  [progress] total=4960 skipped=0 elapsed=25928s rate=0.19/s
+[20230616] venues=2
+  金沢 12R
+  園田 12R
+  [progress] total=4980 skipped=0 elapsed=26038s rate=0.19/s
+[20230617] venues=3
+  船橋 12R
+  高知 12R
+  [progress] total=5000 skipped=0 elapsed=26141s rate=0.19/s
+[nar] done total=5008 skipped=0 failed=1 elapsed=26161s

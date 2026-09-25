@@ -102,6 +102,105 @@ def fetch_one_day(track_cd: str, sponsor_cd: str, date: str) -> Optional[List[Di
     return sorted(races, key=lambda x: x["race_nb"])
 
 
+def _extract_horse_name(cell):
+    """セルから競走馬名を抽出。"""
+    a = cell.find("a")
+    if a:
+        txt = a.get_text(strip=True)
+        if txt and len(txt) > 1 and not txt.isdigit():
+            return txt
+    txt = cell.get_text(" ", strip=True)
+    # 性齢マーカー (牡N/牝N/セN) より前を馬名とする
+    m = re.search(r"[牡牝セ]\s*\d+", txt)
+    if m:
+        name = txt[:m.start()].strip()
+        if name:
+            return name
+    # フォールバック: 最初の連続日本語/英数
+    m2 = re.match(r"([^\s(]+)", txt)
+    return m2.group(1) if m2 else txt
+
+
+def _extract_jockey_weight(cell):
+    """セルから騎手名と斤量を抽出。"""
+    txt = cell.get_text(" ", strip=True)
+    # 斤量: 数字.数字 または ☆◇★ 付き
+    wt = None
+    m = re.search(r"[☆◇★▲△]?\s*(\d+\.\d)", txt)
+    if m:
+        try:
+            wt = float(m.group(1))
+        except ValueError:
+            wt = None
+    # 騎手名: 先頭の空白/括弧まで
+    jockey = ""
+    a = cell.find("a")
+    if a:
+        jockey = a.get_text(strip=True)
+    if not jockey:
+        m2 = re.match(r"([^\s(（]+)", txt)
+        jockey = m2.group(1) if m2 else ""
+    return jockey, wt
+
+
+def _parse_runner_row(cells, prev_frame, prev_num):
+    """ent1 の行から出走馬情報を抽出。
+    16セル: [枠,隠枠,馬番,隠馬番,印,馬名,騎手等,単勝人気,馬体重,...]
+    14セル: [馬番,隠馬番,印,馬名,騎手等,単勝人気,馬体重,...] (枠番は継承)
+    """
+    n = len(cells)
+    if n >= 16:
+        try:
+            frame = int(cells[0].get_text(strip=True))
+        except (ValueError, IndexError):
+            return None, prev_frame, prev_num
+        try:
+            num = int(cells[2].get_text(strip=True))
+        except (ValueError, IndexError):
+            return None, prev_frame, prev_num
+        name_cell = cells[5]
+        jw_cell = cells[6]
+        odds_cell = cells[7]
+        w_cell = cells[8]
+    elif n >= 12:
+        # 枠番セル無し (前行から継承)
+        try:
+            num = int(cells[0].get_text(strip=True))
+        except (ValueError, IndexError):
+            return None, prev_frame, prev_num
+        frame = prev_frame
+        name_cell = cells[3]
+        jw_cell = cells[4]
+        odds_cell = cells[5]
+        w_cell = cells[6]
+    else:
+        return None, prev_frame, prev_num
+
+    horse_name = _extract_horse_name(name_cell)
+    jockey, weight = _extract_jockey_weight(jw_cell)
+
+    odds_txt = odds_cell.get_text(" ", strip=True)
+    m = re.search(r"([\d.]+)\s*(\d+)人気", odds_txt)
+    odds_win = float(m.group(1)) if m else None
+    popularity = int(m.group(2)) if m else None
+
+    w_txt = w_cell.get_text(strip=True)
+    mw = re.search(r"(\d+)", w_txt)
+    horse_weight = int(mw.group(1)) if mw else None
+
+    return {
+        "frame_number": frame,
+        "horse_number": num,
+        "horse_name": horse_name,
+        "jockey": jockey,
+        "weight": weight,
+        "horse_weight": horse_weight,
+        "odds_win": odds_win,
+        "popularity": popularity,
+        "status": "出走",
+    }, frame, num
+
+
 def fetch_shutuba(date: str, track_cd: str, sponsor_cd: str, race_nb: int) -> Optional[Dict]:
     """出走表と単勝オッズを取得。"""
     url = f"{BASE}/keiba/RaceList.do?raceDy={date}&opTrackCd={track_cd}&sponsorCd={sponsor_cd}&raceNb={race_nb}"
@@ -119,44 +218,19 @@ def fetch_shutuba(date: str, track_cd: str, sponsor_cd: str, race_nb: int) -> Op
         return None
 
     runners = []
+    prev_frame = 1
+    prev_num = 0
     for row in table.find_all("tr"):
-        cells = row.find_all("td")
-        if len(cells) < 8:
+        cells = row.find_all(["td", "th"])
+        if not cells:
             continue
-        try:
-            frame = int(cells[0].get_text(strip=True))
-            num = int(cells[2].get_text(strip=True))
-        except (ValueError, IndexError):
+        # ヘッダ行 (cells[0] が数字でない) はスキップ
+        first_txt = cells[0].get_text(strip=True)
+        if not first_txt or not first_txt.isdigit():
             continue
-        # 馬名は cells[5] 内の <a class="tx-midium"><strong>競走馬名</strong></a>
-        horse_name = ""
-        if len(cells) > 5:
-            a_el = cells[5].select_one("a.tx-midium strong, a.tx-midium")
-            if a_el:
-                horse_name = a_el.get_text(strip=True)
-            else:
-                # フォールバック: 2番目の要素
-                parts = [p.strip() for p in cells[5].get_text("\n", strip=True).split("\n") if p.strip()]
-                horse_name = parts[1] if len(parts) > 1 else (parts[0] if parts else "")
-        jockey = cells[6].get_text(" ", strip=True) if len(cells) > 6 else ""
-        odds_txt = cells[7].get_text(" ", strip=True) if len(cells) > 7 else ""
-        m = re.search(r"([\d.]+)\s+(\d+)人気", odds_txt)
-        odds_win = float(m.group(1)) if m else None
-        popularity = int(m.group(2)) if m else None
-        weight_txt = cells[8].get_text(strip=True) if len(cells) > 8 else ""
-        m2 = re.search(r"(\d+)", weight_txt)
-        horse_weight = int(m2.group(1)) if m2 else None
-
-        runners.append({
-            "horse_number": num,
-            "frame_number": frame,
-            "horse_name": horse_name,
-            "jockey": jockey,
-            "weight": None,
-            "horse_weight": horse_weight,
-            "odds_win": odds_win,
-            "popularity": popularity,
-        })
+        parsed, prev_frame, prev_num = _parse_runner_row(cells, prev_frame, prev_num)
+        if parsed:
+            runners.append(parsed)
     return {
         "race_name": race_name,
         "track_cd": track_cd,
@@ -237,15 +311,14 @@ BET_TYPE = {
 
 
 def _parse_float(txt):
-    """'161.3' や '1,234.5' を float に。'9999.9' は上限として None。"""
+    """'161.3' や '1,234.5' を float に。
+    9999.9 は表示上限値だが実数として保持する（除外は投票プラン側で行う）。"""
     if not txt:
         return None
     t = str(txt).replace(",", "").strip()
     try:
         v = float(t)
     except ValueError:
-        return None
-    if v >= 9999.9:
         return None
     return v
 
@@ -550,7 +623,9 @@ def parse_result(html, race_id, race_meta=None):
     rows = table.find_all("tr")
     for row in rows[1:]:
         cells = row.find_all(["td", "th"])
-        if len(cells) < 15:
+        n = len(cells)
+        # 平地: 15セル, ばんえい: 12セル
+        if n < 12:
             continue
         finish = _parse_int(cells[0].get_text(strip=True))
         frame = _parse_int(cells[1].get_text(strip=True))
@@ -564,7 +639,6 @@ def parse_result(html, race_id, race_meta=None):
         jockey = cells[7].get_text(strip=True)
         trainer = cells[8].get_text(strip=True)
         hw_txt = cells[9].get_text(strip=True)
-        # "507(-2)" 形式
         hw = None
         hw_change = None
         mhw = _re.search(r"(\d+)\s*\(([+-]?\d+)\)", hw_txt)
@@ -576,10 +650,18 @@ def parse_result(html, race_id, race_meta=None):
             if mhw2:
                 hw = int(mhw2.group(1))
         time_str = cells[10].get_text(strip=True)
-        margin = cells[11].get_text(strip=True)
-        agari = _parse_float(cells[12].get_text(strip=True))
-        corner = cells[13].get_text(strip=True)
-        popularity = _parse_int(cells[14].get_text(strip=True))
+        # 11セル目以降は着差/上がり3F/通過/人気
+        if n >= 15:
+            margin = cells[11].get_text(strip=True)
+            agari = _parse_float(cells[12].get_text(strip=True))
+            corner = cells[13].get_text(strip=True)
+            popularity = _parse_int(cells[14].get_text(strip=True))
+        else:
+            # ばんえい: 着差/上がり3F/通過なし
+            margin = ""
+            agari = None
+            corner = ""
+            popularity = _parse_int(cells[11].get_text(strip=True)) if n > 11 else None
 
         runners.append({
             "finish": finish,
@@ -605,17 +687,22 @@ def parse_result(html, race_id, race_meta=None):
     order = [n for _, n in finish_order]
 
     # 払戻金 (minipay テーブル)
+    # rowspan により券種名セルが省略される行があるため、直前の券種名を継承する
+    ticket_labels = ("単勝", "複勝", "枠連", "枠単", "馬連", "馬単", "ワイド", "3連複", "3連単")
     payouts = {}
+    current_ticket = None
     for tbl in soup.select("table.minipay"):
         for row in tbl.find_all("tr"):
             cells = row.find_all(["td", "th"])
             if not cells:
                 continue
-            label = cells[0].get_text(strip=True)
-            # 単勝/複勝/枠連/馬連/馬単/ワイド/3連複/3連単 など
             vals = [c.get_text(strip=True) for c in cells]
-            if label:
-                payouts.setdefault(label, []).append(vals)
+            first = vals[0] if vals else ""
+            if first in ticket_labels:
+                current_ticket = first
+            if current_ticket is None:
+                continue
+            payouts.setdefault(current_ticket, []).append(vals)
 
     return {
         "race_id": race_id,
@@ -701,3 +788,62 @@ async def fetch_odds_all_full_async(client, date, track_cd, sponsor_cd, race_nb,
     else:
         result["trifecta"] = {}
     return result
+
+
+def extract_payouts(payouts_raw):
+    """生 payouts を {券種: {組み合わせ: 払戻円}} に整形。
+    生データは [券種名, 組み合わせ, '金額円', 'N番人気'] または
+    [組み合わせ, '金額円', 'N番人気'] の可変長。券種名欠落は前行から継承。"""
+    import re as _re
+    result = {}
+    current_ticket = None
+    for key, rows in (payouts_raw or {}).items():
+        for row in rows:
+            if not isinstance(row, list) or not row:
+                continue
+            # 4要素: [券種名, 組み合わせ, 金額, 人気]
+            # 3要素: [組み合わせ, 金額, 人気]
+            if len(row) >= 4:
+                ticket = row[0].strip()
+                combo = row[1].strip()
+                amount_txt = row[2].strip()
+                current_ticket = ticket
+            elif len(row) == 3:
+                ticket = current_ticket
+                combo = row[0].strip()
+                amount_txt = row[1].strip()
+            else:
+                continue
+            if not ticket or not combo:
+                continue
+            m = _re.search(r"([\d,]+)\s*円", amount_txt)
+            if not m:
+                continue
+            amount = int(m.group(1).replace(",", ""))
+            # 券種名を正規化 (単勝/複勝/枠連/枠単/馬連/馬単/ワイド/3連複/3連単)
+            tk = ticket
+            # 順不同の券種はキーを昇順ソート
+            if tk in ("馬連", "ワイド", "3連複", "枠連"):
+                parts = combo.split("-")
+                try:
+                    combo = "-".join(sorted(parts, key=lambda x: int(x)))
+                except ValueError:
+                    pass
+            if tk not in result:
+                result[tk] = {}
+            result[tk][combo] = amount
+    return result
+
+
+def get_payout(payouts_raw, ticket, combo):
+    """指定券種・組み合わせの払戻円を返す。なければ None。
+    順不同の券種はキーを昇順ソートして検索。"""
+    d = extract_payouts(payouts_raw)
+    m = d.get(ticket) or {}
+    if ticket in ("馬連", "ワイド", "3連複", "枠連"):
+        parts = combo.split("-")
+        try:
+            combo = "-".join(sorted(parts, key=lambda x: int(x)))
+        except ValueError:
+            pass
+    return m.get(combo)

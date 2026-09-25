@@ -34,13 +34,22 @@ def race_obj(rid, payload):
 
 
 def real_odds(payload, ticket, combo):
+    """9999.9(表示上限)は投票プラン除外。"""
+    from backend.app.services.ev_calc import is_bettable_odds
     t = payload.get(ticket) or {}
     e = t.get(combo)
     if not e:
         return None
     if ticket == "wide":
-        return e.get("max") or e.get("min")
-    return e.get("odds")
+        v = e.get("max") or e.get("min")
+    else:
+        v = e.get("odds")
+    if v is None:
+        return None
+    fv = float(v)
+    if not is_bettable_odds(fv):
+        return None
+    return fv
 
 
 def hit_check(ticket, combo, finish):

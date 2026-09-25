@@ -1,7 +1,9 @@
-"""NAR過去データ一括取得。並列・中断再開可能。
+"""NAR過去データ一括取得。並列・中断再開可能。進捗を詳細に表示。
+
 使い方:
   python3 -m backend.scripts.bulk_fetch_nar 2024-01-01 2024-12-31
   python3 -m backend.scripts.bulk_fetch_nar 2024-01-01 2024-12-31 5000
+  FORCE_REDO=1 python3 -m backend.scripts.bulk_fetch_nar 2023-01-01 2024-12-31 5256
 """
 import os
 import sys
@@ -23,11 +25,55 @@ HEADERS = {
 }
 CONCURRENCY = 16
 INNER_CONCURRENCY = 8
+LOG_PATH = "nar_refetch.log"
 SPONSOR_TO_VENUE = {
     "06": "水沢", "13": "浦和", "20": "笠松", "26": "園田",
     "29": "高知", "55": "大井", "61": "川崎", "03": "船橋",
     "11": "門別", "41": "名古屋", "43": "金沢", "04": "船橋", "18": "名古屋", "30": "川崎", "33": "金沢",
 }
+
+
+class Progress:
+    def __init__(self, target, log_path=None, interval=3.0):
+        self.t0 = time.time()
+        self.target = target
+        self.last = 0.0
+        self.interval = interval
+        self.fh = None
+        if log_path:
+            try:
+                self.fh = open(log_path, "a", buffering=1)
+            except Exception:
+                self.fh = None
+
+    def _write(self, msg):
+        ts = datetime.now().strftime("%H:%M:%S")
+        line = f"[{ts}] {msg}"
+        print(line, flush=True)
+        if self.fh:
+            try:
+                self.fh.write(line + "\n")
+            except Exception:
+                pass
+
+    def log(self, msg):
+        self._write(msg)
+
+    def tick(self, stats, force=False):
+        now = time.time()
+        if not force and (now - self.last) < self.interval:
+            return
+        self.last = now
+        processed = stats["total"] + stats["skipped"] + stats["failed"] + stats.get("empty", 0)
+        elapsed = now - self.t0
+        rate = processed / elapsed if elapsed > 0 else 0.0
+        remain = max(0, self.target - stats["total"])
+        eta = remain / rate if rate > 0 else 0.0
+        self._write(
+            f"[progress] new={stats['total']} skip={stats['skipped']} empty={stats.get('empty', 0)} "
+            f"fail={stats['failed']} processed={processed} elapsed={elapsed:.0f}s "
+            f"rate={rate:.2f}/s target={self.target} remain={remain} eta={eta:.0f}s"
+        )
 
 
 def _parse_race_name(name):
@@ -110,25 +156,30 @@ def _build_payload(date, track_cd, sponsor_cd, race_nb, shutuba, detail):
     }
 
 
-async def process_race(client, sem, inner_sem, date, track_cd, sponsor_cd, race_nb, detail, existing_races, existing_odds, stats, lock, target):
+async def _bump(stats, lock, key, prog):
+    async with lock:
+        stats[key] = stats.get(key, 0) + 1
+        prog.tick(stats)
+
+
+async def process_race(client, sem, inner_sem, date, track_cd, sponsor_cd, race_nb, detail,
+                       existing_races, existing_odds, stats, lock, target, prog):
     async with sem:
         if stats["total"] >= target:
             return
         rid = f"nar-{date}-{track_cd}-{race_nb}"
-        # 既存スキップ
-        if rid in existing_races and rid in existing_odds:
-            async with lock:
-                stats["skipped"] += 1
+        force = os.getenv("FORCE_REDO", "") == "1"
+        if not force and rid in existing_races and rid in existing_odds:
+            await _bump(stats, lock, "skipped", prog)
             return
         try:
             shutuba = await asyncio.to_thread(fetch_shutuba, date, track_cd, sponsor_cd, race_nb)
             if not shutuba or not shutuba.get("runners"):
+                await _bump(stats, lock, "empty", prog)
                 return
             payload = _build_payload(date, track_cd, sponsor_cd, race_nb, shutuba, detail)
-            # 結果
             result = await asyncio.to_thread(fetch_result, date, track_cd, sponsor_cd, race_nb)
             if result:
-                # 結果でpayloadを上書き（結果のrunners/着順/払戻を使用）
                 payload["result_runners"] = result.get("runners", [])
                 payload["finish_order"] = result.get("finish_order", [])
                 payload["payouts"] = result.get("payouts", {})
@@ -138,7 +189,6 @@ async def process_race(client, sem, inner_sem, date, track_cd, sponsor_cd, race_
                     payload["distance"] = result["distance"]
             race_store.save_race(rid, payload)
             existing_races.add(rid)
-            # オッズ
             num_runners = len(payload["runners"])
             odds = await fetch_odds_all_full_async(
                 client, date, track_cd, sponsor_cd, race_nb, num_runners,
@@ -147,61 +197,87 @@ async def process_race(client, sem, inner_sem, date, track_cd, sponsor_cd, race_
             if odds:
                 odds_store.save_odds(rid, odds)
                 existing_odds.add(rid)
-            async with lock:
-                stats["total"] += 1
-                if stats["total"] % 20 == 0:
-                    elapsed = time.time() - stats["t0"]
-                    rate = stats["total"] / elapsed if elapsed else 0
-                    print(f"  [progress] total={stats['total']} skipped={stats['skipped']} elapsed={elapsed:.0f}s rate={rate:.2f}/s", flush=True)
+            await _bump(stats, lock, "total", prog)
         except Exception as e:
             async with lock:
                 stats["failed"] += 1
-            print(f"  fail {rid}: {str(e)[:80]}", flush=True)
+                prog.tick(stats)
+            prog.log(f"  fail {rid}: {str(e)[:120]}")
 
 
 async def main_async(date_from, date_to, target):
+    prog = Progress(target=target, log_path=LOG_PATH, interval=3.0)
     existing_races = set(race_store.list_race_ids())
     existing_odds = set(odds_store.list_race_ids())
-    print(f"[nar] start {date_from}〜{date_to} target={target} existing_races={len(existing_races)} existing_odds={len(existing_odds)}", flush=True)
+    force = os.getenv("FORCE_REDO", "") == "1"
+    prog.log(f"[nar] start {date_from}〜{date_to} target={target} "
+             f"existing_races={len(existing_races)} existing_odds={len(existing_odds)}")
+    prog.log(f"[nar] concurrency={CONCURRENCY} inner={INNER_CONCURRENCY} force_redo={force}")
 
-    stats = {"total": 0, "skipped": 0, "failed": 0, "t0": time.time()}
+    stats = {"total": 0, "skipped": 0, "failed": 0, "empty": 0, "t0": time.time()}
     sem = asyncio.Semaphore(CONCURRENCY)
     inner_sem = asyncio.Semaphore(INNER_CONCURRENCY)
     lock = asyncio.Lock()
 
     d0 = datetime.strptime(date_from, "%Y-%m-%d")
     d1 = datetime.strptime(date_to, "%Y-%m-%d")
+    total_days = (d1 - d0).days + 1
+
     async with httpx.AsyncClient(headers=HEADERS) as client:
         d = d0
+        day_idx = 0
         while d <= d1:
             if stats["total"] >= target:
+                prog.log(f"[nar] target reached ({stats['total']}), stopping")
                 break
+            day_idx += 1
             date_str = d.strftime("%Y%m%d")
+            day_label = d.strftime("%Y-%m-%d")
+            prog.log(f"=== day {day_idx}/{total_days} {day_label} ===")
             venues = await fetch_race_list_async(client, date_str)
             if not venues:
+                prog.log("  no venues")
+                prog.tick(stats, force=True)
                 d += timedelta(days=1)
                 continue
-            print(f"[{date_str}] venues={len(venues)}", flush=True)
-            for (track_cd, sponsor_cd) in venues:
+            venue_labels = [SPONSOR_TO_VENUE.get(sp, tc) for (tc, sp) in venues]
+            prog.log(f"  venues={len(venues)}: {venue_labels}")
+            for vi, (track_cd, sponsor_cd) in enumerate(venues, 1):
                 if stats["total"] >= target:
                     break
+                venue_name = SPONSOR_TO_VENUE.get(sponsor_cd, track_cd)
                 race_nbs = await fetch_one_day_races_async(client, date_str, track_cd, sponsor_cd)
                 if not race_nbs:
+                    prog.log(f"  [{vi}/{len(venues)}] {venue_name} no races")
                     continue
-                # 発走時刻・距離
                 try:
                     details_list = await asyncio.to_thread(fetch_one_day_detail, track_cd, sponsor_cd, date_str)
                     details = {x["race_nb"]: x for x in details_list}
-                except Exception:
+                except Exception as e:
+                    prog.log(f"  [{vi}/{len(venues)}] {venue_name} detail fetch failed: {str(e)[:80]}")
                     details = {}
-                print(f"  {SPONSOR_TO_VENUE.get(sponsor_cd, track_cd)} {len(race_nbs)}R", flush=True)
+                before_new = stats["total"]
+                prog.log(f"  [{vi}/{len(venues)}] {venue_name} {len(race_nbs)}R start")
                 tasks = []
                 for rn in race_nbs:
-                    tasks.append(process_race(client, sem, inner_sem, date_str, track_cd, sponsor_cd, rn, details.get(rn, {}), existing_races, existing_odds, stats, lock, target))
+                    tasks.append(process_race(
+                        client, sem, inner_sem, date_str, track_cd, sponsor_cd, rn,
+                        details.get(rn, {}), existing_races, existing_odds,
+                        stats, lock, target, prog,
+                    ))
                 await asyncio.gather(*tasks, return_exceptions=True)
+                prog.log(f"  [{vi}/{len(venues)}] {venue_name} done new={stats['total']-before_new} R (total_new={stats['total']})")
+                prog.tick(stats, force=True)
             d += timedelta(days=1)
+
     elapsed = time.time() - stats["t0"]
-    print(f"[nar] done total={stats['total']} skipped={stats['skipped']} failed={stats['failed']} elapsed={elapsed:.0f}s", flush=True)
+    prog.log(f"[nar] done new={stats['total']} skipped={stats['skipped']} empty={stats['empty']} "
+             f"failed={stats['failed']} elapsed={elapsed:.0f}s")
+    if prog.fh:
+        try:
+            prog.fh.flush()
+        except Exception:
+            pass
     os._exit(0)
 
 
