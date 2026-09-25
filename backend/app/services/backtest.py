@@ -4,7 +4,7 @@ from typing import Dict, List
 
 from backend.app.models.schemas import Race, Runner
 from backend.app.services.prediction import predict_race
-from backend.app.services.ev_calc import calc_ev, mock_odds, _candidates, TICKET_TYPES, _TICKET_LABEL
+from backend.app.services.ev_calc import calc_ev, real_odds_for, _candidates, TICKET_TYPES, _TICKET_LABEL
 from backend.app.services import race_store
 from backend.app.services import odds_store
 from backend.config import settings

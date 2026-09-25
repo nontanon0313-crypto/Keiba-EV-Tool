@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from backend.app.services.race_fetcher import get_races
 from backend.app.services.prediction import predict_race
-from backend.app.services.ev_calc import calc_ev, mock_odds, _candidates, TICKET_TYPES, _TICKET_LABEL
+from backend.app.services.ev_calc import calc_ev, real_odds_for, _candidates, TICKET_TYPES, _TICKET_LABEL
 from backend.app.services.result_fetcher import fetch_result
 from backend.config import settings
 
@@ -71,7 +71,9 @@ def _collect(scope="all", model_version=None):
             for combo, prob in _candidates(pred, t):
                 if prob <= 0:
                     continue
-                odds = mock_odds(prob, race.race_id, combo, t)
+                odds = real_odds_for(race.race_id, t, combo)
+                if odds is None:
+                    continue
                 ev = calc_ev(prob, odds)
                 if ev < THRESHOLDS.get(t, 0.12):
                     continue

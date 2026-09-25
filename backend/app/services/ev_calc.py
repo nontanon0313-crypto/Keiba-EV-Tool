@@ -20,9 +20,19 @@ def calc_ev(prob, odds):
     return prob * odds - 1.0
 
 
-def mock_odds(prob, race_id="", combo="", ticket="trifecta"):
-    rng = random.Random(seed_for(race_id + "|" + ticket + "|" + combo))
-    return round(1.0 / max(prob, 0.001) * rng.uniform(1.1, 1.5), 1)
+def real_odds_for(race_id, ticket, combo):
+    """odds_store から実オッズを取得。なければ None。"""
+    from backend.app.services import odds_store
+    p = odds_store.get_odds_single(race_id) or {}
+    t = p.get(ticket) or {}
+    e = t.get(combo)
+    if not e:
+        return None
+    if ticket == "wide":
+        v = e.get("max") or e.get("min")
+        return float(v) if v is not None else None
+    v = e.get("odds")
+    return float(v) if v is not None else None
 
 
 def kelly_fraction(prob, odds):
@@ -74,8 +84,8 @@ def build_bets(race, prediction, ticket_type="trifecta", threshold=None, min_pro
     for combo, prob in _candidates(prediction, ticket_type):
         if prob < min_prob:
             continue
-        odds = mock_odds(prob, race.race_id, combo, ticket_type)
-        if odds < min_odds:
+        odds = real_odds_for(race.race_id, ticket_type, combo)
+        if odds is None or odds < min_odds:
             continue
         ev = calc_ev(prob, odds)
         if ev < threshold:
@@ -106,8 +116,8 @@ def build_mixed_bets(race, prediction, tickets=None, ev_min=None, odds_min=None,
         for combo, prob in _candidates(prediction, t):
             if prob <= 0:
                 continue
-            odds = mock_odds(prob, race.race_id, combo, t)
-            if odds < odds_min:
+            odds = real_odds_for(race.race_id, t, combo)
+            if odds is None or odds < odds_min:
                 continue
             ev = calc_ev(prob, odds)
             if ev < ev_min:

@@ -140,7 +140,7 @@ def fmt_band_rows(bins, samples, kind):
             "expected_profit_pct": avg_ev * 100,
             "actual_hits": hits, "actual_attempts": n,
             "actual_rate": (hits / n) if n else None,
-            "actual_profit_pct": (hits * avg_odds / n - 1) * 100 if n else None,
+            "actual_profit_pct": (sum(x[1] for x in s if x[3]) / n - 1) * 100 if n else None,
         })
     return rows
 
@@ -172,7 +172,7 @@ def fmt_cumulative(samples, thresholds, kind):
             "expected_profit_pct": avg_ev * 100,
             "actual_hits": hits, "actual_attempts": n,
             "actual_rate": (hits / n) if n else None,
-            "actual_profit_pct": (hits * avg_odds / n - 1) * 100 if n else None,
+            "actual_profit_pct": (sum(x[1] for x in s if x[3]) / n - 1) * 100 if n else None,
         })
     return rows
 
@@ -195,7 +195,7 @@ def fmt_features(features, agg):
                 "expected_profit_pct": (avg_prob * avg_odds - 1.0) * 100,
                 "actual_hits": hits, "actual_attempts": n,
                 "actual_rate": (hits / n) if n else None,
-                "actual_profit_pct": (hits * avg_odds / n - 1) * 100 if n else None,
+                "actual_profit_pct": (sum(x[1] for x in s if x[2]) / n - 1) * 100 if n else None,
             })
         out.append({"feature": key, "label": conf["label"], "rows": rows})
     return out
@@ -278,10 +278,10 @@ def build():
                 ev = calc_ev(prob, ro)
                 hit = hit_check(t, combo, finish)
                 sample = (prob, ro, ev, hit)
-                scopes_samples["all"].append(sample)
-                # フィルタ通過候補のみがplan/non_plan対象
+                # フィルタ通過候補のみが all/plan/non_plan 対象
                 passes_filter = (ro >= settings.MIXED_ODDS_MIN) and (ev >= settings.MIXED_EV_MIN) and (t in settings.MIXED_TICKETS)
                 if passes_filter:
+                    scopes_samples["all"].append(sample)
                     if (t, combo) in plan_set:
                         scopes_samples["plan"].append(sample)
                     else:
