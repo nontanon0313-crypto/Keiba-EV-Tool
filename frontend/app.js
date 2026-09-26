@@ -356,7 +356,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
       html += "<tr class=\"" + cls + "\"><td>" + esc(r.label) + "</td>"
             + "<td>" + r.count + "</td>"
             + "<td>" + ehr + "</td>"
-            + "<td>" + "-" + "</td>"
+            + "<td>" + (r.avg_odds == null ? "-" : fmtNum(r.avg_odds, 1)) + "</td>"
             + "<td>" + ep + "</td>"
             + "<td>" + ahr + "</td>"
             + "<td>" + ap + "</td></tr>";
