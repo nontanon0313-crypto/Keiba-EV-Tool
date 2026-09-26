@@ -329,6 +329,75 @@ def main():
     if not sig_hr_dn:
         print("  なし")
 
+    # === features 構造に再編成 ===
+    # 出走表タブ: pop, weight, frame, odds, sex_id
+    # 単独特徴タブ: age, hw_chg, n_runners, distance, surface_id, venue_id, jockey_id, jockey_rank
+    RACE_TABLE_FEATURES = [
+        ("pop", "人気"),
+        ("weight", "斤量"),
+        ("frame", "枠番"),
+        ("odds", "単勝オッズ"),
+        ("sex_id", "性別"),
+    ]
+    SINGLE_FEATURES = [
+        ("age", "年齢"),
+        ("hw_chg", "馬体重増減"),
+        ("n_runners", "頭数"),
+        ("distance", "距離"),
+        ("surface_id", "馬場"),
+        ("venue_id", "会場"),
+        ("jockey_id", "騎手"),
+        ("jockey_rank", "騎手ランク"),
+    ]
+
+    def to_pct(v):
+        try:
+            return float(v) * 100
+        except Exception:
+            return v
+
+    def build_feature_rows(feature_key):
+        rs = [r for r in results if r["feature"] == feature_key]
+        rows = []
+        for r in rs:
+            rows.append({
+                "label": r["label"],
+                "n": r["n"],
+                "n_other": r["n_other"],
+                "roi_pct": to_pct(r["roi"]),
+                "roi_other_pct": to_pct(r["roi_other"]),
+                "roi_diff_pct": to_pct(r["roi_diff"]),
+                "roi_ci_lo_pct": to_pct(r["roi_ci_lo"]),
+                "roi_ci_hi_pct": to_pct(r["roi_ci_hi"]),
+                "roi_sig_up": r["roi_sig_up"],
+                "roi_sig_down": r["roi_sig_down"],
+                "hit_rate_pct": to_pct(r["hit_rate"]),
+                "hit_rate_other_pct": to_pct(r["hit_rate_other"]),
+                "hr_diff_pct": to_pct(r["hr_diff"]),
+                "hr_ci_lo_pct": to_pct(r["hr_ci_lo"]),
+                "hr_ci_hi_pct": to_pct(r["hr_ci_hi"]),
+                "hr_sig_up": r["hr_sig_up"],
+                "hr_sig_down": r["hr_sig_down"],
+                "avg_odds": r["avg_odds"],
+                "avg_odds_other": r["avg_odds_other"],
+                "avg_payout_hit": r["avg_payout_hit"],
+                "avg_payout_hit_other": r["avg_payout_hit_other"],
+            })
+        return {"feature": feature_key, "label": "", "rows": rows}
+
+    race_table_list = []
+    for fk, flabel in RACE_TABLE_FEATURES:
+        d = build_feature_rows(fk)
+        if d["rows"]:
+            d["label"] = flabel
+            race_table_list.append(d)
+    single_list = []
+    for fk, flabel in SINGLE_FEATURES:
+        d = build_feature_rows(fk)
+        if d["rows"]:
+            d["label"] = flabel
+            single_list.append(d)
+
     def sanitize(o):
         if isinstance(o, dict): return {k: sanitize(v) for k, v in o.items()}
         if isinstance(o, list): return [sanitize(v) for v in o]
@@ -339,7 +408,8 @@ def main():
         "n_samples": N,
         "K": K,
         "z_adj": z_adj,
-        "results": results,
+        "race_table": race_table_list,
+        "single": single_list,
         "generated_at": datetime.now().isoformat(),
     })
     with open("scratch/single_feature_result.json", "w", encoding="utf-8") as f:

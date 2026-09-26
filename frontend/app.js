@@ -20,6 +20,9 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   var analyticsData = null, currentScope = "all", currentView = "ev", filters = {}, currentBets = [];
   var currentFeatureTab = null;
   var analyticsFeaturesData = null;
+  var currentFeatureFilter = "all";
+  var currentRaceTableFeature = null;
+  var currentSingleFeature = null;
   var singleFeatureFilter = "sig";
   var currentTicket = "mixed";
   var currentAnaScope = "all";
@@ -283,36 +286,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     return html;
   }
 
-  function featuresView(features){
-    if (!features || !features.length) return "<p>該当データなし</p>";
-    var tabsHtml = "<div class=\"subtabs\" id=\"feature-tabs\">";
-    features.forEach(function(f, i){
-      var active = (currentFeatureTab === f.feature || (!currentFeatureTab && i === 0)) ? " active" : "";
-      tabsHtml += "<button class=\"subtab" + active + "\" data-feature=\"" + esc(f.feature) + "\" type=\"button\">" + esc(f.label) + "</button>";
-    });
-    tabsHtml += "</div>";
-    var target = null;
-    features.forEach(function(f){ if (f.feature === currentFeatureTab) target = f; });
-    if (!target) target = features[0];
-    return tabsHtml + "<div id=\"feature-body\">" + tableRows(target.rows || [], "範囲") + "</div>";
-  }
 
-  function bindFeatureTabs(features){
-    var box = document.getElementById("feature-tabs");
-    if (!box) return;
-    box.querySelectorAll(".subtab").forEach(function(t){
-      t.addEventListener("click", function(){
-        currentFeatureTab = t.getAttribute("data-feature");
-        box.querySelectorAll(".subtab").forEach(function(x){ x.classList.remove("active"); });
-        t.classList.add("active");
-        var target = null;
-        features.forEach(function(f){ if (f.feature === currentFeatureTab) target = f; });
-        if (!target) return;
-        var body = document.getElementById("feature-body");
-        if (body) body.innerHTML = tableRows(target.rows || [], "範囲");
-      });
-    });
-  }
 
   function renderAnaSummary(s, races){
     if (!s) { anaSummary.innerHTML = ""; return; }
@@ -370,41 +344,65 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   }
 
 
-  function renderSingleFeatureTable(rows, mode){
-    // mode: "roi" or "hr"
+
+
+
+
+  function renderFeatureFilterTabs(){
+    var html = "<div class=\"subtabs\">";
+    html += "<button class=\"subtab" + (currentFeatureFilter === "all" ? " active" : "") + "\" data-feature-filter=\"all\" type=\"button\">全体</button>";
+    html += "<button class=\"subtab" + (currentFeatureFilter === "on" ? " active" : "") + "\" data-feature-filter=\"on\" type=\"button\">適用</button>";
+    html += "<button class=\"subtab" + (currentFeatureFilter === "off" ? " active" : "") + "\" data-feature-filter=\"off\" type=\"button\">適用外</button>";
+    html += "</div>";
+    return html;
+  }
+
+  function renderFeatureTable(rows, mode, filter){
     if (!rows || !rows.length) return "<p>該当データなし</p>";
     var html = "<table class=\"ev-table\"><thead><tr>";
+    html += "<th>ビン</th><th>件数</th>";
     if (mode === "roi") {
-      html += "<th>特徴</th><th>ビン</th><th>n</th><th>ROI</th><th>比較ROI</th><th>差</th><th>CI下限</th><th>CI上限</th>";
+      if (filter === "all" || filter === "on") html += "<th>適用 利益%</th>";
+      if (filter === "all" || filter === "off") html += "<th>適用外 利益%</th>";
+      if (filter === "all") html += "<th>差</th><th>有意</th>";
     } else {
-      html += "<th>特徴</th><th>ビン</th><th>n</th><th>的中率</th><th>比較的中率</th><th>オッズ</th><th>比較オッズ</th><th>払戻</th>";
+      if (filter === "all" || filter === "on") html += "<th>適用 的中率</th><th>適用 平均OD</th>";
+      if (filter === "all" || filter === "off") html += "<th>適用外 的中率</th><th>適用外 平均OD</th>";
+      if (filter === "all") html += "<th>差</th><th>有意</th>";
     }
     html += "</tr></thead><tbody>";
     rows.forEach(function(r){
-      var cls = "";
-      var diff, ci_lo, ci_hi;
-      if (mode === "roi") {
-        diff = r.roi_diff; ci_lo = r.roi_ci_lo; ci_hi = r.roi_ci_hi;
-      } else {
-        diff = r.hr_diff; ci_lo = r.hr_ci_lo; ci_hi = r.hr_ci_hi;
-      }
-      cls = KeibaTheme.evClass(diff, 0);
-      html += "<tr class=\"" + cls + "\">";
-      html += "<td>" + esc(r.feature) + "</td>";
+      var cls1 = KeibaTheme.evClass(r.roi_diff_pct / 100, 0);
+      var cls2 = KeibaTheme.evClass(r.hr_diff_pct / 100, 0);
+      html += "<tr>";
       html += "<td>" + esc(r.label) + "</td>";
       html += "<td>" + r.n + "</td>";
       if (mode === "roi") {
-        html += "<td>" + fmtNum(r.roi, 3) + "</td>";
-        html += "<td>" + fmtNum(r.roi_other, 3) + "</td>";
-        html += "<td>" + fmtSigned(diff, 4) + "</td>";
-        html += "<td>" + fmtSigned(ci_lo, 4) + "</td>";
-        html += "<td>" + fmtSigned(ci_hi, 4) + "</td>";
+        if (filter === "all" || filter === "on") {
+          html += "<td class=\"" + cls1 + "\">" + fmtSignedPct(r.roi_pct, 1) + "</td>";
+        }
+        if (filter === "all" || filter === "off") {
+          html += "<td>" + fmtSignedPct(r.roi_other_pct, 1) + "</td>";
+        }
+        if (filter === "all") {
+          html += "<td>" + fmtSignedPct(r.roi_diff_pct, 1) + "</td>";
+          var sig = r.roi_sig_up ? "優位" : (r.roi_sig_down ? "劣位" : "-");
+          html += "<td>" + sig + "</td>";
+        }
       } else {
-        html += "<td>" + fmtPct(r.hit_rate, 2) + "</td>";
-        html += "<td>" + fmtPct(r.hit_rate_other, 2) + "</td>";
-        html += "<td>" + fmtNum(r.avg_odds, 1) + "</td>";
-        html += "<td>" + fmtNum(r.avg_odds_other, 1) + "</td>";
-        html += "<td>" + fmtNum(r.avg_payout_hit, 0) + "</td>";
+        if (filter === "all" || filter === "on") {
+          html += "<td class=\"" + cls2 + "\">" + fmtPct(r.hit_rate_pct, 2) + "</td>";
+          html += "<td>" + fmtNum(r.avg_odds, 1) + "</td>";
+        }
+        if (filter === "all" || filter === "off") {
+          html += "<td>" + fmtPct(r.hit_rate_other_pct, 2) + "</td>";
+          html += "<td>" + fmtNum(r.avg_odds_other, 1) + "</td>";
+        }
+        if (filter === "all") {
+          html += "<td>" + fmtSignedPct(r.hr_diff_pct, 2) + "</td>";
+          var sig2 = r.hr_sig_up ? "優位" : (r.hr_sig_down ? "劣位" : "-");
+          html += "<td>" + sig2 + "</td>";
+        }
       }
       html += "</tr>";
     });
@@ -412,36 +410,88 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     return html;
   }
 
+  function renderFeatureGroup(features, currentKey){
+    if (!features || !features.length) return "<p>該当データなし</p>";
+    var tabsHtml = "<div class=\"subtabs\">";
+    features.forEach(function(f, i){
+      var active = (currentKey === f.feature || (!currentKey && i === 0)) ? " active" : "";
+      tabsHtml += "<button class=\"subtab" + active + "\" data-feature-group=\"" + esc(f.feature) + "\" type=\"button\">" + esc(f.label) + "</button>";
+    });
+    tabsHtml += "</div>";
+    var target = null;
+    features.forEach(function(f){ if (f.feature === currentKey) target = f; });
+    if (!target) target = features[0];
+    var bodyHtml = "<h4 class=\"feature-title\">利益率</h4>";
+    bodyHtml += renderFeatureTable(target.rows, "roi", currentFeatureFilter);
+    bodyHtml += "<h4 class=\"feature-title\">的中率</h4>";
+    bodyHtml += renderFeatureTable(target.rows, "hr", currentFeatureFilter);
+    return tabsHtml + "<div>" + bodyHtml + "</div>";
+  }
 
+  function bindFeatureFilterTabs(){
+    var tabs = anaView.querySelectorAll("[data-feature-filter]");
+    for (var i = 0; i < tabs.length; i++) {
+      (function(t){
+        t.addEventListener("click", function(){
+          currentFeatureFilter = t.getAttribute("data-feature-filter");
+          renderView();
+        });
+      })(tabs[i]);
+    }
+  }
+
+  function bindFeatureGroupTabs(features, setterFn){
+    var tabs = anaView.querySelectorAll("[data-feature-group]");
+    for (var i = 0; i < tabs.length; i++) {
+      (function(t){
+        t.addEventListener("click", function(){
+          setterFn(t.getAttribute("data-feature-group"));
+          renderView();
+        });
+      })(tabs[i]);
+    }
+  }
+
+  function ensureFeaturesData(cb){
+    if (analyticsFeaturesData) { cb(); return; }
+    anaView.textContent = "読み込み中...";
+    fetchWithTimeout(API_BASE + "/analytics/features", 60000)
+      .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+      .then(function(d){ analyticsFeaturesData = d; cb(); })
+      .catch(function(err){ anaView.textContent = "取得失敗: " + err.message; });
+  }
 
   function renderSingleFeatures(){
-    if (!analyticsFeaturesData) {
-      anaView.textContent = "読み込み中...";
-      fetchWithTimeout(API_BASE + "/analytics/features", 60000)
-        .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
-        .then(function(d){ analyticsFeaturesData = d; renderSingleFeatures(); })
-        .catch(function(err){ anaView.textContent = "取得失敗: " + err.message; });
-      return;
-    }
-    var results = analyticsFeaturesData.results || [];
-    var sig_up_roi = results.filter(function(r){ return r.roi_sig_up; }).sort(function(a,b){ return b.roi_diff - a.roi_diff; });
-    var sig_dn_roi = results.filter(function(r){ return r.roi_sig_down; }).sort(function(a,b){ return a.roi_diff - b.roi_diff; });
-    var sig_up_hr = results.filter(function(r){ return r.hr_sig_up; }).sort(function(a,b){ return b.hr_diff - a.hr_diff; });
-    var sig_dn_hr = results.filter(function(r){ return r.hr_sig_down; }).sort(function(a,b){ return a.hr_diff - b.hr_diff; });
+    ensureFeaturesData(function(){
+      var features = analyticsFeaturesData.single || [];
+      var html = renderFeatureFilterTabs();
+      html += renderFeatureGroup(features, currentSingleFeature);
+      anaView.innerHTML = html;
+      bindFeatureFilterTabs();
+      bindFeatureGroupTabs(features, function(k){ currentSingleFeature = k; });
+    });
+  }
 
-    var html = "";
-    html += "<h4 class=\"feature-title\">ROI 有意優位 (B > B^c)</h4>";
-    html += renderSingleFeatureTable(sig_up_roi, "roi");
-    html += "<h4 class=\"feature-title\">ROI 有意劣位 (B < B^c)</h4>";
-    html += renderSingleFeatureTable(sig_dn_roi, "roi");
-    html += "<h4 class=\"feature-title\">的中率 有意優位 (B > B^c)</h4>";
-    html += renderSingleFeatureTable(sig_up_hr, "hr");
-    html += "<h4 class=\"feature-title\">的中率 有意劣位 (B < B^c)</h4>";
-    html += renderSingleFeatureTable(sig_dn_hr, "hr");
-    anaView.innerHTML = html;
+  function renderRaceTable(){
+    ensureFeaturesData(function(){
+      var features = analyticsFeaturesData.race_table || [];
+      var html = renderFeatureFilterTabs();
+      html += renderFeatureGroup(features, currentRaceTableFeature);
+      anaView.innerHTML = html;
+      bindFeatureFilterTabs();
+      bindFeatureGroupTabs(features, function(k){ currentRaceTableFeature = k; });
+    });
   }
 
   function renderView(){
+    if (currentView === "features") {
+      renderRaceTable();
+      return;
+    }
+    if (currentView === "single_features") {
+      renderSingleFeatures();
+      return;
+    }
     if (!analyticsData) return;
     var scopeData = (analyticsData.scopes || {})[currentAnaScope] || {};
     var races = (analyticsData.meta || {}).races || 0;
@@ -456,18 +506,8 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
       anaView.innerHTML = tableRows(scopeData.odds_bins || [], "オッズ帯") + renderCumTable(scopeData.odds_cum || [], "オッズ帯");
       return;
     }
-    if (currentView === "features") {
-      var feats = scopeData.features || [];
-      anaView.innerHTML = featuresView(feats);
-      bindFeatureTabs(feats);
-      return;
-    }
     if (currentView === "tickets") {
       renderTicketStatsFromData();
-      return;
-    }
-    if (currentView === "single_features") {
-      renderSingleFeatures();
       return;
     }
     anaView.innerHTML = tableRows(scopeData.ev_bins || [], "期待値帯") + renderCumTable(scopeData.ev_cum || [], "期待値帯");
