@@ -218,6 +218,7 @@ def build():
     feat_agg = {s: {k: {r[0]: [] for r in c["ranges"]} for k, c in fc.items()} for s in SCOPES}
     ticket_agg = defaultdict(lambda: {"count": 0, "hits": 0, "prob_sum": 0.0,
                                       "odds_sum": 0.0, "prob_odds_sum": 0.0,
+                                      "sum_inv_odds": 0.0,
                                       "stake": 0, "payout": 0})
 
     races = race_store.list_races()
@@ -268,6 +269,7 @@ def build():
                 ta["prob_sum"] += prob
                 ta["odds_sum"] += ro
                 ta["prob_odds_sum"] += prob * ro
+                ta["sum_inv_odds"] += 1.0 / ro
                 ta["stake"] += 100
                 if hit:
                     ta["payout"] += payout
@@ -407,11 +409,22 @@ def build():
             "features": fmt_features(feat_agg[scope_name]),
         }
 
+    # 券種ごとの「1レースあたり的中点数」（ワイドのみ3点）
+    HITS_PER_RACE = {"trifecta": 1, "trio": 1, "exacta": 1, "quinella": 1, "wide": 3,
+                     "win": 1, "place": 3}
+    RACE_COUNT = len(races)
+    THEORY_DEDUCTION = {"trifecta": 25.0, "trio": 25.0, "exacta": 22.5,
+                        "quinella": 22.5, "wide": 22.5, "win": 20.0, "place": 20.0}
     ticket_stats = []
     for t in tickets:
         ta = ticket_agg[t]
         if ta["count"] == 0:
             continue
+        # 実測控除率 = (1 - 的中点数 / Σ(1/odds)) × 100
+        # Σ(1/odds) はレースごとの総和の平均を使う（全組み合わせ均等買いの控除率）
+        avg_inv = ta["sum_inv_odds"] / RACE_COUNT if RACE_COUNT else 0
+        hpr = HITS_PER_RACE.get(t, 1)
+        measured_deduction = (1 - hpr / avg_inv) * 100 if avg_inv > 0 else None
         ticket_stats.append({
             "ticket": t,
             "label": _TICKET_LABEL.get(t, t),
@@ -422,6 +435,8 @@ def build():
             "actual_hit_rate_pct": (ta["hits"] / ta["count"]) * 100,
             "expected_profit_pct": (ta["prob_odds_sum"] / ta["count"] - 1) * 100,
             "actual_profit_pct": (ta["payout"] / ta["stake"] - 1) * 100 if ta["stake"] else 0.0,
+            "measured_deduction_pct": measured_deduction,
+            "theory_deduction_pct": THEORY_DEDUCTION.get(t),
         })
 
     result = {

@@ -1,0 +1,38 @@
+nohup: ignoring input
+[build] start
+[race_store] backend=turso
+[build] races: 6006
+[odds_store] backend=turso
+[build] odds fetched: 6005
+[build] 200/6006 38.2s
+[build] 400/6006 41.7s
+[build] 600/6006 45.2s
+[build] 800/6006 48.7s
+[build] 1000/6006 52.6s
+[build] 1200/6006 55.8s
+[build] 1400/6006 60.3s
+[build] 1600/6006 64.8s
+[build] 1800/6006 68.3s
+[build] 2000/6006 73.1s
+[build] 2200/6006 78.6s
+[build] 2400/6006 81.6s
+[build] 2600/6006 87.0s
+[build] 2800/6006 92.1s
+[build] 3000/6006 97.7s
+[build] 3200/6006 101.3s
+[build] 3400/6006 106.5s
+[build] 3600/6006 112.1s
+[build] 3800/6006 118.1s
+[build] 4000/6006 121.6s
+[build] 4200/6006 128.1s
+[build] 4400/6006 134.0s
+[build] 4600/6006 137.2s
+[build] 4800/6006 143.3s
+[build] 5000/6006 150.4s
+[build] 5200/6006 156.8s
+[build] 5400/6006 160.5s
+[build] 5600/6006 167.5s
+[build] 5800/6006 174.3s
+[build] 6000/6006 181.6s
+[build] saved turso
+[build] done 347.8s

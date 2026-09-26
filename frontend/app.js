@@ -346,7 +346,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     if (!analyticsData) return;
     var rows = analyticsData.ticket_stats || [];
     if (!rows.length) { anaView.textContent = "データなし"; return; }
-    var html = "<table class=\"ev-table\"><thead><tr><th>券種</th><th>件数</th><th>予想的中率</th><th>オッズ平均</th><th>想定利益%</th><th>実的中率</th><th>実利益%</th></tr></thead><tbody>";
+    var html = "<table class=\"ev-table\"><thead><tr><th>券種</th><th>件数</th><th>予想的中率</th><th>オッズ平均</th><th>想定利益%</th><th>実的中率</th><th>実利益%</th><th>実測控除率%</th><th>理論控除率%</th></tr></thead><tbody>";
     rows.forEach(function(r){
       var cls = KeibaTheme.evClass(r.expected_profit_pct / 100, EV_THRESHOLD);
       var ehr = r.expected_hit_rate_pct == null ? "-" : fmtPct(r.expected_hit_rate_pct, 2);
@@ -359,7 +359,9 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
             + "<td>" + (r.avg_odds == null ? "-" : fmtNum(r.avg_odds, 1)) + "</td>"
             + "<td>" + ep + "</td>"
             + "<td>" + ahr + "</td>"
-            + "<td>" + ap + "</td></tr>";
+            + "<td>" + ap + "</td>"
+            + "<td>" + (r.measured_deduction_pct == null ? "-" : fmtPct(r.measured_deduction_pct, 1)) + "</td>"
+            + "<td>" + (r.theory_deduction_pct == null ? "-" : fmtPct(r.theory_deduction_pct, 1)) + "</td></tr>";
     });
     html += "</tbody></table>";
     anaView.innerHTML = html;
