@@ -46,7 +46,7 @@ def real_odds_for(race_id, ticket, combo):
     if not e:
         return None
     if ticket == "wide":
-        v = e.get("max") or e.get("min")
+        v = e.get("min")
     else:
         v = e.get("odds")
     if v is None:

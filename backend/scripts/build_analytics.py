@@ -1,4 +1,4 @@
-"""analytics_cache 生成。
+"""analytics_cache 生成（メモリ節約型・ストリーミング集計）。
 計算式（全て %数値で返す。フロントは表示のみ）:
   予想的中率% = Σ確率 / N × 100
   想定利益%   = (Σ(確率×オッズ) / N − 1) × 100
@@ -52,7 +52,7 @@ def real_odds(odds_payload, ticket, combo):
     if not e:
         return None
     if ticket == "wide":
-        v = e.get("max") or e.get("min")
+        v = e.get("min")
     else:
         v = e.get("odds")
     if v is None:
@@ -96,29 +96,41 @@ def payout_yen(payouts_dict, ticket_jp, combo):
     return m.get(combo)
 
 
-def _row(label, samples):
-    """samples: [(prob, odds, hit, payout_yen)] のリスト。
-    戻り値の % 系は全て % 数値（77.5 = 77.5%）。"""
-    n = len(samples)
-    if n == 0:
-        return None
-    sum_prob = sum(x[0] for x in samples)
-    sum_odds = sum(x[1] for x in samples)
-    sum_prob_odds = sum(x[0] * x[1] for x in samples)
-    hits = sum(x[2] for x in samples)
-    sum_payout_yen = sum(x[3] for x in samples if x[2])
-    return {
-        "range": label,
-        "count": n,
-        "avg_prob": sum_prob / n,
-        "avg_odds": sum_odds / n,
-        "expected_hit_rate_pct": (sum_prob / n) * 100,
-        "expected_profit_pct": (sum_prob_odds / n - 1) * 100,
-        "actual_hits": hits,
-        "actual_attempts": n,
-        "actual_hit_rate_pct": (hits / n) * 100,
-        "actual_profit_pct": (sum_payout_yen / (n * 100) - 1) * 100,
-    }
+class Agg:
+    """ストリーミング集計。サンプルは保持しない。"""
+    def __init__(self):
+        self.n = 0
+        self.hits = 0
+        self.sum_prob = 0.0
+        self.sum_odds = 0.0
+        self.sum_prob_odds = 0.0
+        self.sum_payout_yen = 0.0
+
+    def add(self, prob, odds, hit, payout_yen=0):
+        self.n += 1
+        self.hits += hit
+        self.sum_prob += prob
+        self.sum_odds += odds
+        self.sum_prob_odds += prob * odds
+        if hit:
+            self.sum_payout_yen += payout_yen
+
+    def row(self, label):
+        n = self.n
+        if n == 0:
+            return None
+        return {
+            "range": label,
+            "count": n,
+            "avg_prob": self.sum_prob / n,
+            "avg_odds": self.sum_odds / n,
+            "expected_hit_rate_pct": (self.sum_prob / n) * 100,
+            "expected_profit_pct": (self.sum_prob_odds / n - 1) * 100,
+            "actual_hits": self.hits,
+            "actual_attempts": n,
+            "actual_hit_rate_pct": (self.hits / n) * 100,
+            "actual_profit_pct": (self.sum_payout_yen / (n * 100) - 1) * 100,
+        }
 
 
 def _prob_bins():
@@ -212,20 +224,55 @@ def build():
     odds_th = [0, 10, 20, 30, 50, 80, 100, 150, 200, 300, 500]
     ev_th = [-1.0, 0.0, 0.2, 0.5, 1.0, 2.0, 5.0]
 
-    # samples: scope -> [(prob, odds, hit)]
-    scopes_samples = {s: [] for s in SCOPES}
-    # features: scope -> feature_key -> label -> [(prob, odds, hit)]
-    feat_agg = {s: {k: {r[0]: [] for r in c["ranges"]} for k, c in fc.items()} for s in SCOPES}
+    # scope集計: scope -> {"total": Agg, "prob_bins": [Agg,...], "odds_bins": [...], "ev_bins": [...],
+    #                      "prob_cum": [Agg,...], "odds_cum": [...], "ev_cum": [...],
+    #                      "features": {key: {label: Agg}}}
+    def new_scope():
+        return {
+            "total": Agg(),
+            "prob_bins": [Agg() for _ in pb],
+            "odds_bins": [Agg() for _ in ob],
+            "ev_bins": [Agg() for _ in eb],
+            "prob_cum": [Agg() for _ in prob_th],
+            "odds_cum": [Agg() for _ in odds_th],
+            "ev_cum": [Agg() for _ in ev_th],
+            "features": {k: {r[0]: Agg() for r in c["ranges"]} for k, c in fc.items()},
+        }
+
+    scopes_data = {s: new_scope() for s in SCOPES}
     ticket_agg = defaultdict(lambda: {"count": 0, "hits": 0, "prob_sum": 0.0,
                                       "odds_sum": 0.0, "prob_odds_sum": 0.0,
                                       "sum_inv_odds": 0.0,
                                       "stake": 0, "payout": 0})
+    RACE_COUNT = 0
 
     races = race_store.list_races()
     print("[build] races:", len(races), flush=True)
     rids = [it["race_id"] for it in races]
     odds_map = odds_store.get_odds_batch(rids)
     print("[build] odds fetched:", len(odds_map), flush=True)
+
+    def add_to_scope(scope, prob, odds, hit, payout_yen):
+        scope["total"].add(prob, odds, hit, payout_yen)
+        for j, (lo, hi) in enumerate(pb):
+            if lo <= prob < hi:
+                scope["prob_bins"][j].add(prob, odds, hit, payout_yen); break
+        for j, (lo, hi) in enumerate(ob):
+            if lo <= odds < hi:
+                scope["odds_bins"][j].add(prob, odds, hit, payout_yen); break
+        ev = prob * odds - 1.0
+        for j, (lo, hi) in enumerate(eb):
+            if lo <= ev < hi:
+                scope["ev_bins"][j].add(prob, odds, hit, payout_yen); break
+        for j, th in enumerate(prob_th):
+            if prob >= th:
+                scope["prob_cum"][j].add(prob, odds, hit, payout_yen)
+        for j, th in enumerate(odds_th):
+            if odds >= th:
+                scope["odds_cum"][j].add(prob, odds, hit, payout_yen)
+        for j, th in enumerate(ev_th):
+            if ev >= th:
+                scope["ev_cum"][j].add(prob, odds, hit, payout_yen)
 
     for i, it in enumerate(races):
         rid = it["race_id"]
@@ -242,9 +289,9 @@ def build():
             continue
         plan_set = compute_plan_set(race, pred, odds_p)
         runner_map = {r.horse_number: r for r in race.runners}
-        # runner payload から age_sex を取るための生データマップ
         raw_runner_map = {r0.get("horse_number"): r0 for r0 in payload.get("runners", [])}
         result_runner_map = {r0.get("horse_number"): r0 for r0 in payload.get("result_runners", [])}
+        RACE_COUNT += 1
 
         for t in tickets:
             for combo, prob in _candidates(pred, t):
@@ -253,16 +300,14 @@ def build():
                 ro = real_odds(odds_p, t, combo)
                 if not ro or ro <= 1:
                     continue
-                ev = calc_ev(prob, ro)
                 hit = hit_check(t, combo, finish)
                 ticket_jp = _TICKET_LABEL.get(t, t)
                 payout = payout_yen(payouts_dict, ticket_jp, combo) or 0
-                sample = (prob, ro, hit, payout)
 
                 # 全組み合わせ
-                scopes_samples["all_combos"].append(sample)
+                add_to_scope(scopes_data["all_combos"], prob, ro, hit, payout)
 
-                # 券種別集計
+                # 券種別
                 ta = ticket_agg[t]
                 ta["count"] += 1
                 ta["hits"] += hit
@@ -274,7 +319,17 @@ def build():
                 if hit:
                     ta["payout"] += payout
 
-                # features（全スコープへ）
+                # フィルタ判定
+                ev = prob * ro - 1.0
+                passes_filter = (ro >= settings.MIXED_ODDS_MIN) and (ev >= settings.MIXED_EV_MIN) and (t in settings.MIXED_TICKETS)
+                if passes_filter:
+                    add_to_scope(scopes_data["all"], prob, ro, hit, payout)
+                    if (t, combo) in plan_set:
+                        add_to_scope(scopes_data["plan"], prob, ro, hit, payout)
+                    else:
+                        add_to_scope(scopes_data["non_plan"], prob, ro, hit, payout)
+
+                # features（all_combos のみ。メモリ節約のため）
                 parts = combo.split("-")
                 try:
                     first_num = int(parts[0])
@@ -291,60 +346,50 @@ def build():
                         age_sex = (raw_r.get("age_sex")
                                    or (result_runner_map.get(first_num) or {}).get("age_sex")
                                    or "")
-                        for scope in SCOPES:
-                            agg = feat_agg[scope]
-                            if pop is not None:
-                                for (label, lo, hi) in fc["popularity"]["ranges"]:
-                                    if lo <= pop <= hi:
-                                        agg["popularity"][label].append(sample)
-                            if wt is not None:
-                                for (label, lo, hi) in fc["weight"]["ranges"]:
-                                    if lo <= wt < hi:
-                                        agg["weight"][label].append(sample)
-                            if fr is not None:
-                                for (label, lo, hi) in fc["frame"]["ranges"]:
-                                    if lo <= fr <= hi:
-                                        agg["frame"][label].append(sample)
-                            if ow is not None:
-                                for (label, lo, hi) in fc["odds_win"]["ranges"]:
-                                    if lo <= ow < hi:
-                                        agg["odds_win"][label].append(sample)
-                            if age_sex:
-                                a = age_sex[0] if age_sex else ""
-                                if a == "牡":
-                                    agg["age_sex"]["牡"].append(sample)
-                                elif a == "牝":
-                                    agg["age_sex"]["牝"].append(sample)
-                                elif a == "セ":
-                                    agg["age_sex"]["セ"].append(sample)
-
-                passes_filter = (ro >= settings.MIXED_ODDS_MIN) and (ev >= settings.MIXED_EV_MIN) and (t in settings.MIXED_TICKETS)
-                if passes_filter:
-                    scopes_samples["all"].append(sample)
-                    if (t, combo) in plan_set:
-                        scopes_samples["plan"].append(sample)
-                    else:
-                        scopes_samples["non_plan"].append(sample)
+                        fagg = scopes_data["all_combos"]["features"]
+                        if pop is not None:
+                            for (label, lo, hi) in fc["popularity"]["ranges"]:
+                                if lo <= pop <= hi:
+                                    fagg["popularity"][label].add(prob, ro, hit, payout)
+                        if wt is not None:
+                            for (label, lo, hi) in fc["weight"]["ranges"]:
+                                if lo <= wt < hi:
+                                    fagg["weight"][label].add(prob, ro, hit, payout)
+                        if fr is not None:
+                            for (label, lo, hi) in fc["frame"]["ranges"]:
+                                if lo <= fr <= hi:
+                                    fagg["frame"][label].add(prob, ro, hit, payout)
+                        if ow is not None:
+                            for (label, lo, hi) in fc["odds_win"]["ranges"]:
+                                if lo <= ow < hi:
+                                    fagg["odds_win"][label].add(prob, ro, hit, payout)
+                        if age_sex:
+                            a = age_sex[0] if age_sex else ""
+                            if a in ("牡", "牝", "セ"):
+                                fagg["age_sex"][a].add(prob, ro, hit, payout)
 
         if (i + 1) % 200 == 0:
             print("[build] {}/{} {:.1f}s".format(i + 1, len(races), time.time() - t0), flush=True)
 
-    def fmt_features(agg):
+    def features_out(scope):
         out = []
         for key, conf in fc.items():
             rows = []
             for (label, lo, hi) in conf["ranges"]:
-                row = _row(label, agg.get(key, {}).get(label, []))
+                agg = scope["features"].get(key, {}).get(label)
+                if agg is None or agg.n == 0:
+                    continue
+                row = agg.row(label)
                 if row:
                     rows.append(row)
             out.append({"feature": key, "label": conf["label"], "rows": rows})
         return out
 
-    def band_rows(bins, samples, kind):
+    def band_out(scope, bins, key, kind):
         rows = []
-        for i, (lo, hi) in enumerate(bins):
-            s = samples[i]
-            if not s:
+        for j, (lo, hi) in enumerate(bins):
+            agg = scope[key][j]
+            if agg.n == 0:
                 continue
             if kind == "prob":
                 label = "{:.3f}-{:.3f}".format(lo, hi)
@@ -352,67 +397,48 @@ def build():
                 label = "{}-{}".format(lo, hi) if hi < 999999 else "{}+".format(lo)
             else:
                 label = "{:.2f}-{:.2f}".format(lo, hi) if hi < 99999 else "{:.2f}+".format(lo)
-            row = _row(label, s)
+            row = agg.row(label)
             if row:
                 rows.append(row)
         return rows
 
-    def cum_rows(samples, thresholds, kind):
+    def cum_out(scope, thresholds, key, kind):
         rows = []
-        for th in thresholds:
+        for j, th in enumerate(thresholds):
+            agg = scope[key][j]
+            if agg.n == 0:
+                continue
             if kind == "prob":
-                s = [x for x in samples if x[0] >= th]
                 label = "≥{:.3f}".format(th)
             elif kind == "odds":
-                s = [x for x in samples if x[1] >= th]
                 label = "≥{}".format(th)
-            elif kind == "ev":
-                s = [x for x in samples if (x[0]*x[1]-1.0) >= th]
-                label = "≥{:.2f}".format(th)
             else:
-                continue
-            row = _row(label, s)
+                label = "≥{:.2f}".format(th)
+            row = agg.row(label)
             if row:
                 rows.append(row)
         return rows
 
     scopes_out = {}
-    for scope_name, samples in scopes_samples.items():
-        prob_s = {j: [] for j in range(len(pb))}
-        odds_s = {j: [] for j in range(len(ob))}
-        ev_s = {j: [] for j in range(len(eb))}
-        for smp in samples:
-            ev = smp[0] * smp[1] - 1.0
-            for j, (lo, hi) in enumerate(pb):
-                if lo <= smp[0] < hi:
-                    prob_s[j].append(smp); break
-            for j, (lo, hi) in enumerate(ob):
-                if lo <= smp[1] < hi:
-                    odds_s[j].append(smp); break
-            for j, (lo, hi) in enumerate(eb):
-                if lo <= ev < hi:
-                    ev_s[j].append(smp); break
-        total = len(samples)
-        hits = sum(smp[2] for smp in samples)
-        scopes_out[scope_name] = {
+    for s in SCOPES:
+        scope = scopes_data[s]
+        scopes_out[s] = {
             "summary": {
-                "total_count": total,
-                "total_hits": hits,
-                "hit_rate_pct": (hits / total * 100) if total else 0.0,
+                "total_count": scope["total"].n,
+                "total_hits": scope["total"].hits,
+                "hit_rate_pct": (scope["total"].hits / scope["total"].n * 100) if scope["total"].n else 0.0,
             },
-            "prob_bins": band_rows(pb, prob_s, "prob"),
-            "prob_cum": cum_rows(samples, prob_th, "prob"),
-            "odds_bins": band_rows(ob, odds_s, "odds"),
-            "odds_cum": cum_rows(samples, odds_th, "odds"),
-            "ev_bins": band_rows(eb, ev_s, "ev"),
-            "ev_cum": cum_rows(samples, ev_th, "ev"),
-            "features": fmt_features(feat_agg[scope_name]),
+            "prob_bins": band_out(scope, pb, "prob_bins", "prob"),
+            "prob_cum": cum_out(scope, prob_th, "prob_cum", "prob"),
+            "odds_bins": band_out(scope, ob, "odds_bins", "odds"),
+            "odds_cum": cum_out(scope, odds_th, "odds_cum", "odds"),
+            "ev_bins": band_out(scope, eb, "ev_bins", "ev"),
+            "ev_cum": cum_out(scope, ev_th, "ev_cum", "ev"),
+            "features": features_out(scope),
         }
 
-    # 券種ごとの「1レースあたり的中点数」（ワイドのみ3点）
     HITS_PER_RACE = {"trifecta": 1, "trio": 1, "exacta": 1, "quinella": 1, "wide": 3,
                      "win": 1, "place": 3}
-    RACE_COUNT = len(races)
     THEORY_DEDUCTION = {"trifecta": 25.0, "trio": 25.0, "exacta": 22.5,
                         "quinella": 22.5, "wide": 22.5, "win": 20.0, "place": 20.0}
     ticket_stats = []
@@ -420,8 +446,6 @@ def build():
         ta = ticket_agg[t]
         if ta["count"] == 0:
             continue
-        # 実測控除率 = (1 - 的中点数 / Σ(1/odds)) × 100
-        # Σ(1/odds) はレースごとの総和の平均を使う（全組み合わせ均等買いの控除率）
         avg_inv = ta["sum_inv_odds"] / RACE_COUNT if RACE_COUNT else 0
         hpr = HITS_PER_RACE.get(t, 1)
         measured_deduction = (1 - hpr / avg_inv) * 100 if avg_inv > 0 else None
