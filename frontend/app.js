@@ -18,6 +18,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   var anaViewTabs = $("ana-view-tabs");
   var betsSummary = $("bets-summary"), betsList = $("bets-list"), curveCanvas = $("curve-chart");
   var analyticsData = null, currentScope = "all", currentView = "ev", filters = {}, currentBets = [];
+  var currentFeatureTab = null;
   var currentTicket = "mixed";
   var currentAnaScope = "all";
   var currentTabName = "predict";
@@ -44,8 +45,9 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     }
     return raceId;
   }
-  function fmtPct(v, d){ return (v * 100).toFixed(d == null ? 2 : d) + "%"; }
+  function fmtPct(v, d){ return Number(v).toFixed(d == null ? 2 : d) + "%"; }
   function fmtNum(v, d){ return Number(v).toFixed(d == null ? 2 : d); }
+  function fmtSignedPct(v, d){ return (v >= 0 ? "+" : "") + Number(v).toFixed(d == null ? 2 : d) + "%"; }
   function fmtInt(v){ return String(Math.round(v)); }
   function fmtYen(v){ return fmtInt(v) + "円"; }
   function fmtSigned(v, d){ return (v >= 0 ? "+" : "") + fmtNum(v, d); }
@@ -265,9 +267,15 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     var html = "<table class=\"ev-table\"><thead><tr><th>" + label + "</th><th>件数</th><th>予想的中率</th><th>オッズ平均</th><th>想定利益%</th><th>実的中率</th><th>実利益%</th></tr></thead><tbody>";
     rows.forEach(function(r){
       var cls = KeibaTheme.evClass(r.expected_profit_pct / 100, EV_THRESHOLD);
-      var actual = r.actual_rate == null ? "-" : fmtPct(r.actual_rate);
-      var ap = r.actual_profit_pct == null ? "-" : fmtSigned(r.actual_profit_pct, 1);
-      html += "<tr class=\"" + cls + "\"><td>" + esc(r.range) + "</td><td>" + r.count + "</td><td>" + fmtPct(r.avg_prob) + "</td><td>" + fmtNum(r.avg_odds, 1) + "</td><td>" + fmtSigned(r.expected_profit_pct, 1) + "</td><td>" + actual + "</td><td>" + ap + "</td></tr>";
+      var actual = r.actual_hit_rate_pct == null ? "-" : fmtPct(r.actual_hit_rate_pct, 1);
+      var ap = r.actual_profit_pct == null ? "-" : fmtSignedPct(r.actual_profit_pct, 1);
+      var ep = r.expected_profit_pct == null ? "-" : fmtSignedPct(r.expected_profit_pct, 1);
+      var ehr = r.expected_hit_rate_pct == null ? "-" : fmtPct(r.expected_hit_rate_pct, 1);
+      var ratio = "";
+      if (window._anaTotalCount && window._anaTotalCount > 0) {
+        ratio = " (" + (r.count / window._anaTotalCount * 100).toFixed(1) + "%)";
+      }
+      html += "<tr class=\"" + cls + "\"><td>" + esc(r.range) + "</td><td>" + r.count + ratio + "</td><td>" + ehr + "</td><td>" + fmtNum(r.avg_odds, 1) + "</td><td>" + ep + "</td><td>" + actual + "</td><td>" + ap + "</td></tr>";
     });
     html += "</tbody></table>";
     return html;
@@ -275,19 +283,40 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
 
   function featuresView(features){
     if (!features || !features.length) return "<p>該当データなし</p>";
-    var html = "";
-    features.forEach(function(f){
-      html += "<h4 class=\"feature-title\">" + esc(f.label) + "</h4>";
-      html += tableRows(f.rows || [], "範囲");
+    var tabsHtml = "<div class=\"subtabs\" id=\"feature-tabs\">";
+    features.forEach(function(f, i){
+      var active = (currentFeatureTab === f.feature || (!currentFeatureTab && i === 0)) ? " active" : "";
+      tabsHtml += "<button class=\"subtab" + active + "\" data-feature=\"" + esc(f.feature) + "\" type=\"button\">" + esc(f.label) + "</button>";
     });
-    return html;
+    tabsHtml += "</div>";
+    var target = null;
+    features.forEach(function(f){ if (f.feature === currentFeatureTab) target = f; });
+    if (!target) target = features[0];
+    return tabsHtml + "<div id=\"feature-body\">" + tableRows(target.rows || [], "範囲") + "</div>";
+  }
+
+  function bindFeatureTabs(features){
+    var box = document.getElementById("feature-tabs");
+    if (!box) return;
+    box.querySelectorAll(".subtab").forEach(function(t){
+      t.addEventListener("click", function(){
+        currentFeatureTab = t.getAttribute("data-feature");
+        box.querySelectorAll(".subtab").forEach(function(x){ x.classList.remove("active"); });
+        t.classList.add("active");
+        var target = null;
+        features.forEach(function(f){ if (f.feature === currentFeatureTab) target = f; });
+        if (!target) return;
+        var body = document.getElementById("feature-body");
+        if (body) body.innerHTML = tableRows(target.rows || [], "範囲");
+      });
+    });
   }
 
   function renderAnaSummary(s, races){
     if (!s) { anaSummary.innerHTML = ""; return; }
     var cnt = s.total_count || 0;
     var hits = s.total_hits || 0;
-    var hr = s.hit_rate || 0;
+    var hr = s.hit_rate_pct || 0;
     var racesN = races || 0;
     anaSummary.innerHTML = "<div>対象レース: " + racesN + " / 買い目 " + cnt + " 件</div>"
       + "<div>的中: " + hits + " (" + fmtPct(hr, 2) + ")</div>";
@@ -299,9 +328,15 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     html += "<table class=\"ev-table\"><thead><tr><th>範囲</th><th>件数</th><th>予想的中率</th><th>オッズ平均</th><th>想定利益%</th><th>実的中率</th><th>実利益%</th></tr></thead><tbody>";
     rows.forEach(function(r){
       var cls = KeibaTheme.evClass(r.expected_profit_pct / 100, EV_THRESHOLD);
-      var actual = r.actual_rate == null ? "-" : fmtPct(r.actual_rate);
-      var ap = r.actual_profit_pct == null ? "-" : fmtSigned(r.actual_profit_pct, 1);
-      html += "<tr class=\"" + cls + "\"><td>" + esc(r.range) + "</td><td>" + r.count + "</td><td>" + fmtPct(r.avg_prob) + "</td><td>" + fmtNum(r.avg_odds, 1) + "</td><td>" + fmtSigned(r.expected_profit_pct, 1) + "</td><td>" + actual + "</td><td>" + ap + "</td></tr>";
+      var actual = r.actual_hit_rate_pct == null ? "-" : fmtPct(r.actual_hit_rate_pct, 1);
+      var ap = r.actual_profit_pct == null ? "-" : fmtSignedPct(r.actual_profit_pct, 1);
+      var ep = r.expected_profit_pct == null ? "-" : fmtSignedPct(r.expected_profit_pct, 1);
+      var ehr = r.expected_hit_rate_pct == null ? "-" : fmtPct(r.expected_hit_rate_pct, 1);
+      var ratio2 = "";
+      if (window._anaTotalCount && window._anaTotalCount > 0) {
+        ratio2 = " (" + (r.count / window._anaTotalCount * 100).toFixed(1) + "%)";
+      }
+      html += "<tr class=\"" + cls + "\"><td>" + esc(r.range) + "</td><td>" + r.count + ratio2 + "</td><td>" + ehr + "</td><td>" + fmtNum(r.avg_odds, 1) + "</td><td>" + ep + "</td><td>" + actual + "</td><td>" + ap + "</td></tr>";
     });
     html += "</tbody></table>";
     return html;
@@ -311,16 +346,20 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     if (!analyticsData) return;
     var rows = analyticsData.ticket_stats || [];
     if (!rows.length) { anaView.textContent = "データなし"; return; }
-    var html = "<table class=\"ev-table\"><thead><tr><th>券種</th><th>買い目数</th><th>的中</th><th>的中率</th><th>想定的中率</th><th>ROI</th><th>想定ROI</th></tr></thead><tbody>";
+    var html = "<table class=\"ev-table\"><thead><tr><th>券種</th><th>件数</th><th>予想的中率</th><th>オッズ平均</th><th>想定利益%</th><th>実的中率</th><th>実利益%</th></tr></thead><tbody>";
     rows.forEach(function(r){
-      var cls = KeibaTheme.evClass(r.roi, EV_THRESHOLD);
+      var cls = KeibaTheme.evClass(r.expected_profit_pct / 100, EV_THRESHOLD);
+      var ehr = r.expected_hit_rate_pct == null ? "-" : fmtPct(r.expected_hit_rate_pct, 2);
+      var ahr = r.actual_hit_rate_pct == null ? "-" : fmtPct(r.actual_hit_rate_pct, 2);
+      var ep = r.expected_profit_pct == null ? "-" : fmtSignedPct(r.expected_profit_pct, 1);
+      var ap = r.actual_profit_pct == null ? "-" : fmtSignedPct(r.actual_profit_pct, 1);
       html += "<tr class=\"" + cls + "\"><td>" + esc(r.label) + "</td>"
             + "<td>" + r.count + "</td>"
-            + "<td>" + r.hits + "</td>"
-            + "<td>" + fmtPct(r.hit_rate, 2) + "</td>"
-            + "<td>" + fmtPct(r.expected_hit_rate, 2) + "</td>"
-            + "<td>" + fmtPct(r.roi, 1) + "</td>"
-            + "<td>" + fmtPct(r.expected_roi, 1) + "</td></tr>";
+            + "<td>" + ehr + "</td>"
+            + "<td>" + "-" + "</td>"
+            + "<td>" + ep + "</td>"
+            + "<td>" + ahr + "</td>"
+            + "<td>" + ap + "</td></tr>";
     });
     html += "</tbody></table>";
     anaView.innerHTML = html;
@@ -331,6 +370,8 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     if (!analyticsData) return;
     var scopeData = (analyticsData.scopes || {})[currentAnaScope] || {};
     var races = (analyticsData.meta || {}).races || 0;
+    var allCombos = (analyticsData.scopes || {}).all_combos || {};
+    window._anaTotalCount = ((allCombos.summary || {}).total_count) || 0;
     renderAnaSummary(scopeData.summary, races);
     if (currentView === "prob") {
       anaView.innerHTML = tableRows(scopeData.prob_bins || [], "確率帯") + renderCumTable(scopeData.prob_cum || [], "確率帯");
@@ -341,7 +382,9 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
       return;
     }
     if (currentView === "features") {
-      anaView.innerHTML = featuresView(scopeData.features || []);
+      var feats = scopeData.features || [];
+      anaView.innerHTML = featuresView(feats);
+      bindFeatureTabs(feats);
       return;
     }
     if (currentView === "tickets") {
