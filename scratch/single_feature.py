@@ -82,6 +82,14 @@ def build_dataset():
             if n is not None:
                 rr_map[n] = rr
 
+        # レース排除率（単勝のΣ(1/odds)から逆算）
+        inv_sum = 0.0
+        for r0 in runners:
+            o = r0.get("odds_win")
+            if o and o > 1:
+                inv_sum += 1.0 / float(o)
+        race_rho = (1.0 - 1.0 / inv_sum) if inv_sum > 0 else 0.20
+
         for r0 in runners:
             num = r0.get("horse_number")
             odds = r0.get("odds_win")
@@ -113,8 +121,11 @@ def build_dataset():
                 if j in jockey_ids:
                     jockey_id = jockey_ids[j]
             payout = win_payouts.get(num, 0) if num == finish_order[0] else 0
+            market_hit_prob = (1.0 - race_rho) / float(odds) if odds > 1 else 0.0
             records.append({
                 "odds": float(odds),
+                "market_hit_prob": float(market_hit_prob),
+                "race_rho": float(race_rho),
                 "pop": float(pop) if pop is not None else 0.0,
                 "frame": float(frame or 0),
                 "weight": float(weight) if weight is not None else -1.0,
@@ -223,6 +234,8 @@ def main():
     hits = (np.array([r["payout"] for r in records]) > 0).astype(np.float64)
     odds_arr = np.array([r["odds"] for r in records])
     payouts_arr = np.array([r["payout"] for r in records])
+    market_hit_arr = np.array([r["market_hit_prob"] for r in records])
+    race_rho_arr = np.array([r["race_rho"] for r in records])
 
     results = []
     for feature, label, pred in all_bins:
@@ -265,11 +278,31 @@ def main():
         else:
             avg_payout_C = 0.0
 
+        # 市場側
+        market_hr_B = float(market_hit_arr[mask].mean())
+        market_hr_C = float(market_hit_arr[~mask].mean())
+        market_hr_diff = market_hr_B - market_hr_C
+        se_m_B = math.sqrt(market_hr_B * (1 - market_hr_B) / n_B)
+        se_m_C = math.sqrt(market_hr_C * (1 - market_hr_C) / n_C)
+        se_m_diff = math.sqrt(se_m_B**2 + se_m_C**2)
+        mhr_ci_lo = market_hr_diff - z_adj * se_m_diff
+        mhr_ci_hi = market_hr_diff + z_adj * se_m_diff
+
+        market_rho_B = float(race_rho_arr[mask].mean()) * 100  # %
+        market_rho_C = float(race_rho_arr[~mask].mean()) * 100
+
         results.append({
             "feature": feature,
             "label": label,
             "n": n_B,
             "n_other": n_C,
+            "market_hit_rate": market_hr_B,
+            "market_hit_rate_other": market_hr_C,
+            "market_hr_diff": market_hr_diff,
+            "market_hr_ci_lo": float(mhr_ci_lo),
+            "market_hr_ci_hi": float(mhr_ci_hi),
+            "market_rho_pct": market_rho_B,
+            "market_rho_other_pct": market_rho_C,
             "roi": float(pB.sum() / n_B) + 1.0,
             "roi_other": float(pC.sum() / n_C) + 1.0,
             "roi_diff": diff,
@@ -378,6 +411,13 @@ def main():
                 "hr_ci_hi_pct": to_pct(r["hr_ci_hi"]),
                 "hr_sig_up": r["hr_sig_up"],
                 "hr_sig_down": r["hr_sig_down"],
+                "market_hit_rate_pct": to_pct(r["market_hit_rate"]),
+                "market_hit_rate_other_pct": to_pct(r["market_hit_rate_other"]),
+                "market_hr_diff_pct": to_pct(r["market_hr_diff"]),
+                "market_hr_ci_lo_pct": to_pct(r["market_hr_ci_lo"]),
+                "market_hr_ci_hi_pct": to_pct(r["market_hr_ci_hi"]),
+                "market_rho_pct": r["market_rho_pct"],
+                "market_rho_other_pct": r["market_rho_other_pct"],
                 "avg_odds": r["avg_odds"],
                 "avg_odds_other": r["avg_odds_other"],
                 "avg_payout_hit": r["avg_payout_hit"],

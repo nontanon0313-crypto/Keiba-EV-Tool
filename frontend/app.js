@@ -362,13 +362,11 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     var html = "<table class=\"ev-table\"><thead><tr>";
     html += "<th>ビン</th><th>件数</th>";
     if (mode === "roi") {
-      if (filter === "all" || filter === "on") html += "<th>適用 利益%</th>";
-      if (filter === "all" || filter === "off") html += "<th>適用外 利益%</th>";
-      if (filter === "all") html += "<th>差</th><th>有意</th>";
+      if (filter === "all" || filter === "on") html += "<th>適用 実%</th><th>適用 市場%</th><th>適用 差</th>";
+      if (filter === "all" || filter === "off") html += "<th>適用外 実%</th><th>適用外 市場%</th><th>適用外 差</th>";
     } else {
-      if (filter === "all" || filter === "on") html += "<th>適用 的中率</th><th>適用 平均OD</th>";
-      if (filter === "all" || filter === "off") html += "<th>適用外 的中率</th><th>適用外 平均OD</th>";
-      if (filter === "all") html += "<th>差</th><th>有意</th>";
+      if (filter === "all" || filter === "on") html += "<th>適用 実的中率</th><th>適用 市場的中率</th><th>適用 差</th>";
+      if (filter === "all" || filter === "off") html += "<th>適用外 実的中率</th><th>適用外 市場的中率</th><th>適用外 差</th>";
     }
     html += "</tr></thead><tbody>";
     rows.forEach(function(r){
@@ -376,34 +374,44 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
       html += "<td>" + esc(r.label) + "</td>";
       html += "<td>" + r.n + "</td>";
       if (mode === "roi") {
-        var cls_roi = KeibaTheme.evClass(r.roi_pct / 100, 0);
-        var cls_roi_o = KeibaTheme.evClass(r.roi_other_pct / 100, 0);
-        var cls_diff = KeibaTheme.evClass(r.roi_diff_pct / 100, 0);
+        var real_on = r.roi_pct;
+        var market_on = -(r.market_rho_pct || 0);
+        var diff_on = real_on - market_on;
+        var real_off = r.roi_other_pct;
+        var market_off = -(r.market_rho_other_pct || 0);
+        var diff_off = real_off - market_off;
+        var cls_real_on = KeibaTheme.evClass(real_on / 100, 0);
+        var cls_real_off = KeibaTheme.evClass(real_off / 100, 0);
+        var cls_diff_on = KeibaTheme.evClass(diff_on / 100, 0);
+        var cls_diff_off = KeibaTheme.evClass(diff_off / 100, 0);
         if (filter === "all" || filter === "on") {
-          html += "<td class=\"" + cls_roi + "\">" + fmtSignedPct(r.roi_pct, 1) + "</td>";
+          html += "<td class=\"" + cls_real_on + "\">" + fmtSignedPct(real_on, 1) + "</td>";
+          html += "<td>" + fmtSignedPct(market_on, 1) + "</td>";
+          html += "<td class=\"" + cls_diff_on + "\">" + fmtSignedPct(diff_on, 1) + "</td>";
         }
         if (filter === "all" || filter === "off") {
-          html += "<td class=\"" + cls_roi_o + "\">" + fmtSignedPct(r.roi_other_pct, 1) + "</td>";
-        }
-        if (filter === "all") {
-          html += "<td class=\"" + cls_diff + "\">" + fmtSignedPct(r.roi_diff_pct, 1) + "</td>";
-          var sig = r.roi_sig_up ? "優位" : (r.roi_sig_down ? "劣位" : "-");
-          html += "<td>" + sig + "</td>";
+          html += "<td class=\"" + cls_real_off + "\">" + fmtSignedPct(real_off, 1) + "</td>";
+          html += "<td>" + fmtSignedPct(market_off, 1) + "</td>";
+          html += "<td class=\"" + cls_diff_off + "\">" + fmtSignedPct(diff_off, 1) + "</td>";
         }
       } else {
+        var hr_real_on = r.hit_rate_pct;
+        var hr_mkt_on = r.market_hit_rate_pct;
+        var hr_diff_on = hr_real_on - hr_mkt_on;
+        var hr_real_off = r.hit_rate_other_pct;
+        var hr_mkt_off = r.market_hit_rate_other_pct;
+        var hr_diff_off = hr_real_off - hr_mkt_off;
+        var hcls_on = KeibaTheme.evClass(hr_diff_on / 100, 0);
+        var hcls_off = KeibaTheme.evClass(hr_diff_off / 100, 0);
         if (filter === "all" || filter === "on") {
-          html += "<td>" + fmtPct(r.hit_rate_pct, 2) + "</td>";
-          html += "<td>" + fmtNum(r.avg_odds, 1) + "</td>";
+          html += "<td>" + fmtPct(hr_real_on, 2) + "</td>";
+          html += "<td>" + fmtPct(hr_mkt_on, 2) + "</td>";
+          html += "<td class=\"" + hcls_on + "\">" + fmtSignedPct(hr_diff_on, 2) + "</td>";
         }
         if (filter === "all" || filter === "off") {
-          html += "<td>" + fmtPct(r.hit_rate_other_pct, 2) + "</td>";
-          html += "<td>" + fmtNum(r.avg_odds_other, 1) + "</td>";
-        }
-        if (filter === "all") {
-          var cls_hrd = KeibaTheme.evClass(r.hr_diff_pct / 100, 0);
-          html += "<td class=\"" + cls_hrd + "\">" + fmtSignedPct(r.hr_diff_pct, 2) + "</td>";
-          var sig2 = r.hr_sig_up ? "優位" : (r.hr_sig_down ? "劣位" : "-");
-          html += "<td>" + sig2 + "</td>";
+          html += "<td>" + fmtPct(hr_real_off, 2) + "</td>";
+          html += "<td>" + fmtPct(hr_mkt_off, 2) + "</td>";
+          html += "<td class=\"" + hcls_off + "\">" + fmtSignedPct(hr_diff_off, 2) + "</td>";
         }
       }
       html += "</tr>";
