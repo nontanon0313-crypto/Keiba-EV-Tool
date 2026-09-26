@@ -4381,3 +4381,1553 @@ nohup: ignoring input
 [09:23:55] [progress] new=4409 skip=0 empty=0 fail=1 processed=4410 elapsed=24808s rate=0.18/s target=6000 remain=1591 eta=8950s
 [09:23:59] [progress] new=4410 skip=0 empty=0 fail=1 processed=4411 elapsed=24812s rate=0.18/s target=6000 remain=1590 eta=8944s
 [09:24:05] [progress] new=4412 skip=0 empty=0 fail=1 processed=4413 elapsed=24817s rate=0.18/s target=6000 remain=1588 eta=8930s
+[09:24:08] [progress] new=4414 skip=0 empty=0 fail=1 processed=4415 elapsed=24821s rate=0.18/s target=6000 remain=1586 eta=8916s
+[09:24:12] [progress] new=4415 skip=0 empty=0 fail=1 processed=4416 elapsed=24825s rate=0.18/s target=6000 remain=1585 eta=8910s
+[09:24:17] [progress] new=4417 skip=0 empty=0 fail=1 processed=4418 elapsed=24829s rate=0.18/s target=6000 remain=1583 eta=8897s
+[09:24:17]   [1/4] 水沢 done new=12 R (total_new=4417)
+[09:24:17] [progress] new=4417 skip=0 empty=0 fail=1 processed=4418 elapsed=24829s rate=0.18/s target=6000 remain=1583 eta=8897s
+[09:24:21]   [2/4] 41 12R start
+[09:25:01] [progress] new=4418 skip=0 empty=0 fail=1 processed=4419 elapsed=24874s rate=0.18/s target=6000 remain=1582 eta=8905s
+[09:25:07] [progress] new=4420 skip=0 empty=0 fail=1 processed=4421 elapsed=24879s rate=0.18/s target=6000 remain=1580 eta=8891s
+[09:25:11] [progress] new=4421 skip=0 empty=0 fail=1 processed=4422 elapsed=24883s rate=0.18/s target=6000 remain=1579 eta=8885s
+[09:25:14] [progress] new=4423 skip=0 empty=0 fail=1 processed=4424 elapsed=24887s rate=0.18/s target=6000 remain=1577 eta=8871s
+[09:25:18] [progress] new=4424 skip=0 empty=0 fail=1 processed=4425 elapsed=24890s rate=0.18/s target=6000 remain=1576 eta=8865s
+[09:25:22] [progress] new=4426 skip=0 empty=0 fail=1 processed=4427 elapsed=24895s rate=0.18/s target=6000 remain=1574 eta=8851s
+[09:25:26] [progress] new=4427 skip=0 empty=0 fail=1 processed=4428 elapsed=24899s rate=0.18/s target=6000 remain=1573 eta=8845s
+[09:25:33] [progress] new=4429 skip=0 empty=0 fail=1 processed=4430 elapsed=24905s rate=0.18/s target=6000 remain=1571 eta=8832s
+[09:25:33]   [2/4] 41 done new=12 R (total_new=4429)
+[09:25:33] [progress] new=4429 skip=0 empty=0 fail=1 processed=4430 elapsed=24905s rate=0.18/s target=6000 remain=1571 eta=8832s
+[09:25:39]   [3/4] 金沢 12R start
+[09:26:11] [progress] new=4430 skip=0 empty=0 fail=1 processed=4431 elapsed=24943s rate=0.18/s target=6000 remain=1570 eta=8838s
+[09:26:16] [progress] new=4431 skip=0 empty=0 fail=1 processed=4432 elapsed=24949s rate=0.18/s target=6000 remain=1569 eta=8832s
+[09:26:19] [progress] new=4432 skip=0 empty=0 fail=1 processed=4433 elapsed=24952s rate=0.18/s target=6000 remain=1568 eta=8826s
+[09:26:22] [progress] new=4433 skip=0 empty=0 fail=1 processed=4434 elapsed=24955s rate=0.18/s target=6000 remain=1567 eta=8819s
+[09:26:28] [progress] new=4435 skip=0 empty=0 fail=1 processed=4436 elapsed=24961s rate=0.18/s target=6000 remain=1565 eta=8806s
+[09:26:31] [progress] new=4436 skip=0 empty=0 fail=1 processed=4437 elapsed=24964s rate=0.18/s target=6000 remain=1564 eta=8800s
+[09:26:36] [progress] new=4437 skip=0 empty=0 fail=1 processed=4438 elapsed=24968s rate=0.18/s target=6000 remain=1563 eta=8793s
+[09:26:42] [progress] new=4439 skip=0 empty=0 fail=1 processed=4440 elapsed=24975s rate=0.18/s target=6000 remain=1561 eta=8781s
+[09:26:45] [progress] new=4440 skip=0 empty=0 fail=1 processed=4441 elapsed=24978s rate=0.18/s target=6000 remain=1560 eta=8774s
+[09:26:49] [progress] new=4441 skip=0 empty=0 fail=1 processed=4442 elapsed=24982s rate=0.18/s target=6000 remain=1559 eta=8768s
+[09:26:49]   [3/4] 金沢 done new=12 R (total_new=4441)
+[09:26:49] [progress] new=4441 skip=0 empty=0 fail=1 processed=4442 elapsed=24982s rate=0.18/s target=6000 remain=1559 eta=8768s
+[09:26:55]   [4/4] 高知 11R start
+[09:27:21] [progress] new=4442 skip=0 empty=0 fail=1 processed=4443 elapsed=25013s rate=0.18/s target=6000 remain=1558 eta=8771s
+[09:27:25] [progress] new=4443 skip=0 empty=0 fail=1 processed=4444 elapsed=25017s rate=0.18/s target=6000 remain=1557 eta=8765s
+[09:27:30] [progress] new=4445 skip=0 empty=0 fail=1 processed=4446 elapsed=25023s rate=0.18/s target=6000 remain=1555 eta=8752s
+[09:27:34] [progress] new=4447 skip=0 empty=0 fail=1 processed=4448 elapsed=25027s rate=0.18/s target=6000 remain=1553 eta=8738s
+[09:27:38] [progress] new=4448 skip=0 empty=0 fail=1 processed=4449 elapsed=25031s rate=0.18/s target=6000 remain=1552 eta=8732s
+[09:27:45] [progress] new=4450 skip=0 empty=0 fail=1 processed=4451 elapsed=25038s rate=0.18/s target=6000 remain=1550 eta=8719s
+[09:27:52] [progress] new=4452 skip=0 empty=0 fail=1 processed=4453 elapsed=25044s rate=0.18/s target=6000 remain=1548 eta=8706s
+[09:27:52]   [4/4] 高知 done new=11 R (total_new=4452)
+[09:27:52] [progress] new=4452 skip=0 empty=0 fail=1 processed=4453 elapsed=25044s rate=0.18/s target=6000 remain=1548 eta=8706s
+[09:27:52] === day 151/365 2023-05-31 ===
+[09:27:55]   venues=3: ['浦和', '金沢', '園田']
+[09:28:00]   [1/3] 浦和 12R start
+[09:28:32] [progress] new=4453 skip=0 empty=0 fail=1 processed=4454 elapsed=25085s rate=0.18/s target=6000 remain=1547 eta=8713s
+[09:28:36] [progress] new=4454 skip=0 empty=0 fail=1 processed=4455 elapsed=25088s rate=0.18/s target=6000 remain=1546 eta=8706s
+[09:28:39] [progress] new=4455 skip=0 empty=0 fail=1 processed=4456 elapsed=25091s rate=0.18/s target=6000 remain=1545 eta=8700s
+[09:28:42] [progress] new=4456 skip=0 empty=0 fail=1 processed=4457 elapsed=25095s rate=0.18/s target=6000 remain=1544 eta=8693s
+[09:28:49] [progress] new=4458 skip=0 empty=0 fail=1 processed=4459 elapsed=25101s rate=0.18/s target=6000 remain=1542 eta=8680s
+[09:28:54] [progress] new=4460 skip=0 empty=0 fail=1 processed=4461 elapsed=25107s rate=0.18/s target=6000 remain=1540 eta=8667s
+[09:28:59] [progress] new=4461 skip=0 empty=0 fail=1 processed=4462 elapsed=25111s rate=0.18/s target=6000 remain=1539 eta=8661s
+[09:29:05] [progress] new=4463 skip=0 empty=0 fail=1 processed=4464 elapsed=25117s rate=0.18/s target=6000 remain=1537 eta=8648s
+[09:29:08] [progress] new=4464 skip=0 empty=0 fail=1 processed=4465 elapsed=25121s rate=0.18/s target=6000 remain=1536 eta=8642s
+[09:29:08]   [1/3] 浦和 done new=12 R (total_new=4464)
+[09:29:08] [progress] new=4464 skip=0 empty=0 fail=1 processed=4465 elapsed=25121s rate=0.18/s target=6000 remain=1536 eta=8642s
+[09:29:13]   [2/3] 金沢 12R start
+[09:29:46] [progress] new=4465 skip=0 empty=0 fail=1 processed=4466 elapsed=25159s rate=0.18/s target=6000 remain=1535 eta=8647s
+[09:29:50] [progress] new=4466 skip=0 empty=0 fail=1 processed=4467 elapsed=25163s rate=0.18/s target=6000 remain=1534 eta=8641s
+[09:29:58] [progress] new=4468 skip=0 empty=0 fail=1 processed=4469 elapsed=25170s rate=0.18/s target=6000 remain=1532 eta=8628s
+[09:30:03] [progress] new=4470 skip=0 empty=0 fail=1 processed=4471 elapsed=25176s rate=0.18/s target=6000 remain=1530 eta=8615s
+[09:30:07] [progress] new=4471 skip=0 empty=0 fail=1 processed=4472 elapsed=25180s rate=0.18/s target=6000 remain=1529 eta=8609s
+[09:30:11] [progress] new=4472 skip=0 empty=0 fail=1 processed=4473 elapsed=25183s rate=0.18/s target=6000 remain=1528 eta=8603s
+[09:30:15] [progress] new=4473 skip=0 empty=0 fail=1 processed=4474 elapsed=25187s rate=0.18/s target=6000 remain=1527 eta=8596s
+[09:30:22] [progress] new=4475 skip=0 empty=0 fail=1 processed=4476 elapsed=25194s rate=0.18/s target=6000 remain=1525 eta=8584s
+[09:30:26] [progress] new=4476 skip=0 empty=0 fail=1 processed=4477 elapsed=25199s rate=0.18/s target=6000 remain=1524 eta=8578s
+[09:30:26]   [2/3] 金沢 done new=12 R (total_new=4476)
+[09:30:26] [progress] new=4476 skip=0 empty=0 fail=1 processed=4477 elapsed=25199s rate=0.18/s target=6000 remain=1524 eta=8578s
+[09:30:30]   [3/3] 園田 12R start
+[09:31:00] [progress] new=4477 skip=0 empty=0 fail=1 processed=4478 elapsed=25233s rate=0.18/s target=6000 remain=1523 eta=8582s
+[09:31:05] [progress] new=4479 skip=0 empty=0 fail=1 processed=4480 elapsed=25238s rate=0.18/s target=6000 remain=1521 eta=8568s
+[09:31:10] [progress] new=4481 skip=0 empty=0 fail=1 processed=4482 elapsed=25243s rate=0.18/s target=6000 remain=1519 eta=8555s
+[09:31:14] [progress] new=4483 skip=0 empty=0 fail=1 processed=4484 elapsed=25247s rate=0.18/s target=6000 remain=1517 eta=8541s
+[09:31:19] [progress] new=4484 skip=0 empty=0 fail=1 processed=4485 elapsed=25252s rate=0.18/s target=6000 remain=1516 eta=8536s
+[09:31:24] [progress] new=4486 skip=0 empty=0 fail=1 processed=4487 elapsed=25256s rate=0.18/s target=6000 remain=1514 eta=8522s
+[09:31:30] [progress] new=4488 skip=0 empty=0 fail=1 processed=4489 elapsed=25263s rate=0.18/s target=6000 remain=1512 eta=8509s
+[09:31:30]   [3/3] 園田 done new=12 R (total_new=4488)
+[09:31:30] [progress] new=4488 skip=0 empty=0 fail=1 processed=4489 elapsed=25263s rate=0.18/s target=6000 remain=1512 eta=8509s
+[09:31:30] === day 152/365 2023-06-01 ===
+[09:31:34]   venues=3: ['06', '金沢', '園田']
+[09:31:39]   [1/3] 06 12R start
+[09:32:05] [progress] new=4489 skip=0 empty=0 fail=1 processed=4490 elapsed=25298s rate=0.18/s target=6000 remain=1511 eta=8513s
+[09:32:09] [progress] new=4491 skip=0 empty=0 fail=1 processed=4492 elapsed=25302s rate=0.18/s target=6000 remain=1509 eta=8500s
+[09:32:12] [progress] new=4492 skip=0 empty=0 fail=1 processed=4493 elapsed=25305s rate=0.18/s target=6000 remain=1508 eta=8493s
+[09:32:15] [progress] new=4493 skip=0 empty=0 fail=1 processed=4494 elapsed=25308s rate=0.18/s target=6000 remain=1507 eta=8487s
+[09:32:22] [progress] new=4495 skip=0 empty=0 fail=1 processed=4496 elapsed=25314s rate=0.18/s target=6000 remain=1505 eta=8474s
+[09:32:25] [progress] new=4496 skip=0 empty=0 fail=1 processed=4497 elapsed=25317s rate=0.18/s target=6000 remain=1504 eta=8467s
+[09:32:29] [progress] new=4498 skip=0 empty=0 fail=1 processed=4499 elapsed=25321s rate=0.18/s target=6000 remain=1502 eta=8454s
+[09:32:35] [progress] new=4500 skip=0 empty=0 fail=1 processed=4501 elapsed=25327s rate=0.18/s target=6000 remain=1500 eta=8440s
+[09:32:35]   [1/3] 06 done new=12 R (total_new=4500)
+[09:32:35] [progress] new=4500 skip=0 empty=0 fail=1 processed=4501 elapsed=25327s rate=0.18/s target=6000 remain=1500 eta=8440s
+[09:32:42]   [2/3] 金沢 12R start
+[09:33:12] [progress] new=4501 skip=0 empty=0 fail=1 processed=4502 elapsed=25365s rate=0.18/s target=6000 remain=1499 eta=8445s
+[09:33:16] [progress] new=4502 skip=0 empty=0 fail=1 processed=4503 elapsed=25369s rate=0.18/s target=6000 remain=1498 eta=8439s
+[09:33:20] [progress] new=4503 skip=0 empty=0 fail=1 processed=4504 elapsed=25372s rate=0.18/s target=6000 remain=1497 eta=8433s
+[09:33:27] [progress] new=4505 skip=0 empty=0 fail=1 processed=4506 elapsed=25380s rate=0.18/s target=6000 remain=1495 eta=8420s
+[09:33:34] [progress] new=4507 skip=0 empty=0 fail=1 processed=4508 elapsed=25387s rate=0.18/s target=6000 remain=1493 eta=8408s
+[09:33:38] [progress] new=4508 skip=0 empty=0 fail=1 processed=4509 elapsed=25391s rate=0.18/s target=6000 remain=1492 eta=8402s
+[09:33:46] [progress] new=4510 skip=0 empty=0 fail=1 processed=4511 elapsed=25398s rate=0.18/s target=6000 remain=1490 eta=8389s
+[09:33:50] [progress] new=4511 skip=0 empty=0 fail=1 processed=4512 elapsed=25402s rate=0.18/s target=6000 remain=1489 eta=8383s
+[09:33:53]   [2/3] 金沢 done new=12 R (total_new=4512)
+[09:33:53] [progress] new=4512 skip=0 empty=0 fail=1 processed=4513 elapsed=25405s rate=0.18/s target=6000 remain=1488 eta=8376s
+[09:34:00]   [3/3] 園田 12R start
+[09:34:26] [progress] new=4513 skip=0 empty=0 fail=1 processed=4514 elapsed=25438s rate=0.18/s target=6000 remain=1487 eta=8380s
+[09:34:31] [progress] new=4514 skip=0 empty=0 fail=1 processed=4515 elapsed=25443s rate=0.18/s target=6000 remain=1486 eta=8374s
+[09:34:34] [progress] new=4515 skip=0 empty=0 fail=1 processed=4516 elapsed=25446s rate=0.18/s target=6000 remain=1485 eta=8367s
+[09:34:38] [progress] new=4516 skip=0 empty=0 fail=1 processed=4517 elapsed=25450s rate=0.18/s target=6000 remain=1484 eta=8361s
+[09:34:45] [progress] new=4518 skip=0 empty=0 fail=1 processed=4519 elapsed=25457s rate=0.18/s target=6000 remain=1482 eta=8349s
+[09:34:49] [progress] new=4519 skip=0 empty=0 fail=1 processed=4520 elapsed=25461s rate=0.18/s target=6000 remain=1481 eta=8343s
+[09:34:52] [progress] new=4520 skip=0 empty=0 fail=1 processed=4521 elapsed=25465s rate=0.18/s target=6000 remain=1480 eta=8336s
+[09:34:57] [progress] new=4521 skip=0 empty=0 fail=1 processed=4522 elapsed=25470s rate=0.18/s target=6000 remain=1479 eta=8330s
+[09:35:01] [progress] new=4522 skip=0 empty=0 fail=1 processed=4523 elapsed=25473s rate=0.18/s target=6000 remain=1478 eta=8324s
+[09:35:05] [progress] new=4523 skip=0 empty=0 fail=1 processed=4524 elapsed=25478s rate=0.18/s target=6000 remain=1477 eta=8318s
+[09:35:09] [progress] new=4524 skip=0 empty=0 fail=1 processed=4525 elapsed=25482s rate=0.18/s target=6000 remain=1476 eta=8312s
+[09:35:09]   [3/3] 園田 done new=12 R (total_new=4524)
+[09:35:09] [progress] new=4524 skip=0 empty=0 fail=1 processed=4525 elapsed=25482s rate=0.18/s target=6000 remain=1476 eta=8312s
+[09:35:09] === day 153/365 2023-06-02 ===
+[09:35:11]   venues=2: ['金沢', '園田']
+[09:35:16]   [1/2] 金沢 12R start
+[09:35:47] [progress] new=4525 skip=0 empty=0 fail=1 processed=4526 elapsed=25519s rate=0.18/s target=6000 remain=1475 eta=8317s
+[09:35:50] [progress] new=4526 skip=0 empty=0 fail=1 processed=4527 elapsed=25523s rate=0.18/s target=6000 remain=1474 eta=8310s
+[09:35:54] [progress] new=4527 skip=0 empty=0 fail=1 processed=4528 elapsed=25527s rate=0.18/s target=6000 remain=1473 eta=8304s
+[09:35:58] [progress] new=4528 skip=0 empty=0 fail=1 processed=4529 elapsed=25530s rate=0.18/s target=6000 remain=1472 eta=8298s
+[09:36:01] [progress] new=4530 skip=0 empty=0 fail=1 processed=4531 elapsed=25534s rate=0.18/s target=6000 remain=1470 eta=8284s
+[09:36:07] [progress] new=4531 skip=0 empty=0 fail=1 processed=4532 elapsed=25539s rate=0.18/s target=6000 remain=1469 eta=8278s
+[09:36:14] [progress] new=4533 skip=0 empty=0 fail=1 processed=4534 elapsed=25547s rate=0.18/s target=6000 remain=1467 eta=8266s
+[09:36:21] [progress] new=4535 skip=0 empty=0 fail=1 processed=4536 elapsed=25553s rate=0.18/s target=6000 remain=1465 eta=8253s
+[09:36:24]   [1/2] 金沢 done new=12 R (total_new=4536)
+[09:36:24] [progress] new=4536 skip=0 empty=0 fail=1 processed=4537 elapsed=25556s rate=0.18/s target=6000 remain=1464 eta=8247s
+[09:36:30]   [2/2] 園田 11R start
+[09:36:54] [progress] new=4537 skip=0 empty=0 fail=1 processed=4538 elapsed=25587s rate=0.18/s target=6000 remain=1463 eta=8249s
+[09:36:59] [progress] new=4539 skip=0 empty=0 fail=1 processed=4540 elapsed=25592s rate=0.18/s target=6000 remain=1461 eta=8236s
+[09:37:03] [progress] new=4540 skip=0 empty=0 fail=1 processed=4541 elapsed=25596s rate=0.18/s target=6000 remain=1460 eta=8229s
+[09:37:09] [progress] new=4542 skip=0 empty=0 fail=1 processed=4543 elapsed=25602s rate=0.18/s target=6000 remain=1458 eta=8217s
+[09:37:13] [progress] new=4544 skip=0 empty=0 fail=1 processed=4545 elapsed=25605s rate=0.18/s target=6000 remain=1456 eta=8203s
+[09:37:18] [progress] new=4546 skip=0 empty=0 fail=1 processed=4547 elapsed=25611s rate=0.18/s target=6000 remain=1454 eta=8190s
+[09:37:21]   [2/2] 園田 done new=11 R (total_new=4547)
+[09:37:21] [progress] new=4547 skip=0 empty=0 fail=1 processed=4548 elapsed=25613s rate=0.18/s target=6000 remain=1453 eta=8183s
+[09:37:21] === day 154/365 2023-06-03 ===
+[09:37:24]   venues=2: ['船橋', '川崎']
+[09:37:30]   [1/2] 船橋 12R start
+[09:37:59] [progress] new=4548 skip=0 empty=0 fail=1 processed=4549 elapsed=25652s rate=0.18/s target=6000 remain=1452 eta=8188s
+[09:38:04] [progress] new=4550 skip=0 empty=0 fail=1 processed=4551 elapsed=25657s rate=0.18/s target=6000 remain=1450 eta=8174s
+[09:38:09] [progress] new=4552 skip=0 empty=0 fail=1 processed=4553 elapsed=25661s rate=0.18/s target=6000 remain=1448 eta=8161s
+[09:38:13] [progress] new=4553 skip=0 empty=0 fail=1 processed=4554 elapsed=25665s rate=0.18/s target=6000 remain=1447 eta=8155s
+[09:38:18] [progress] new=4555 skip=0 empty=0 fail=1 processed=4556 elapsed=25671s rate=0.18/s target=6000 remain=1445 eta=8142s
+[09:38:23] [progress] new=4557 skip=0 empty=0 fail=1 processed=4558 elapsed=25676s rate=0.18/s target=6000 remain=1443 eta=8129s
+[09:38:28] [progress] new=4559 skip=0 empty=0 fail=1 processed=4560 elapsed=25680s rate=0.18/s target=6000 remain=1441 eta=8115s
+[09:38:28]   [1/2] 船橋 done new=12 R (total_new=4559)
+[09:38:28] [progress] new=4559 skip=0 empty=0 fail=1 processed=4560 elapsed=25680s rate=0.18/s target=6000 remain=1441 eta=8115s
+[09:38:32]   [2/2] 川崎 11R start
+[09:39:01] [progress] new=4560 skip=0 empty=0 fail=1 processed=4561 elapsed=25713s rate=0.18/s target=6000 remain=1440 eta=8118s
+[09:39:05] [progress] new=4561 skip=0 empty=0 fail=1 processed=4562 elapsed=25717s rate=0.18/s target=6000 remain=1439 eta=8112s
+[09:39:10] [progress] new=4563 skip=0 empty=0 fail=1 processed=4564 elapsed=25723s rate=0.18/s target=6000 remain=1437 eta=8099s
+[09:39:14] [progress] new=4564 skip=0 empty=0 fail=1 processed=4565 elapsed=25726s rate=0.18/s target=6000 remain=1436 eta=8093s
+[09:39:18] [progress] new=4565 skip=0 empty=0 fail=1 processed=4566 elapsed=25730s rate=0.18/s target=6000 remain=1435 eta=8086s
+[09:39:23] [progress] new=4567 skip=0 empty=0 fail=1 processed=4568 elapsed=25735s rate=0.18/s target=6000 remain=1433 eta=8073s
+[09:39:30] [progress] new=4569 skip=0 empty=0 fail=1 processed=4570 elapsed=25743s rate=0.18/s target=6000 remain=1431 eta=8061s
+[09:39:34] [progress] new=4570 skip=0 empty=0 fail=1 processed=4571 elapsed=25746s rate=0.18/s target=6000 remain=1430 eta=8055s
+[09:39:34]   [2/2] 川崎 done new=11 R (total_new=4570)
+[09:39:34] [progress] new=4570 skip=0 empty=0 fail=1 processed=4571 elapsed=25746s rate=0.18/s target=6000 remain=1430 eta=8055s
+[09:39:34] === day 155/365 2023-06-04 ===
+[09:39:36]   venues=4: ['船橋', '水沢', '41', '川崎']
+[09:39:40]   [1/4] 船橋 12R start
+[09:40:09] [progress] new=4571 skip=0 empty=0 fail=1 processed=4572 elapsed=25782s rate=0.18/s target=6000 remain=1429 eta=8058s
+[09:40:13] [progress] new=4573 skip=0 empty=0 fail=1 processed=4574 elapsed=25786s rate=0.18/s target=6000 remain=1427 eta=8045s
+[09:40:17] [progress] new=4574 skip=0 empty=0 fail=1 processed=4575 elapsed=25790s rate=0.18/s target=6000 remain=1426 eta=8038s
+[09:40:22] [progress] new=4576 skip=0 empty=0 fail=1 processed=4577 elapsed=25795s rate=0.18/s target=6000 remain=1424 eta=8025s
+[09:40:28] [progress] new=4578 skip=0 empty=0 fail=1 processed=4579 elapsed=25801s rate=0.18/s target=6000 remain=1422 eta=8012s
+[09:40:33] [progress] new=4580 skip=0 empty=0 fail=1 processed=4581 elapsed=25805s rate=0.18/s target=6000 remain=1420 eta=7999s
+[09:40:37] [progress] new=4581 skip=0 empty=0 fail=1 processed=4582 elapsed=25809s rate=0.18/s target=6000 remain=1419 eta=7993s
+[09:40:40]   [1/4] 船橋 done new=12 R (total_new=4582)
+[09:40:40] [progress] new=4582 skip=0 empty=0 fail=1 processed=4583 elapsed=25812s rate=0.18/s target=6000 remain=1418 eta=7986s
+[09:40:44]   [2/4] 水沢 12R start
+[09:41:10] [progress] new=4583 skip=0 empty=0 fail=1 processed=4584 elapsed=25842s rate=0.18/s target=6000 remain=1417 eta=7988s
+[09:41:14] [progress] new=4584 skip=0 empty=0 fail=1 processed=4585 elapsed=25847s rate=0.18/s target=6000 remain=1416 eta=7982s
+[09:41:18] [progress] new=4586 skip=0 empty=0 fail=1 processed=4587 elapsed=25851s rate=0.18/s target=6000 remain=1414 eta=7969s
+[09:41:24] [progress] new=4588 skip=0 empty=0 fail=1 processed=4589 elapsed=25856s rate=0.18/s target=6000 remain=1412 eta=7956s
+[09:41:30] [progress] new=4590 skip=0 empty=0 fail=1 processed=4591 elapsed=25863s rate=0.18/s target=6000 remain=1410 eta=7943s
+[09:41:36] [progress] new=4592 skip=0 empty=0 fail=1 processed=4593 elapsed=25869s rate=0.18/s target=6000 remain=1408 eta=7930s
+[09:41:44] [progress] new=4594 skip=0 empty=0 fail=1 processed=4595 elapsed=25877s rate=0.18/s target=6000 remain=1406 eta=7918s
+[09:41:44]   [2/4] 水沢 done new=12 R (total_new=4594)
+[09:41:44] [progress] new=4594 skip=0 empty=0 fail=1 processed=4595 elapsed=25877s rate=0.18/s target=6000 remain=1406 eta=7918s
+[09:41:49]   [3/4] 41 12R start
+[09:42:19] [progress] new=4595 skip=0 empty=0 fail=1 processed=4596 elapsed=25912s rate=0.18/s target=6000 remain=1405 eta=7921s
+[09:42:22] [progress] new=4596 skip=0 empty=0 fail=1 processed=4597 elapsed=25915s rate=0.18/s target=6000 remain=1404 eta=7915s
+[09:42:27] [progress] new=4598 skip=0 empty=0 fail=1 processed=4599 elapsed=25920s rate=0.18/s target=6000 remain=1402 eta=7902s
+[09:42:33] [progress] new=4599 skip=0 empty=0 fail=1 processed=4600 elapsed=25925s rate=0.18/s target=6000 remain=1401 eta=7896s
+[09:42:37] [progress] new=4601 skip=0 empty=0 fail=1 processed=4602 elapsed=25930s rate=0.18/s target=6000 remain=1399 eta=7883s
+[09:42:43] [progress] new=4603 skip=0 empty=0 fail=1 processed=4604 elapsed=25936s rate=0.18/s target=6000 remain=1397 eta=7870s
+[09:42:48] [progress] new=4604 skip=0 empty=0 fail=1 processed=4605 elapsed=25941s rate=0.18/s target=6000 remain=1396 eta=7864s
+[09:42:51] [progress] new=4605 skip=0 empty=0 fail=1 processed=4606 elapsed=25944s rate=0.18/s target=6000 remain=1395 eta=7858s
+[09:42:53]   [3/4] 41 done new=12 R (total_new=4606)
+[09:42:53] [progress] new=4606 skip=0 empty=0 fail=1 processed=4607 elapsed=25946s rate=0.18/s target=6000 remain=1394 eta=7851s
+[09:43:01]   [4/4] 川崎 11R start
+[09:43:33] [progress] new=4607 skip=0 empty=0 fail=1 processed=4608 elapsed=25985s rate=0.18/s target=6000 remain=1393 eta=7855s
+[09:43:37] [progress] new=4608 skip=0 empty=0 fail=1 processed=4609 elapsed=25989s rate=0.18/s target=6000 remain=1392 eta=7849s
+[09:43:40] [progress] new=4609 skip=0 empty=0 fail=1 processed=4610 elapsed=25993s rate=0.18/s target=6000 remain=1391 eta=7843s
+[09:43:44] [progress] new=4611 skip=0 empty=0 fail=1 processed=4612 elapsed=25997s rate=0.18/s target=6000 remain=1389 eta=7830s
+[09:43:51] [progress] new=4613 skip=0 empty=0 fail=1 processed=4614 elapsed=26003s rate=0.18/s target=6000 remain=1387 eta=7817s
+[09:43:58] [progress] new=4615 skip=0 empty=0 fail=1 processed=4616 elapsed=26010s rate=0.18/s target=6000 remain=1385 eta=7804s
+[09:44:05] [progress] new=4617 skip=0 empty=0 fail=1 processed=4618 elapsed=26017s rate=0.18/s target=6000 remain=1383 eta=7792s
+[09:44:05]   [4/4] 川崎 done new=11 R (total_new=4617)
+[09:44:05] [progress] new=4617 skip=0 empty=0 fail=1 processed=4618 elapsed=26017s rate=0.18/s target=6000 remain=1383 eta=7792s
+[09:44:05] === day 156/365 2023-06-05 ===
+[09:44:08]   venues=3: ['船橋', '水沢', '川崎']
+[09:44:14]   [1/3] 船橋 12R start
+[09:44:55] [progress] new=4618 skip=0 empty=0 fail=1 processed=4619 elapsed=26068s rate=0.18/s target=6000 remain=1382 eta=7799s
+[09:45:01] [progress] new=4620 skip=0 empty=0 fail=1 processed=4621 elapsed=26073s rate=0.18/s target=6000 remain=1380 eta=7786s
+[09:45:04] [progress] new=4621 skip=0 empty=0 fail=1 processed=4622 elapsed=26077s rate=0.18/s target=6000 remain=1379 eta=7780s
+[09:45:11] [progress] new=4623 skip=0 empty=0 fail=1 processed=4624 elapsed=26083s rate=0.18/s target=6000 remain=1377 eta=7767s
+[09:45:14] [progress] new=4624 skip=0 empty=0 fail=1 processed=4625 elapsed=26086s rate=0.18/s target=6000 remain=1376 eta=7761s
+[09:45:17] [progress] new=4625 skip=0 empty=0 fail=1 processed=4626 elapsed=26090s rate=0.18/s target=6000 remain=1375 eta=7755s
+[09:45:23] [progress] new=4627 skip=0 empty=0 fail=1 processed=4628 elapsed=26096s rate=0.18/s target=6000 remain=1373 eta=7742s
+[09:45:29] [progress] new=4629 skip=0 empty=0 fail=1 processed=4630 elapsed=26102s rate=0.18/s target=6000 remain=1371 eta=7729s
+[09:45:29]   [1/3] 船橋 done new=12 R (total_new=4629)
+[09:45:29] [progress] new=4629 skip=0 empty=0 fail=1 processed=4630 elapsed=26102s rate=0.18/s target=6000 remain=1371 eta=7729s
+[09:45:36]   [2/3] 水沢 12R start
+[09:46:06] [progress] new=4630 skip=0 empty=0 fail=1 processed=4631 elapsed=26139s rate=0.18/s target=6000 remain=1370 eta=7733s
+[09:46:11] [progress] new=4632 skip=0 empty=0 fail=1 processed=4633 elapsed=26143s rate=0.18/s target=6000 remain=1368 eta=7719s
+[09:46:14] [progress] new=4634 skip=0 empty=0 fail=1 processed=4635 elapsed=26146s rate=0.18/s target=6000 remain=1366 eta=7706s
+[09:46:19] [progress] new=4636 skip=0 empty=0 fail=1 processed=4637 elapsed=26152s rate=0.18/s target=6000 remain=1364 eta=7693s
+[09:46:25] [progress] new=4638 skip=0 empty=0 fail=1 processed=4639 elapsed=26157s rate=0.18/s target=6000 remain=1362 eta=7680s
+[09:46:30] [progress] new=4640 skip=0 empty=0 fail=1 processed=4641 elapsed=26163s rate=0.18/s target=6000 remain=1360 eta=7667s
+[09:46:33] [progress] new=4641 skip=0 empty=0 fail=1 processed=4642 elapsed=26166s rate=0.18/s target=6000 remain=1359 eta=7660s
+[09:46:33]   [2/3] 水沢 done new=12 R (total_new=4641)
+[09:46:33] [progress] new=4641 skip=0 empty=0 fail=1 processed=4642 elapsed=26166s rate=0.18/s target=6000 remain=1359 eta=7660s
+[09:46:41]   [3/3] 川崎 11R start
+[09:47:13] [progress] new=4642 skip=0 empty=0 fail=1 processed=4643 elapsed=26205s rate=0.18/s target=6000 remain=1358 eta=7665s
+[09:47:19] [progress] new=4644 skip=0 empty=0 fail=1 processed=4645 elapsed=26211s rate=0.18/s target=6000 remain=1356 eta=7652s
+[09:47:25] [progress] new=4646 skip=0 empty=0 fail=1 processed=4647 elapsed=26217s rate=0.18/s target=6000 remain=1354 eta=7639s
+[09:47:28] [progress] new=4647 skip=0 empty=0 fail=1 processed=4648 elapsed=26221s rate=0.18/s target=6000 remain=1353 eta=7633s
+[09:47:31] [progress] new=4648 skip=0 empty=0 fail=1 processed=4649 elapsed=26224s rate=0.18/s target=6000 remain=1352 eta=7626s
+[09:47:35] [progress] new=4649 skip=0 empty=0 fail=1 processed=4650 elapsed=26228s rate=0.18/s target=6000 remain=1351 eta=7620s
+[09:47:39] [progress] new=4650 skip=0 empty=0 fail=1 processed=4651 elapsed=26231s rate=0.18/s target=6000 remain=1350 eta=7614s
+[09:47:43] [progress] new=4651 skip=0 empty=0 fail=1 processed=4652 elapsed=26235s rate=0.18/s target=6000 remain=1349 eta=7608s
+[09:47:45]   [3/3] 川崎 done new=11 R (total_new=4652)
+[09:47:45] [progress] new=4652 skip=0 empty=0 fail=1 processed=4653 elapsed=26238s rate=0.18/s target=6000 remain=1348 eta=7601s
+[09:47:45] === day 157/365 2023-06-06 ===
+[09:47:48]   venues=2: ['水沢', '41']
+[09:47:52]   [1/2] 水沢 12R start
+[09:48:15] [progress] new=4653 skip=0 empty=0 fail=1 processed=4654 elapsed=26267s rate=0.18/s target=6000 remain=1347 eta=7602s
+[09:48:19] [progress] new=4654 skip=0 empty=0 fail=1 processed=4655 elapsed=26272s rate=0.18/s target=6000 remain=1346 eta=7597s
+[09:48:23] [progress] new=4655 skip=0 empty=0 fail=1 processed=4656 elapsed=26276s rate=0.18/s target=6000 remain=1345 eta=7590s
+[09:48:28] [progress] new=4657 skip=0 empty=0 fail=1 processed=4658 elapsed=26281s rate=0.18/s target=6000 remain=1343 eta=7577s
+[09:48:34] [progress] new=4659 skip=0 empty=0 fail=1 processed=4660 elapsed=26286s rate=0.18/s target=6000 remain=1341 eta=7564s
+[09:48:37] [progress] new=4660 skip=0 empty=0 fail=1 processed=4661 elapsed=26289s rate=0.18/s target=6000 remain=1340 eta=7558s
+[09:48:42] [progress] new=4662 skip=0 empty=0 fail=1 processed=4663 elapsed=26294s rate=0.18/s target=6000 remain=1338 eta=7545s
+[09:48:48] [progress] new=4664 skip=0 empty=0 fail=1 processed=4665 elapsed=26300s rate=0.18/s target=6000 remain=1336 eta=7532s
+[09:48:48]   [1/2] 水沢 done new=12 R (total_new=4664)
+[09:48:48] [progress] new=4664 skip=0 empty=0 fail=1 processed=4665 elapsed=26300s rate=0.18/s target=6000 remain=1336 eta=7532s
+[09:48:54]   [2/2] 41 12R start
+[09:49:22] [progress] new=4665 skip=0 empty=0 fail=1 processed=4666 elapsed=26335s rate=0.18/s target=6000 remain=1335 eta=7535s
+[09:49:27] [progress] new=4667 skip=0 empty=0 fail=1 processed=4668 elapsed=26339s rate=0.18/s target=6000 remain=1333 eta=7522s
+[09:49:31] [progress] new=4669 skip=0 empty=0 fail=1 processed=4670 elapsed=26344s rate=0.18/s target=6000 remain=1331 eta=7508s
+[09:49:35] [progress] new=4670 skip=0 empty=0 fail=1 processed=4671 elapsed=26348s rate=0.18/s target=6000 remain=1330 eta=7502s
+[09:49:39] [progress] new=4671 skip=0 empty=0 fail=1 processed=4672 elapsed=26352s rate=0.18/s target=6000 remain=1329 eta=7496s
+[09:49:44] [progress] new=4673 skip=0 empty=0 fail=1 processed=4674 elapsed=26357s rate=0.18/s target=6000 remain=1327 eta=7483s
+[09:49:49] [progress] new=4675 skip=0 empty=0 fail=1 processed=4676 elapsed=26361s rate=0.18/s target=6000 remain=1325 eta=7470s
+[09:49:55] [progress] new=4676 skip=0 empty=0 fail=1 processed=4677 elapsed=26368s rate=0.18/s target=6000 remain=1324 eta=7464s
+[09:49:55]   [2/2] 41 done new=12 R (total_new=4676)
+[09:49:55] [progress] new=4676 skip=0 empty=0 fail=1 processed=4677 elapsed=26368s rate=0.18/s target=6000 remain=1324 eta=7464s
+[09:49:55] === day 158/365 2023-06-07 ===
+[09:49:58]   venues=1: ['園田']
+[09:50:05]   [1/1] 園田 12R start
+[09:50:37] [progress] new=4677 skip=0 empty=0 fail=1 processed=4678 elapsed=26409s rate=0.18/s target=6000 remain=1323 eta=7469s
+[09:50:42] [progress] new=4679 skip=0 empty=0 fail=1 processed=4680 elapsed=26415s rate=0.18/s target=6000 remain=1321 eta=7456s
+[09:50:47] [progress] new=4680 skip=0 empty=0 fail=1 processed=4681 elapsed=26419s rate=0.18/s target=6000 remain=1320 eta=7450s
+[09:50:54] [progress] new=4682 skip=0 empty=0 fail=1 processed=4683 elapsed=26426s rate=0.18/s target=6000 remain=1318 eta=7437s
+[09:50:58] [progress] new=4683 skip=0 empty=0 fail=1 processed=4684 elapsed=26431s rate=0.18/s target=6000 remain=1317 eta=7432s
+[09:51:02] [progress] new=4684 skip=0 empty=0 fail=1 processed=4685 elapsed=26434s rate=0.18/s target=6000 remain=1316 eta=7425s
+[09:51:06] [progress] new=4685 skip=0 empty=0 fail=1 processed=4686 elapsed=26438s rate=0.18/s target=6000 remain=1315 eta=7419s
+[09:51:10] [progress] new=4687 skip=0 empty=0 fail=1 processed=4688 elapsed=26443s rate=0.18/s target=6000 remain=1313 eta=7406s
+[09:51:16] [progress] new=4688 skip=0 empty=0 fail=1 processed=4689 elapsed=26449s rate=0.18/s target=6000 remain=1312 eta=7400s
+[09:51:16]   [1/1] 園田 done new=12 R (total_new=4688)
+[09:51:16] [progress] new=4688 skip=0 empty=0 fail=1 processed=4689 elapsed=26449s rate=0.18/s target=6000 remain=1312 eta=7400s
+[09:51:16] === day 159/365 2023-06-08 ===
+[09:51:19]   venues=2: ['笠松', '園田']
+[09:51:23]   [1/2] 笠松 12R start
+[09:51:54] [progress] new=4689 skip=0 empty=0 fail=1 processed=4690 elapsed=26486s rate=0.18/s target=6000 remain=1311 eta=7404s
+[09:51:58] [progress] new=4690 skip=0 empty=0 fail=1 processed=4691 elapsed=26491s rate=0.18/s target=6000 remain=1310 eta=7398s
+[09:52:03] [progress] new=4692 skip=0 empty=0 fail=1 processed=4693 elapsed=26495s rate=0.18/s target=6000 remain=1308 eta=7385s
+[09:52:07] [progress] new=4693 skip=0 empty=0 fail=1 processed=4694 elapsed=26499s rate=0.18/s target=6000 remain=1307 eta=7378s
+[09:52:11] [progress] new=4695 skip=0 empty=0 fail=1 processed=4696 elapsed=26504s rate=0.18/s target=6000 remain=1305 eta=7365s
+[09:52:14] [progress] new=4696 skip=0 empty=0 fail=1 processed=4697 elapsed=26507s rate=0.18/s target=6000 remain=1304 eta=7359s
+[09:52:18] [progress] new=4697 skip=0 empty=0 fail=1 processed=4698 elapsed=26511s rate=0.18/s target=6000 remain=1303 eta=7353s
+[09:52:22] [progress] new=4699 skip=0 empty=0 fail=1 processed=4700 elapsed=26515s rate=0.18/s target=6000 remain=1301 eta=7340s
+[09:52:26] [progress] new=4700 skip=0 empty=0 fail=1 processed=4701 elapsed=26518s rate=0.18/s target=6000 remain=1300 eta=7333s
+[09:52:26]   [1/2] 笠松 done new=12 R (total_new=4700)
+[09:52:26] [progress] new=4700 skip=0 empty=0 fail=1 processed=4701 elapsed=26518s rate=0.18/s target=6000 remain=1300 eta=7333s
+[09:52:31]   [2/2] 園田 12R start
+[09:53:02] [progress] new=4701 skip=0 empty=0 fail=1 processed=4702 elapsed=26555s rate=0.18/s target=6000 remain=1299 eta=7336s
+[09:53:07] [progress] new=4702 skip=0 empty=0 fail=1 processed=4703 elapsed=26559s rate=0.18/s target=6000 remain=1298 eta=7330s
+[09:53:11] [progress] new=4703 skip=0 empty=0 fail=1 processed=4704 elapsed=26563s rate=0.18/s target=6000 remain=1297 eta=7324s
+[09:53:16] [progress] new=4705 skip=0 empty=0 fail=1 processed=4706 elapsed=26569s rate=0.18/s target=6000 remain=1295 eta=7311s
+[09:53:21] [progress] new=4706 skip=0 empty=0 fail=1 processed=4707 elapsed=26574s rate=0.18/s target=6000 remain=1294 eta=7305s
+[09:53:25] [progress] new=4707 skip=0 empty=0 fail=1 processed=4708 elapsed=26577s rate=0.18/s target=6000 remain=1293 eta=7299s
+[09:53:30] [progress] new=4708 skip=0 empty=0 fail=1 processed=4709 elapsed=26582s rate=0.18/s target=6000 remain=1292 eta=7293s
+[09:53:35] [progress] new=4710 skip=0 empty=0 fail=1 processed=4711 elapsed=26588s rate=0.18/s target=6000 remain=1290 eta=7280s
+[09:53:40] [progress] new=4711 skip=0 empty=0 fail=1 processed=4712 elapsed=26592s rate=0.18/s target=6000 remain=1289 eta=7274s
+[09:53:45] [progress] new=4712 skip=0 empty=0 fail=1 processed=4713 elapsed=26598s rate=0.18/s target=6000 remain=1288 eta=7269s
+[09:53:45]   [2/2] 園田 done new=12 R (total_new=4712)
+[09:53:45] [progress] new=4712 skip=0 empty=0 fail=1 processed=4713 elapsed=26598s rate=0.18/s target=6000 remain=1288 eta=7269s
+[09:53:45] === day 160/365 2023-06-09 ===
+[09:53:47]   venues=2: ['笠松', '園田']
+[09:53:55]   [1/2] 笠松 12R start
+[09:54:26] [progress] new=4713 skip=0 empty=0 fail=1 processed=4714 elapsed=26639s rate=0.18/s target=6000 remain=1287 eta=7273s
+[09:54:33] [progress] new=4715 skip=0 empty=0 fail=1 processed=4716 elapsed=26645s rate=0.18/s target=6000 remain=1285 eta=7260s
+[09:54:38] [progress] new=4717 skip=0 empty=0 fail=1 processed=4718 elapsed=26650s rate=0.18/s target=6000 remain=1283 eta=7247s
+[09:54:42] [progress] new=4718 skip=0 empty=0 fail=1 processed=4719 elapsed=26654s rate=0.18/s target=6000 remain=1282 eta=7241s
+[09:54:47] [progress] new=4720 skip=0 empty=0 fail=1 processed=4721 elapsed=26660s rate=0.18/s target=6000 remain=1280 eta=7228s
+[09:54:54] [progress] new=4722 skip=0 empty=0 fail=1 processed=4723 elapsed=26667s rate=0.18/s target=6000 remain=1278 eta=7216s
+[09:54:57] [progress] new=4723 skip=0 empty=0 fail=1 processed=4724 elapsed=26670s rate=0.18/s target=6000 remain=1277 eta=7209s
+[09:55:00]   [1/2] 笠松 done new=12 R (total_new=4724)
+[09:55:00] [progress] new=4724 skip=0 empty=0 fail=1 processed=4725 elapsed=26672s rate=0.18/s target=6000 remain=1276 eta=7203s
+[09:55:04]   [2/2] 園田 12R start
+[09:55:38] [progress] new=4725 skip=0 empty=0 fail=1 processed=4726 elapsed=26710s rate=0.18/s target=6000 remain=1275 eta=7206s
+[09:55:42] [progress] new=4726 skip=0 empty=0 fail=1 processed=4727 elapsed=26715s rate=0.18/s target=6000 remain=1274 eta=7200s
+[09:55:48] [progress] new=4727 skip=0 empty=0 fail=1 processed=4728 elapsed=26721s rate=0.18/s target=6000 remain=1273 eta=7194s
+[09:55:52] [progress] new=4728 skip=0 empty=0 fail=1 processed=4729 elapsed=26724s rate=0.18/s target=6000 remain=1272 eta=7188s
+[09:55:58] [progress] new=4730 skip=0 empty=0 fail=1 processed=4731 elapsed=26730s rate=0.18/s target=6000 remain=1270 eta=7176s
+[09:56:04] [progress] new=4732 skip=0 empty=0 fail=1 processed=4733 elapsed=26737s rate=0.18/s target=6000 remain=1268 eta=7163s
+[09:56:09] [progress] new=4733 skip=0 empty=0 fail=1 processed=4734 elapsed=26741s rate=0.18/s target=6000 remain=1267 eta=7157s
+[09:56:15] [progress] new=4734 skip=0 empty=0 fail=1 processed=4735 elapsed=26747s rate=0.18/s target=6000 remain=1266 eta=7151s
+[09:56:22] [progress] new=4736 skip=0 empty=0 fail=1 processed=4737 elapsed=26754s rate=0.18/s target=6000 remain=1264 eta=7139s
+[09:56:22]   [2/2] 園田 done new=12 R (total_new=4736)
+[09:56:22] [progress] new=4736 skip=0 empty=0 fail=1 processed=4737 elapsed=26754s rate=0.18/s target=6000 remain=1264 eta=7139s
+[09:56:22] === day 161/365 2023-06-10 ===
+[09:56:23]   venues=3: ['船橋', '高知', '川崎']
+[09:56:26]   [1/3] 船橋 12R start
+[09:56:58] [progress] new=4737 skip=0 empty=0 fail=1 processed=4738 elapsed=26791s rate=0.18/s target=6000 remain=1263 eta=7142s
+[09:57:04] [progress] new=4739 skip=0 empty=0 fail=1 processed=4740 elapsed=26796s rate=0.18/s target=6000 remain=1261 eta=7129s
+[09:57:08] [progress] new=4740 skip=0 empty=0 fail=1 processed=4741 elapsed=26801s rate=0.18/s target=6000 remain=1260 eta=7123s
+[09:57:12] [progress] new=4742 skip=0 empty=0 fail=1 processed=4743 elapsed=26805s rate=0.18/s target=6000 remain=1258 eta=7110s
+[09:57:16] [progress] new=4743 skip=0 empty=0 fail=1 processed=4744 elapsed=26809s rate=0.18/s target=6000 remain=1257 eta=7103s
+[09:57:20] [progress] new=4744 skip=0 empty=0 fail=1 processed=4745 elapsed=26813s rate=0.18/s target=6000 remain=1256 eta=7097s
+[09:57:24] [progress] new=4745 skip=0 empty=0 fail=1 processed=4746 elapsed=26817s rate=0.18/s target=6000 remain=1255 eta=7091s
+[09:57:30] [progress] new=4747 skip=0 empty=0 fail=1 processed=4748 elapsed=26822s rate=0.18/s target=6000 remain=1253 eta=7078s
+[09:57:32]   [1/3] 船橋 done new=12 R (total_new=4748)
+[09:57:32] [progress] new=4748 skip=0 empty=0 fail=1 processed=4749 elapsed=26825s rate=0.18/s target=6000 remain=1252 eta=7072s
+[09:57:37]   [2/3] 高知 11R start
+[09:58:08] [progress] new=4749 skip=0 empty=0 fail=1 processed=4750 elapsed=26860s rate=0.18/s target=6000 remain=1251 eta=7074s
+[09:58:12] [progress] new=4750 skip=0 empty=0 fail=1 processed=4751 elapsed=26864s rate=0.18/s target=6000 remain=1250 eta=7068s
+[09:58:16] [progress] new=4751 skip=0 empty=0 fail=1 processed=4752 elapsed=26868s rate=0.18/s target=6000 remain=1249 eta=7062s
+[09:58:20] [progress] new=4752 skip=0 empty=0 fail=1 processed=4753 elapsed=26873s rate=0.18/s target=6000 remain=1248 eta=7056s
+[09:58:25] [progress] new=4754 skip=0 empty=0 fail=1 processed=4755 elapsed=26877s rate=0.18/s target=6000 remain=1246 eta=7043s
+[09:58:29] [progress] new=4755 skip=0 empty=0 fail=1 processed=4756 elapsed=26881s rate=0.18/s target=6000 remain=1245 eta=7037s
+[09:58:33] [progress] new=4756 skip=0 empty=0 fail=1 processed=4757 elapsed=26886s rate=0.18/s target=6000 remain=1244 eta=7031s
+[09:58:39] [progress] new=4758 skip=0 empty=0 fail=1 processed=4759 elapsed=26891s rate=0.18/s target=6000 remain=1242 eta=7018s
+[09:58:42] [progress] new=4759 skip=0 empty=0 fail=1 processed=4760 elapsed=26895s rate=0.18/s target=6000 remain=1241 eta=7012s
+[09:58:42]   [2/3] 高知 done new=11 R (total_new=4759)
+[09:58:42] [progress] new=4759 skip=0 empty=0 fail=1 processed=4760 elapsed=26895s rate=0.18/s target=6000 remain=1241 eta=7012s
+[09:58:46]   [3/3] 川崎 11R start
+[09:59:15] [progress] new=4760 skip=0 empty=0 fail=1 processed=4761 elapsed=26928s rate=0.18/s target=6000 remain=1240 eta=7013s
+[09:59:20] [progress] new=4761 skip=0 empty=0 fail=1 processed=4762 elapsed=26932s rate=0.18/s target=6000 remain=1239 eta=7007s
+[09:59:26] [progress] new=4763 skip=0 empty=0 fail=1 processed=4764 elapsed=26939s rate=0.18/s target=6000 remain=1237 eta=6995s
+[09:59:30] [progress] new=4765 skip=0 empty=0 fail=1 processed=4766 elapsed=26943s rate=0.18/s target=6000 remain=1235 eta=6982s
+[09:59:34] [progress] new=4766 skip=0 empty=0 fail=1 processed=4767 elapsed=26946s rate=0.18/s target=6000 remain=1234 eta=6975s
+[09:59:38] [progress] new=4767 skip=0 empty=0 fail=1 processed=4768 elapsed=26950s rate=0.18/s target=6000 remain=1233 eta=6969s
+[09:59:42] [progress] new=4769 skip=0 empty=0 fail=1 processed=4770 elapsed=26955s rate=0.18/s target=6000 remain=1231 eta=6956s
+[09:59:46] [progress] new=4770 skip=0 empty=0 fail=1 processed=4771 elapsed=26959s rate=0.18/s target=6000 remain=1230 eta=6950s
+[09:59:46]   [3/3] 川崎 done new=11 R (total_new=4770)
+[09:59:46] [progress] new=4770 skip=0 empty=0 fail=1 processed=4771 elapsed=26959s rate=0.18/s target=6000 remain=1230 eta=6950s
+[09:59:46] === day 162/365 2023-06-11 ===
+[09:59:49]   venues=5: ['船橋', '水沢', '名古屋', '高知', '川崎']
+[09:59:54]   [1/5] 船橋 12R start
+[10:00:27] [progress] new=4771 skip=0 empty=0 fail=1 processed=4772 elapsed=26999s rate=0.18/s target=6000 remain=1229 eta=6953s
+[10:00:32] [progress] new=4773 skip=0 empty=0 fail=1 processed=4774 elapsed=27005s rate=0.18/s target=6000 remain=1227 eta=6941s
+[10:00:38] [progress] new=4775 skip=0 empty=0 fail=1 processed=4776 elapsed=27010s rate=0.18/s target=6000 remain=1225 eta=6928s
+[10:00:44] [progress] new=4777 skip=0 empty=0 fail=1 processed=4778 elapsed=27017s rate=0.18/s target=6000 remain=1223 eta=6915s
+[10:00:48] [progress] new=4778 skip=0 empty=0 fail=1 processed=4779 elapsed=27021s rate=0.18/s target=6000 remain=1222 eta=6909s
+[10:00:53] [progress] new=4780 skip=0 empty=0 fail=1 processed=4781 elapsed=27026s rate=0.18/s target=6000 remain=1220 eta=6896s
+[10:00:57] [progress] new=4781 skip=0 empty=0 fail=1 processed=4782 elapsed=27030s rate=0.18/s target=6000 remain=1219 eta=6890s
+[10:01:00] [progress] new=4782 skip=0 empty=0 fail=1 processed=4783 elapsed=27033s rate=0.18/s target=6000 remain=1218 eta=6884s
+[10:01:00]   [1/5] 船橋 done new=12 R (total_new=4782)
+[10:01:00] [progress] new=4782 skip=0 empty=0 fail=1 processed=4783 elapsed=27033s rate=0.18/s target=6000 remain=1218 eta=6884s
+[10:01:06]   [2/5] 水沢 11R start
+[10:01:33] [progress] new=4783 skip=0 empty=0 fail=1 processed=4784 elapsed=27066s rate=0.18/s target=6000 remain=1217 eta=6885s
+[10:01:37] [progress] new=4785 skip=0 empty=0 fail=1 processed=4786 elapsed=27070s rate=0.18/s target=6000 remain=1215 eta=6872s
+[10:01:41] [progress] new=4786 skip=0 empty=0 fail=1 processed=4787 elapsed=27074s rate=0.18/s target=6000 remain=1214 eta=6866s
+[10:01:44] [progress] new=4788 skip=0 empty=0 fail=1 processed=4789 elapsed=27077s rate=0.18/s target=6000 remain=1212 eta=6853s
+[10:01:48] [progress] new=4789 skip=0 empty=0 fail=1 processed=4790 elapsed=27081s rate=0.18/s target=6000 remain=1211 eta=6847s
+[10:01:52] [progress] new=4791 skip=0 empty=0 fail=1 processed=4792 elapsed=27085s rate=0.18/s target=6000 remain=1209 eta=6833s
+[10:01:58] [progress] new=4793 skip=0 empty=0 fail=1 processed=4794 elapsed=27091s rate=0.18/s target=6000 remain=1207 eta=6821s
+[10:01:58]   [2/5] 水沢 done new=11 R (total_new=4793)
+[10:01:58] [progress] new=4793 skip=0 empty=0 fail=1 processed=4794 elapsed=27091s rate=0.18/s target=6000 remain=1207 eta=6821s
+[10:02:02]   [3/5] 名古屋 12R start
+[10:02:33] [progress] new=4794 skip=0 empty=0 fail=1 processed=4795 elapsed=27126s rate=0.18/s target=6000 remain=1206 eta=6822s
+[10:02:37] [progress] new=4796 skip=0 empty=0 fail=1 processed=4797 elapsed=27130s rate=0.18/s target=6000 remain=1204 eta=6809s
+[10:02:41] [progress] new=4797 skip=0 empty=0 fail=1 processed=4798 elapsed=27134s rate=0.18/s target=6000 remain=1203 eta=6803s
+[10:02:46] [progress] new=4799 skip=0 empty=0 fail=1 processed=4800 elapsed=27139s rate=0.18/s target=6000 remain=1201 eta=6790s
+[10:02:49] [progress] new=4800 skip=0 empty=0 fail=1 processed=4801 elapsed=27142s rate=0.18/s target=6000 remain=1200 eta=6784s
+[10:02:53] [progress] new=4801 skip=0 empty=0 fail=1 processed=4802 elapsed=27145s rate=0.18/s target=6000 remain=1199 eta=6778s
+[10:02:57] [progress] new=4802 skip=0 empty=0 fail=1 processed=4803 elapsed=27150s rate=0.18/s target=6000 remain=1198 eta=6772s
+[10:03:03] [progress] new=4804 skip=0 empty=0 fail=1 processed=4805 elapsed=27156s rate=0.18/s target=6000 remain=1196 eta=6759s
+[10:03:04]   [3/5] 名古屋 done new=12 R (total_new=4805)
+[10:03:04] [progress] new=4805 skip=0 empty=0 fail=1 processed=4806 elapsed=27157s rate=0.18/s target=6000 remain=1195 eta=6752s
+[10:03:10]   [4/5] 高知 12R start
+[10:03:39] [progress] new=4806 skip=0 empty=0 fail=1 processed=4807 elapsed=27191s rate=0.18/s target=6000 remain=1194 eta=6754s
+[10:03:42] [progress] new=4807 skip=0 empty=0 fail=1 processed=4808 elapsed=27195s rate=0.18/s target=6000 remain=1193 eta=6748s
+[10:03:49] [progress] new=4809 skip=0 empty=0 fail=1 processed=4810 elapsed=27202s rate=0.18/s target=6000 remain=1191 eta=6735s
+[10:03:53] [progress] new=4811 skip=0 empty=0 fail=1 processed=4812 elapsed=27206s rate=0.18/s target=6000 remain=1189 eta=6722s
+[10:03:57] [progress] new=4812 skip=0 empty=0 fail=1 processed=4813 elapsed=27210s rate=0.18/s target=6000 remain=1188 eta=6716s
+[10:04:01] [progress] new=4813 skip=0 empty=0 fail=1 processed=4814 elapsed=27213s rate=0.18/s target=6000 remain=1187 eta=6710s
+[10:04:04] [progress] new=4814 skip=0 empty=0 fail=1 processed=4815 elapsed=27216s rate=0.18/s target=6000 remain=1186 eta=6704s
+[10:04:12] [progress] new=4816 skip=0 empty=0 fail=1 processed=4817 elapsed=27224s rate=0.18/s target=6000 remain=1184 eta=6692s
+[10:04:15] [progress] new=4817 skip=0 empty=0 fail=1 processed=4818 elapsed=27228s rate=0.18/s target=6000 remain=1183 eta=6685s
+[10:04:15]   [4/5] 高知 done new=12 R (total_new=4817)
+[10:04:15] [progress] new=4817 skip=0 empty=0 fail=1 processed=4818 elapsed=27228s rate=0.18/s target=6000 remain=1183 eta=6685s
+[10:04:21]   [5/5] 川崎 11R start
+[10:04:49] [progress] new=4818 skip=0 empty=0 fail=1 processed=4819 elapsed=27261s rate=0.18/s target=6000 remain=1182 eta=6687s
+[10:04:53] [progress] new=4819 skip=0 empty=0 fail=1 processed=4820 elapsed=27266s rate=0.18/s target=6000 remain=1181 eta=6681s
+[10:04:57] [progress] new=4820 skip=0 empty=0 fail=1 processed=4821 elapsed=27270s rate=0.18/s target=6000 remain=1180 eta=6675s
+[10:05:01] [progress] new=4822 skip=0 empty=0 fail=1 processed=4823 elapsed=27274s rate=0.18/s target=6000 remain=1178 eta=6662s
+[10:05:06] [progress] new=4823 skip=0 empty=0 fail=1 processed=4824 elapsed=27279s rate=0.18/s target=6000 remain=1177 eta=6656s
+[10:05:11] [progress] new=4825 skip=0 empty=0 fail=1 processed=4826 elapsed=27283s rate=0.18/s target=6000 remain=1175 eta=6643s
+[10:05:14] [progress] new=4826 skip=0 empty=0 fail=1 processed=4827 elapsed=27286s rate=0.18/s target=6000 remain=1174 eta=6636s
+[10:05:18] [progress] new=4827 skip=0 empty=0 fail=1 processed=4828 elapsed=27291s rate=0.18/s target=6000 remain=1173 eta=6631s
+[10:05:21]   [5/5] 川崎 done new=11 R (total_new=4828)
+[10:05:21] [progress] new=4828 skip=0 empty=0 fail=1 processed=4829 elapsed=27294s rate=0.18/s target=6000 remain=1172 eta=6624s
+[10:05:21] === day 163/365 2023-06-12 ===
+[10:05:23]   venues=3: ['船橋', '水沢', '笠松']
+[10:05:29]   [1/3] 船橋 12R start
+[10:05:59] [progress] new=4829 skip=0 empty=0 fail=1 processed=4830 elapsed=27331s rate=0.18/s target=6000 remain=1171 eta=6626s
+[10:06:05] [progress] new=4831 skip=0 empty=0 fail=1 processed=4832 elapsed=27337s rate=0.18/s target=6000 remain=1169 eta=6614s
+[10:06:09] [progress] new=4833 skip=0 empty=0 fail=1 processed=4834 elapsed=27342s rate=0.18/s target=6000 remain=1167 eta=6601s
+[10:06:16] [progress] new=4835 skip=0 empty=0 fail=1 processed=4836 elapsed=27349s rate=0.18/s target=6000 remain=1165 eta=6588s
+[10:06:21] [progress] new=4837 skip=0 empty=0 fail=1 processed=4838 elapsed=27354s rate=0.18/s target=6000 remain=1163 eta=6575s
+[10:06:25] [progress] new=4838 skip=0 empty=0 fail=1 processed=4839 elapsed=27358s rate=0.18/s target=6000 remain=1162 eta=6569s
+[10:06:31] [progress] new=4840 skip=0 empty=0 fail=1 processed=4841 elapsed=27364s rate=0.18/s target=6000 remain=1160 eta=6557s
+[10:06:31]   [1/3] 船橋 done new=12 R (total_new=4840)
+[10:06:31] [progress] new=4840 skip=0 empty=0 fail=1 processed=4841 elapsed=27364s rate=0.18/s target=6000 remain=1160 eta=6557s
+[10:06:35]   [2/3] 水沢 12R start
+[10:07:09] [progress] new=4841 skip=0 empty=0 fail=1 processed=4842 elapsed=27402s rate=0.18/s target=6000 remain=1159 eta=6559s
+[10:07:13] [progress] new=4843 skip=0 empty=0 fail=1 processed=4844 elapsed=27406s rate=0.18/s target=6000 remain=1157 eta=6546s
+[10:07:17] [progress] new=4844 skip=0 empty=0 fail=1 processed=4845 elapsed=27410s rate=0.18/s target=6000 remain=1156 eta=6540s
+[10:07:21] [progress] new=4845 skip=0 empty=0 fail=1 processed=4846 elapsed=27414s rate=0.18/s target=6000 remain=1155 eta=6534s
+[10:07:28] [progress] new=4847 skip=0 empty=0 fail=1 processed=4848 elapsed=27421s rate=0.18/s target=6000 remain=1153 eta=6521s
+[10:07:33] [progress] new=4849 skip=0 empty=0 fail=1 processed=4850 elapsed=27426s rate=0.18/s target=6000 remain=1151 eta=6509s
+[10:07:38] [progress] new=4850 skip=0 empty=0 fail=1 processed=4851 elapsed=27431s rate=0.18/s target=6000 remain=1150 eta=6503s
+[10:07:42] [progress] new=4851 skip=0 empty=0 fail=1 processed=4852 elapsed=27435s rate=0.18/s target=6000 remain=1149 eta=6497s
+[10:07:45]   [2/3] 水沢 done new=12 R (total_new=4852)
+[10:07:45] [progress] new=4852 skip=0 empty=0 fail=1 processed=4853 elapsed=27437s rate=0.18/s target=6000 remain=1148 eta=6490s
+[10:07:50]   [3/3] 笠松 12R start
+[10:08:21] [progress] new=4853 skip=0 empty=0 fail=1 processed=4854 elapsed=27474s rate=0.18/s target=6000 remain=1147 eta=6492s
+[10:08:25] [progress] new=4854 skip=0 empty=0 fail=1 processed=4855 elapsed=27477s rate=0.18/s target=6000 remain=1146 eta=6486s
+[10:08:31] [progress] new=4856 skip=0 empty=0 fail=1 processed=4857 elapsed=27483s rate=0.18/s target=6000 remain=1144 eta=6473s
+[10:08:36] [progress] new=4858 skip=0 empty=0 fail=1 processed=4859 elapsed=27489s rate=0.18/s target=6000 remain=1142 eta=6461s
+[10:08:41] [progress] new=4860 skip=0 empty=0 fail=1 processed=4861 elapsed=27494s rate=0.18/s target=6000 remain=1140 eta=6448s
+[10:08:45] [progress] new=4861 skip=0 empty=0 fail=1 processed=4862 elapsed=27498s rate=0.18/s target=6000 remain=1139 eta=6442s
+[10:08:50] [progress] new=4863 skip=0 empty=0 fail=1 processed=4864 elapsed=27503s rate=0.18/s target=6000 remain=1137 eta=6429s
+[10:08:53]   [3/3] 笠松 done new=12 R (total_new=4864)
+[10:08:53] [progress] new=4864 skip=0 empty=0 fail=1 processed=4865 elapsed=27506s rate=0.18/s target=6000 remain=1136 eta=6423s
+[10:08:53] === day 164/365 2023-06-13 ===
+[10:08:55]   venues=3: ['水沢', '名古屋', '金沢']
+[10:09:00]   [1/3] 水沢 12R start
+[10:09:31] [progress] new=4865 skip=0 empty=0 fail=1 processed=4866 elapsed=27544s rate=0.18/s target=6000 remain=1135 eta=6425s
+[10:09:35] [progress] new=4867 skip=0 empty=0 fail=1 processed=4868 elapsed=27548s rate=0.18/s target=6000 remain=1133 eta=6412s
+[10:09:38] [progress] new=4868 skip=0 empty=0 fail=1 processed=4869 elapsed=27551s rate=0.18/s target=6000 remain=1132 eta=6405s
+[10:09:41] [progress] new=4869 skip=0 empty=0 fail=1 processed=4870 elapsed=27554s rate=0.18/s target=6000 remain=1131 eta=6399s
+[10:09:46] [progress] new=4871 skip=0 empty=0 fail=1 processed=4872 elapsed=27559s rate=0.18/s target=6000 remain=1129 eta=6386s
+[10:09:51] [progress] new=4873 skip=0 empty=0 fail=1 processed=4874 elapsed=27563s rate=0.18/s target=6000 remain=1127 eta=6373s
+[10:09:54] [progress] new=4874 skip=0 empty=0 fail=1 processed=4875 elapsed=27567s rate=0.18/s target=6000 remain=1126 eta=6367s
+[10:09:58] [progress] new=4875 skip=0 empty=0 fail=1 processed=4876 elapsed=27570s rate=0.18/s target=6000 remain=1125 eta=6361s
+[10:10:03] [progress] new=4876 skip=0 empty=0 fail=1 processed=4877 elapsed=27575s rate=0.18/s target=6000 remain=1124 eta=6355s
+[10:10:03]   [1/3] 水沢 done new=12 R (total_new=4876)
+[10:10:03] [progress] new=4876 skip=0 empty=0 fail=1 processed=4877 elapsed=27575s rate=0.18/s target=6000 remain=1124 eta=6355s
+[10:10:10]   [2/3] 名古屋 12R start
+[10:10:40] [progress] new=4877 skip=0 empty=0 fail=1 processed=4878 elapsed=27613s rate=0.18/s target=6000 remain=1123 eta=6357s
+[10:10:45] [progress] new=4879 skip=0 empty=0 fail=1 processed=4880 elapsed=27617s rate=0.18/s target=6000 remain=1121 eta=6344s
+[10:10:49] [progress] new=4881 skip=0 empty=0 fail=1 processed=4882 elapsed=27622s rate=0.18/s target=6000 remain=1119 eta=6331s
+[10:10:54] [progress] new=4883 skip=0 empty=0 fail=1 processed=4884 elapsed=27626s rate=0.18/s target=6000 remain=1117 eta=6318s
+[10:10:58] [progress] new=4884 skip=0 empty=0 fail=1 processed=4885 elapsed=27630s rate=0.18/s target=6000 remain=1116 eta=6312s
+[10:11:04] [progress] new=4886 skip=0 empty=0 fail=1 processed=4887 elapsed=27636s rate=0.18/s target=6000 remain=1114 eta=6300s
+[10:11:09] [progress] new=4888 skip=0 empty=0 fail=1 processed=4889 elapsed=27642s rate=0.18/s target=6000 remain=1112 eta=6287s
+[10:11:09]   [2/3] 名古屋 done new=12 R (total_new=4888)
+[10:11:09] [progress] new=4888 skip=0 empty=0 fail=1 processed=4889 elapsed=27642s rate=0.18/s target=6000 remain=1112 eta=6287s
+[10:11:18]   [3/3] 金沢 12R start
+[10:11:50] [progress] new=4889 skip=0 empty=0 fail=1 processed=4890 elapsed=27683s rate=0.18/s target=6000 remain=1111 eta=6289s
+[10:11:54] [progress] new=4890 skip=0 empty=0 fail=1 processed=4891 elapsed=27686s rate=0.18/s target=6000 remain=1110 eta=6283s
+[10:11:58] [progress] new=4891 skip=0 empty=0 fail=1 processed=4892 elapsed=27691s rate=0.18/s target=6000 remain=1109 eta=6277s
+[10:12:03] [progress] new=4892 skip=0 empty=0 fail=1 processed=4893 elapsed=27695s rate=0.18/s target=6000 remain=1108 eta=6272s
+[10:12:10] [progress] new=4894 skip=0 empty=0 fail=1 processed=4895 elapsed=27703s rate=0.18/s target=6000 remain=1106 eta=6259s
+[10:12:14] [progress] new=4895 skip=0 empty=0 fail=1 processed=4896 elapsed=27707s rate=0.18/s target=6000 remain=1105 eta=6253s
+[10:12:19] [progress] new=4896 skip=0 empty=0 fail=1 processed=4897 elapsed=27711s rate=0.18/s target=6000 remain=1104 eta=6247s
+[10:12:23] [progress] new=4897 skip=0 empty=0 fail=1 processed=4898 elapsed=27716s rate=0.18/s target=6000 remain=1103 eta=6241s
+[10:12:26] [progress] new=4898 skip=0 empty=0 fail=1 processed=4899 elapsed=27719s rate=0.18/s target=6000 remain=1102 eta=6235s
+[10:12:31] [progress] new=4899 skip=0 empty=0 fail=1 processed=4900 elapsed=27723s rate=0.18/s target=6000 remain=1101 eta=6229s
+[10:12:35] [progress] new=4900 skip=0 empty=0 fail=1 processed=4901 elapsed=27728s rate=0.18/s target=6000 remain=1100 eta=6223s
+[10:12:35]   [3/3] 金沢 done new=12 R (total_new=4900)
+[10:12:35] [progress] new=4900 skip=0 empty=0 fail=1 processed=4901 elapsed=27728s rate=0.18/s target=6000 remain=1100 eta=6223s
+[10:12:35] === day 165/365 2023-06-14 ===
+[10:12:39]   venues=3: ['34', '金沢', '園田']
+[10:12:44]   [1/3] 34 12R start
+[10:13:13] [progress] new=4901 skip=0 empty=0 fail=1 processed=4902 elapsed=27766s rate=0.18/s target=6000 remain=1099 eta=6225s
+[10:13:18] [progress] new=4902 skip=0 empty=0 fail=1 processed=4903 elapsed=27770s rate=0.18/s target=6000 remain=1098 eta=6219s
+[10:13:23] [progress] new=4904 skip=0 empty=0 fail=1 processed=4905 elapsed=27775s rate=0.18/s target=6000 remain=1096 eta=6206s
+[10:13:26] [progress] new=4905 skip=0 empty=0 fail=1 processed=4906 elapsed=27779s rate=0.18/s target=6000 remain=1095 eta=6200s
+[10:13:29] [progress] new=4906 skip=0 empty=0 fail=1 processed=4907 elapsed=27782s rate=0.18/s target=6000 remain=1094 eta=6194s
+[10:13:33] [progress] new=4907 skip=0 empty=0 fail=1 processed=4908 elapsed=27786s rate=0.18/s target=6000 remain=1093 eta=6188s
+[10:13:37] [progress] new=4908 skip=0 empty=0 fail=1 processed=4909 elapsed=27789s rate=0.18/s target=6000 remain=1092 eta=6182s
+[10:13:41] [progress] new=4909 skip=0 empty=0 fail=1 processed=4910 elapsed=27794s rate=0.18/s target=6000 remain=1091 eta=6176s
+[10:13:45] [progress] new=4910 skip=0 empty=0 fail=1 processed=4911 elapsed=27797s rate=0.18/s target=6000 remain=1090 eta=6170s
+[10:13:48] [progress] new=4911 skip=0 empty=0 fail=1 processed=4912 elapsed=27800s rate=0.18/s target=6000 remain=1089 eta=6163s
+[10:13:52] [progress] new=4912 skip=0 empty=0 fail=1 processed=4913 elapsed=27804s rate=0.18/s target=6000 remain=1088 eta=6157s
+[10:13:52]   [1/3] 34 done new=12 R (total_new=4912)
+[10:13:52] [progress] new=4912 skip=0 empty=0 fail=1 processed=4913 elapsed=27804s rate=0.18/s target=6000 remain=1088 eta=6157s
+[10:13:57]   [2/3] 金沢 12R start
+[10:14:30] [progress] new=4913 skip=0 empty=0 fail=1 processed=4914 elapsed=27842s rate=0.18/s target=6000 remain=1087 eta=6159s
+[10:14:34] [progress] new=4914 skip=0 empty=0 fail=1 processed=4915 elapsed=27847s rate=0.18/s target=6000 remain=1086 eta=6153s
+[10:14:41] [progress] new=4916 skip=0 empty=0 fail=1 processed=4917 elapsed=27854s rate=0.18/s target=6000 remain=1084 eta=6141s
+[10:14:45] [progress] new=4917 skip=0 empty=0 fail=1 processed=4918 elapsed=27857s rate=0.18/s target=6000 remain=1083 eta=6135s
+[10:14:49] [progress] new=4918 skip=0 empty=0 fail=1 processed=4919 elapsed=27862s rate=0.18/s target=6000 remain=1082 eta=6129s
+[10:14:54] [progress] new=4919 skip=0 empty=0 fail=1 processed=4920 elapsed=27867s rate=0.18/s target=6000 remain=1081 eta=6123s
+[10:15:00] [progress] new=4921 skip=0 empty=0 fail=1 processed=4922 elapsed=27872s rate=0.18/s target=6000 remain=1079 eta=6110s
+[10:15:04] [progress] new=4922 skip=0 empty=0 fail=1 processed=4923 elapsed=27876s rate=0.18/s target=6000 remain=1078 eta=6104s
+[10:15:07] [progress] new=4923 skip=0 empty=0 fail=1 processed=4924 elapsed=27880s rate=0.18/s target=6000 remain=1077 eta=6098s
+[10:15:11] [progress] new=4924 skip=0 empty=0 fail=1 processed=4925 elapsed=27884s rate=0.18/s target=6000 remain=1076 eta=6092s
+[10:15:11]   [2/3] 金沢 done new=12 R (total_new=4924)
+[10:15:11] [progress] new=4924 skip=0 empty=0 fail=1 processed=4925 elapsed=27884s rate=0.18/s target=6000 remain=1076 eta=6092s
+[10:15:16]   [3/3] 園田 12R start
+[10:15:48] [progress] new=4925 skip=0 empty=0 fail=1 processed=4926 elapsed=27921s rate=0.18/s target=6000 remain=1075 eta=6093s
+[10:15:53] [progress] new=4926 skip=0 empty=0 fail=1 processed=4927 elapsed=27925s rate=0.18/s target=6000 remain=1074 eta=6087s
+[10:15:57] [progress] new=4928 skip=0 empty=0 fail=1 processed=4929 elapsed=27930s rate=0.18/s target=6000 remain=1072 eta=6074s
+[10:16:01] [progress] new=4929 skip=0 empty=0 fail=1 processed=4930 elapsed=27934s rate=0.18/s target=6000 remain=1071 eta=6068s
+[10:16:06] [progress] new=4931 skip=0 empty=0 fail=1 processed=4932 elapsed=27938s rate=0.18/s target=6000 remain=1069 eta=6056s
+[10:16:10] [progress] new=4932 skip=0 empty=0 fail=1 processed=4933 elapsed=27943s rate=0.18/s target=6000 remain=1068 eta=6050s
+[10:16:14] [progress] new=4933 skip=0 empty=0 fail=1 processed=4934 elapsed=27947s rate=0.18/s target=6000 remain=1067 eta=6044s
+[10:16:18] [progress] new=4934 skip=0 empty=0 fail=1 processed=4935 elapsed=27951s rate=0.18/s target=6000 remain=1066 eta=6038s
+[10:16:21] [progress] new=4935 skip=0 empty=0 fail=1 processed=4936 elapsed=27954s rate=0.18/s target=6000 remain=1065 eta=6031s
+[10:16:26] [progress] new=4936 skip=0 empty=0 fail=1 processed=4937 elapsed=27958s rate=0.18/s target=6000 remain=1064 eta=6025s
+[10:16:26]   [3/3] 園田 done new=12 R (total_new=4936)
+[10:16:26] [progress] new=4936 skip=0 empty=0 fail=1 processed=4937 elapsed=27958s rate=0.18/s target=6000 remain=1064 eta=6025s
+[10:16:26] === day 166/365 2023-06-15 ===
+[10:16:27]   venues=2: ['金沢', '園田']
+[10:16:32]   [1/2] 金沢 12R start
+[10:17:04] [progress] new=4937 skip=0 empty=0 fail=1 processed=4938 elapsed=27997s rate=0.18/s target=6000 remain=1063 eta=6027s
+[10:17:07] [progress] new=4938 skip=0 empty=0 fail=1 processed=4939 elapsed=28000s rate=0.18/s target=6000 remain=1062 eta=6021s
+[10:17:12] [progress] new=4939 skip=0 empty=0 fail=1 processed=4940 elapsed=28004s rate=0.18/s target=6000 remain=1061 eta=6015s
+[10:17:16] [progress] new=4940 skip=0 empty=0 fail=1 processed=4941 elapsed=28008s rate=0.18/s target=6000 remain=1060 eta=6009s
+[10:17:23] [progress] new=4942 skip=0 empty=0 fail=1 processed=4943 elapsed=28015s rate=0.18/s target=6000 remain=1058 eta=5996s
+[10:17:27] [progress] new=4943 skip=0 empty=0 fail=1 processed=4944 elapsed=28019s rate=0.18/s target=6000 remain=1057 eta=5990s
+[10:17:31] [progress] new=4944 skip=0 empty=0 fail=1 processed=4945 elapsed=28023s rate=0.18/s target=6000 remain=1056 eta=5984s
+[10:17:34] [progress] new=4945 skip=0 empty=0 fail=1 processed=4946 elapsed=28026s rate=0.18/s target=6000 remain=1055 eta=5978s
+[10:17:41] [progress] new=4947 skip=0 empty=0 fail=1 processed=4948 elapsed=28034s rate=0.18/s target=6000 remain=1053 eta=5966s
+[10:17:45] [progress] new=4948 skip=0 empty=0 fail=1 processed=4949 elapsed=28038s rate=0.18/s target=6000 remain=1052 eta=5960s
+[10:17:45]   [1/2] 金沢 done new=12 R (total_new=4948)
+[10:17:45] [progress] new=4948 skip=0 empty=0 fail=1 processed=4949 elapsed=28038s rate=0.18/s target=6000 remain=1052 eta=5960s
+[10:17:49]   [2/2] 園田 12R start
+[10:18:21] [progress] new=4949 skip=0 empty=0 fail=1 processed=4950 elapsed=28073s rate=0.18/s target=6000 remain=1051 eta=5961s
+[10:18:25] [progress] new=4950 skip=0 empty=0 fail=1 processed=4951 elapsed=28077s rate=0.18/s target=6000 remain=1050 eta=5955s
+[10:18:28] [progress] new=4951 skip=0 empty=0 fail=1 processed=4952 elapsed=28081s rate=0.18/s target=6000 remain=1049 eta=5948s
+[10:18:35] [progress] new=4953 skip=0 empty=0 fail=1 processed=4954 elapsed=28087s rate=0.18/s target=6000 remain=1047 eta=5936s
+[10:18:41] [progress] new=4955 skip=0 empty=0 fail=1 processed=4956 elapsed=28093s rate=0.18/s target=6000 remain=1045 eta=5924s
+[10:18:45] [progress] new=4956 skip=0 empty=0 fail=1 processed=4957 elapsed=28097s rate=0.18/s target=6000 remain=1044 eta=5918s
+[10:18:50] [progress] new=4957 skip=0 empty=0 fail=1 processed=4958 elapsed=28102s rate=0.18/s target=6000 remain=1043 eta=5912s
+[10:18:54] [progress] new=4958 skip=0 empty=0 fail=1 processed=4959 elapsed=28106s rate=0.18/s target=6000 remain=1042 eta=5906s
+[10:18:57] [progress] new=4959 skip=0 empty=0 fail=1 processed=4960 elapsed=28109s rate=0.18/s target=6000 remain=1041 eta=5900s
+[10:19:01] [progress] new=4960 skip=0 empty=0 fail=1 processed=4961 elapsed=28114s rate=0.18/s target=6000 remain=1040 eta=5894s
+[10:19:01]   [2/2] 園田 done new=12 R (total_new=4960)
+[10:19:01] [progress] new=4960 skip=0 empty=0 fail=1 processed=4961 elapsed=28114s rate=0.18/s target=6000 remain=1040 eta=5894s
+[10:19:01] === day 167/365 2023-06-16 ===
+[10:19:03]   venues=2: ['金沢', '園田']
+[10:19:10]   [1/2] 金沢 12R start
+[10:19:36] [progress] new=4961 skip=0 empty=0 fail=1 processed=4962 elapsed=28148s rate=0.18/s target=6000 remain=1039 eta=5894s
+[10:19:40] [progress] new=4962 skip=0 empty=0 fail=1 processed=4963 elapsed=28153s rate=0.18/s target=6000 remain=1038 eta=5888s
+[10:19:43] [progress] new=4963 skip=0 empty=0 fail=1 processed=4964 elapsed=28156s rate=0.18/s target=6000 remain=1037 eta=5882s
+[10:19:48] [progress] new=4964 skip=0 empty=0 fail=1 processed=4965 elapsed=28160s rate=0.18/s target=6000 remain=1036 eta=5876s
+[10:19:52] [progress] new=4965 skip=0 empty=0 fail=1 processed=4966 elapsed=28165s rate=0.18/s target=6000 remain=1035 eta=5870s
+[10:19:57] [progress] new=4967 skip=0 empty=0 fail=1 processed=4968 elapsed=28170s rate=0.18/s target=6000 remain=1033 eta=5857s
+[10:20:02] [progress] new=4968 skip=0 empty=0 fail=1 processed=4969 elapsed=28175s rate=0.18/s target=6000 remain=1032 eta=5852s
+[10:20:06] [progress] new=4969 skip=0 empty=0 fail=1 processed=4970 elapsed=28179s rate=0.18/s target=6000 remain=1031 eta=5846s
+[10:20:10] [progress] new=4970 skip=0 empty=0 fail=1 processed=4971 elapsed=28183s rate=0.18/s target=6000 remain=1030 eta=5840s
+[10:20:14] [progress] new=4971 skip=0 empty=0 fail=1 processed=4972 elapsed=28187s rate=0.18/s target=6000 remain=1029 eta=5834s
+[10:20:17]   [1/2] 金沢 done new=12 R (total_new=4972)
+[10:20:17] [progress] new=4972 skip=0 empty=0 fail=1 processed=4973 elapsed=28189s rate=0.18/s target=6000 remain=1028 eta=5827s
+[10:20:22]   [2/2] 園田 12R start
+[10:20:53] [progress] new=4973 skip=0 empty=0 fail=1 processed=4974 elapsed=28226s rate=0.18/s target=6000 remain=1027 eta=5828s
+[10:20:58] [progress] new=4975 skip=0 empty=0 fail=1 processed=4976 elapsed=28230s rate=0.18/s target=6000 remain=1025 eta=5815s
+[10:21:05] [progress] new=4977 skip=0 empty=0 fail=1 processed=4978 elapsed=28237s rate=0.18/s target=6000 remain=1023 eta=5803s
+[10:21:11] [progress] new=4979 skip=0 empty=0 fail=1 processed=4980 elapsed=28244s rate=0.18/s target=6000 remain=1021 eta=5791s
+[10:21:15] [progress] new=4980 skip=0 empty=0 fail=1 processed=4981 elapsed=28248s rate=0.18/s target=6000 remain=1020 eta=5785s
+[10:21:19] [progress] new=4981 skip=0 empty=0 fail=1 processed=4982 elapsed=28252s rate=0.18/s target=6000 remain=1019 eta=5779s
+[10:21:23] [progress] new=4982 skip=0 empty=0 fail=1 processed=4983 elapsed=28255s rate=0.18/s target=6000 remain=1018 eta=5772s
+[10:21:27] [progress] new=4984 skip=0 empty=0 fail=1 processed=4985 elapsed=28260s rate=0.18/s target=6000 remain=1016 eta=5760s
+[10:21:27]   [2/2] 園田 done new=12 R (total_new=4984)
+[10:21:27] [progress] new=4984 skip=0 empty=0 fail=1 processed=4985 elapsed=28260s rate=0.18/s target=6000 remain=1016 eta=5760s
+[10:21:27] === day 168/365 2023-06-17 ===
+[10:21:29]   venues=3: ['船橋', '高知', '川崎']
+[10:21:34]   [1/3] 船橋 12R start
+[10:22:04] [progress] new=4985 skip=0 empty=0 fail=1 processed=4986 elapsed=28296s rate=0.18/s target=6000 remain=1015 eta=5760s
+[10:22:11] [progress] new=4987 skip=0 empty=0 fail=1 processed=4988 elapsed=28303s rate=0.18/s target=6000 remain=1013 eta=5748s
+[10:22:14] [progress] new=4989 skip=0 empty=0 fail=1 processed=4990 elapsed=28307s rate=0.18/s target=6000 remain=1011 eta=5735s
+[10:22:18] [progress] new=4990 skip=0 empty=0 fail=1 processed=4991 elapsed=28311s rate=0.18/s target=6000 remain=1010 eta=5729s
+[10:22:23] [progress] new=4992 skip=0 empty=0 fail=1 processed=4993 elapsed=28316s rate=0.18/s target=6000 remain=1008 eta=5716s
+[10:22:29] [progress] new=4994 skip=0 empty=0 fail=1 processed=4995 elapsed=28322s rate=0.18/s target=6000 remain=1006 eta=5704s
+[10:22:35] [progress] new=4996 skip=0 empty=0 fail=1 processed=4997 elapsed=28327s rate=0.18/s target=6000 remain=1004 eta=5692s
+[10:22:35]   [1/3] 船橋 done new=12 R (total_new=4996)
+[10:22:35] [progress] new=4996 skip=0 empty=0 fail=1 processed=4997 elapsed=28327s rate=0.18/s target=6000 remain=1004 eta=5692s
+[10:22:40]   [2/3] 高知 12R start
+[10:23:10] [progress] new=4997 skip=0 empty=0 fail=1 processed=4998 elapsed=28362s rate=0.18/s target=6000 remain=1003 eta=5692s
+[10:23:15] [progress] new=4999 skip=0 empty=0 fail=1 processed=5000 elapsed=28367s rate=0.18/s target=6000 remain=1001 eta=5679s
+[10:23:18] [progress] new=5000 skip=0 empty=0 fail=1 processed=5001 elapsed=28371s rate=0.18/s target=6000 remain=1000 eta=5673s
+[10:23:21] [progress] new=5001 skip=0 empty=0 fail=1 processed=5002 elapsed=28374s rate=0.18/s target=6000 remain=999 eta=5667s
+[10:23:25] [progress] new=5002 skip=0 empty=0 fail=1 processed=5003 elapsed=28378s rate=0.18/s target=6000 remain=998 eta=5661s
+[10:23:29] [progress] new=5003 skip=0 empty=0 fail=1 processed=5004 elapsed=28382s rate=0.18/s target=6000 remain=997 eta=5655s
+[10:23:32] [progress] new=5004 skip=0 empty=0 fail=1 processed=5005 elapsed=28385s rate=0.18/s target=6000 remain=996 eta=5649s
+[10:23:39] [progress] new=5006 skip=0 empty=0 fail=1 processed=5007 elapsed=28391s rate=0.18/s target=6000 remain=994 eta=5636s
+[10:23:44] [progress] new=5008 skip=0 empty=0 fail=1 processed=5009 elapsed=28397s rate=0.18/s target=6000 remain=992 eta=5624s
+[10:23:44]   [2/3] 高知 done new=12 R (total_new=5008)
+[10:23:44] [progress] new=5008 skip=0 empty=0 fail=1 processed=5009 elapsed=28397s rate=0.18/s target=6000 remain=992 eta=5624s
+[10:23:48]   [3/3] 川崎 11R start
+[10:24:19] [progress] new=5009 skip=0 empty=0 fail=1 processed=5010 elapsed=28431s rate=0.18/s target=6000 remain=991 eta=5624s
+[10:24:25] [progress] new=5011 skip=0 empty=0 fail=1 processed=5012 elapsed=28437s rate=0.18/s target=6000 remain=989 eta=5611s
+[10:24:29] [progress] new=5013 skip=0 empty=0 fail=1 processed=5014 elapsed=28442s rate=0.18/s target=6000 remain=987 eta=5599s
+[10:24:36] [progress] new=5015 skip=0 empty=0 fail=1 processed=5016 elapsed=28449s rate=0.18/s target=6000 remain=985 eta=5587s
+[10:24:40] [progress] new=5016 skip=0 empty=0 fail=1 processed=5017 elapsed=28453s rate=0.18/s target=6000 remain=984 eta=5581s
+[10:24:46] [progress] new=5018 skip=0 empty=0 fail=1 processed=5019 elapsed=28459s rate=0.18/s target=6000 remain=982 eta=5568s
+[10:24:49] [progress] new=5019 skip=0 empty=0 fail=1 processed=5020 elapsed=28462s rate=0.18/s target=6000 remain=981 eta=5562s
+[10:24:49]   [3/3] 川崎 done new=11 R (total_new=5019)
+[10:24:49] [progress] new=5019 skip=0 empty=0 fail=1 processed=5020 elapsed=28462s rate=0.18/s target=6000 remain=981 eta=5562s
+[10:24:49] === day 169/365 2023-06-18 ===
+[10:24:50]   venues=5: ['船橋', '水沢', '名古屋', '高知', '川崎']
+[10:24:54]   [1/5] 船橋 12R start
+[10:25:21] [progress] new=5020 skip=0 empty=0 fail=1 processed=5021 elapsed=28494s rate=0.18/s target=6000 remain=980 eta=5561s
+[10:25:27] [progress] new=5022 skip=0 empty=0 fail=1 processed=5023 elapsed=28499s rate=0.18/s target=6000 remain=978 eta=5549s
+[10:25:31] [progress] new=5024 skip=0 empty=0 fail=1 processed=5025 elapsed=28503s rate=0.18/s target=6000 remain=976 eta=5536s
+[10:25:36] [progress] new=5025 skip=0 empty=0 fail=1 processed=5026 elapsed=28508s rate=0.18/s target=6000 remain=975 eta=5530s
+[10:25:41] [progress] new=5027 skip=0 empty=0 fail=1 processed=5028 elapsed=28514s rate=0.18/s target=6000 remain=973 eta=5518s
+[10:25:47] [progress] new=5029 skip=0 empty=0 fail=1 processed=5030 elapsed=28520s rate=0.18/s target=6000 remain=971 eta=5506s
+[10:25:51] [progress] new=5030 skip=0 empty=0 fail=1 processed=5031 elapsed=28524s rate=0.18/s target=6000 remain=970 eta=5500s
+[10:25:55] [progress] new=5031 skip=0 empty=0 fail=1 processed=5032 elapsed=28527s rate=0.18/s target=6000 remain=969 eta=5493s
+[10:25:55]   [1/5] 船橋 done new=12 R (total_new=5031)
+[10:25:55] [progress] new=5031 skip=0 empty=0 fail=1 processed=5032 elapsed=28527s rate=0.18/s target=6000 remain=969 eta=5493s
+[10:26:01]   [2/5] 水沢 11R start
+[10:26:29] [progress] new=5032 skip=0 empty=0 fail=1 processed=5033 elapsed=28561s rate=0.18/s target=6000 remain=968 eta=5493s
+[10:26:33] [progress] new=5034 skip=0 empty=0 fail=1 processed=5035 elapsed=28565s rate=0.18/s target=6000 remain=966 eta=5480s
+[10:26:36] [progress] new=5035 skip=0 empty=0 fail=1 processed=5036 elapsed=28569s rate=0.18/s target=6000 remain=965 eta=5474s
+[10:26:43] [progress] new=5037 skip=0 empty=0 fail=1 processed=5038 elapsed=28576s rate=0.18/s target=6000 remain=963 eta=5462s
+[10:26:48] [progress] new=5039 skip=0 empty=0 fail=1 processed=5040 elapsed=28581s rate=0.18/s target=6000 remain=961 eta=5450s
+[10:26:52] [progress] new=5041 skip=0 empty=0 fail=1 processed=5042 elapsed=28585s rate=0.18/s target=6000 remain=959 eta=5437s
+[10:26:57] [progress] new=5042 skip=0 empty=0 fail=1 processed=5043 elapsed=28589s rate=0.18/s target=6000 remain=958 eta=5431s
+[10:26:57]   [2/5] 水沢 done new=11 R (total_new=5042)
+[10:26:57] [progress] new=5042 skip=0 empty=0 fail=1 processed=5043 elapsed=28589s rate=0.18/s target=6000 remain=958 eta=5431s
+[10:27:02]   [3/5] 名古屋 11R start
+[10:27:31] [progress] new=5043 skip=0 empty=0 fail=1 processed=5044 elapsed=28623s rate=0.18/s target=6000 remain=957 eta=5431s
+[10:27:35] [progress] new=5044 skip=0 empty=0 fail=1 processed=5045 elapsed=28628s rate=0.18/s target=6000 remain=956 eta=5425s
+[10:27:39] [progress] new=5046 skip=0 empty=0 fail=1 processed=5047 elapsed=28632s rate=0.18/s target=6000 remain=954 eta=5412s
+[10:27:43] [progress] new=5047 skip=0 empty=0 fail=1 processed=5048 elapsed=28636s rate=0.18/s target=6000 remain=953 eta=5406s
+[10:27:49] [progress] new=5049 skip=0 empty=0 fail=1 processed=5050 elapsed=28642s rate=0.18/s target=6000 remain=951 eta=5394s
+[10:27:55] [progress] new=5051 skip=0 empty=0 fail=1 processed=5052 elapsed=28647s rate=0.18/s target=6000 remain=949 eta=5381s
+[10:27:59] [progress] new=5052 skip=0 empty=0 fail=1 processed=5053 elapsed=28651s rate=0.18/s target=6000 remain=948 eta=5375s
+[10:28:01]   [3/5] 名古屋 done new=11 R (total_new=5053)
+[10:28:01] [progress] new=5053 skip=0 empty=0 fail=1 processed=5054 elapsed=28654s rate=0.18/s target=6000 remain=947 eta=5369s
+[10:28:05]   [4/5] 高知 12R start
+[10:28:35] [progress] new=5054 skip=0 empty=0 fail=1 processed=5055 elapsed=28688s rate=0.18/s target=6000 remain=946 eta=5369s
+[10:28:39] [progress] new=5055 skip=0 empty=0 fail=1 processed=5056 elapsed=28692s rate=0.18/s target=6000 remain=945 eta=5363s
+[10:28:43] [progress] new=5056 skip=0 empty=0 fail=1 processed=5057 elapsed=28695s rate=0.18/s target=6000 remain=944 eta=5357s
+[10:28:50] [progress] new=5058 skip=0 empty=0 fail=1 processed=5059 elapsed=28703s rate=0.18/s target=6000 remain=942 eta=5345s
+[10:28:53] [progress] new=5059 skip=0 empty=0 fail=1 processed=5060 elapsed=28706s rate=0.18/s target=6000 remain=941 eta=5338s
+[10:28:56] [progress] new=5060 skip=0 empty=0 fail=1 processed=5061 elapsed=28709s rate=0.18/s target=6000 remain=940 eta=5332s
+[10:29:00] [progress] new=5061 skip=0 empty=0 fail=1 processed=5062 elapsed=28712s rate=0.18/s target=6000 remain=939 eta=5326s
+[10:29:03] [progress] new=5062 skip=0 empty=0 fail=1 processed=5063 elapsed=28715s rate=0.18/s target=6000 remain=938 eta=5320s
+[10:29:08] [progress] new=5063 skip=0 empty=0 fail=1 processed=5064 elapsed=28720s rate=0.18/s target=6000 remain=937 eta=5314s
+[10:29:13] [progress] new=5065 skip=0 empty=0 fail=1 processed=5066 elapsed=28726s rate=0.18/s target=6000 remain=935 eta=5302s
+[10:29:13]   [4/5] 高知 done new=12 R (total_new=5065)
+[10:29:13] [progress] new=5065 skip=0 empty=0 fail=1 processed=5066 elapsed=28726s rate=0.18/s target=6000 remain=935 eta=5302s
+[10:29:18]   [5/5] 川崎 11R start
+[10:29:45] [progress] new=5066 skip=0 empty=0 fail=1 processed=5067 elapsed=28758s rate=0.18/s target=6000 remain=934 eta=5301s
+[10:29:49] [progress] new=5067 skip=0 empty=0 fail=1 processed=5068 elapsed=28762s rate=0.18/s target=6000 remain=933 eta=5295s
+[10:29:54] [progress] new=5068 skip=0 empty=0 fail=1 processed=5069 elapsed=28766s rate=0.18/s target=6000 remain=932 eta=5289s
+[10:29:58] [progress] new=5069 skip=0 empty=0 fail=1 processed=5070 elapsed=28770s rate=0.18/s target=6000 remain=931 eta=5283s
+[10:30:02] [progress] new=5071 skip=0 empty=0 fail=1 processed=5072 elapsed=28775s rate=0.18/s target=6000 remain=929 eta=5270s
+[10:30:06] [progress] new=5072 skip=0 empty=0 fail=1 processed=5073 elapsed=28779s rate=0.18/s target=6000 remain=928 eta=5264s
+[10:30:10] [progress] new=5073 skip=0 empty=0 fail=1 processed=5074 elapsed=28783s rate=0.18/s target=6000 remain=927 eta=5258s
+[10:30:17] [progress] new=5075 skip=0 empty=0 fail=1 processed=5076 elapsed=28790s rate=0.18/s target=6000 remain=925 eta=5246s
+[10:30:19]   [5/5] 川崎 done new=11 R (total_new=5076)
+[10:30:19] [progress] new=5076 skip=0 empty=0 fail=1 processed=5077 elapsed=28792s rate=0.18/s target=6000 remain=924 eta=5240s
+[10:30:19] === day 170/365 2023-06-19 ===
+[10:30:22]   venues=3: ['船橋', '水沢', '川崎']
+[10:30:27]   [1/3] 船橋 12R start
+[10:30:58] [progress] new=5077 skip=0 empty=0 fail=1 processed=5078 elapsed=28830s rate=0.18/s target=6000 remain=923 eta=5240s
+[10:31:04] [progress] new=5079 skip=0 empty=0 fail=1 processed=5080 elapsed=28836s rate=0.18/s target=6000 remain=921 eta=5228s
+[10:31:08] [progress] new=5081 skip=0 empty=0 fail=1 processed=5082 elapsed=28840s rate=0.18/s target=6000 remain=919 eta=5215s
+[10:31:11] [progress] new=5082 skip=0 empty=0 fail=1 processed=5083 elapsed=28843s rate=0.18/s target=6000 remain=918 eta=5209s
+[10:31:17] [progress] new=5084 skip=0 empty=0 fail=1 processed=5085 elapsed=28850s rate=0.18/s target=6000 remain=916 eta=5197s
+[10:31:23] [progress] new=5086 skip=0 empty=0 fail=1 processed=5087 elapsed=28855s rate=0.18/s target=6000 remain=914 eta=5185s
+[10:31:26] [progress] new=5087 skip=0 empty=0 fail=1 processed=5088 elapsed=28858s rate=0.18/s target=6000 remain=913 eta=5178s
+[10:31:28]   [1/3] 船橋 done new=12 R (total_new=5088)
+[10:31:28] [progress] new=5088 skip=0 empty=0 fail=1 processed=5089 elapsed=28860s rate=0.18/s target=6000 remain=912 eta=5172s
+[10:31:35]   [2/3] 水沢 12R start
+[10:32:06] [progress] new=5089 skip=0 empty=0 fail=1 processed=5090 elapsed=28898s rate=0.18/s target=6000 remain=911 eta=5172s
+[10:32:10] [progress] new=5091 skip=0 empty=0 fail=1 processed=5092 elapsed=28902s rate=0.18/s target=6000 remain=909 eta=5160s
+[10:32:15] [progress] new=5093 skip=0 empty=0 fail=1 processed=5094 elapsed=28907s rate=0.18/s target=6000 remain=907 eta=5147s
+[10:32:19] [progress] new=5094 skip=0 empty=0 fail=1 processed=5095 elapsed=28911s rate=0.18/s target=6000 remain=906 eta=5141s
+[10:32:25] [progress] new=5096 skip=0 empty=0 fail=1 processed=5097 elapsed=28917s rate=0.18/s target=6000 remain=904 eta=5129s
+[10:32:28] [progress] new=5097 skip=0 empty=0 fail=1 processed=5098 elapsed=28921s rate=0.18/s target=6000 remain=903 eta=5123s
+[10:32:33] [progress] new=5099 skip=0 empty=0 fail=1 processed=5100 elapsed=28926s rate=0.18/s target=6000 remain=901 eta=5110s
+[10:32:36]   [2/3] 水沢 done new=12 R (total_new=5100)
+[10:32:36] [progress] new=5100 skip=0 empty=0 fail=1 processed=5101 elapsed=28929s rate=0.18/s target=6000 remain=900 eta=5104s
+[10:32:42]   [3/3] 川崎 11R start
+[10:33:09] [progress] new=5101 skip=0 empty=0 fail=1 processed=5102 elapsed=28962s rate=0.18/s target=6000 remain=899 eta=5103s
+[10:33:13] [progress] new=5102 skip=0 empty=0 fail=1 processed=5103 elapsed=28966s rate=0.18/s target=6000 remain=898 eta=5097s
+[10:33:16] [progress] new=5103 skip=0 empty=0 fail=1 processed=5104 elapsed=28969s rate=0.18/s target=6000 remain=897 eta=5091s
+[10:33:22] [progress] new=5105 skip=0 empty=0 fail=1 processed=5106 elapsed=28975s rate=0.18/s target=6000 remain=895 eta=5079s
+[10:33:26] [progress] new=5106 skip=0 empty=0 fail=1 processed=5107 elapsed=28979s rate=0.18/s target=6000 remain=894 eta=5073s
+[10:33:30] [progress] new=5107 skip=0 empty=0 fail=1 processed=5108 elapsed=28983s rate=0.18/s target=6000 remain=893 eta=5067s
+[10:33:37] [progress] new=5109 skip=0 empty=0 fail=1 processed=5110 elapsed=28990s rate=0.18/s target=6000 remain=891 eta=5055s
+[10:33:44] [progress] new=5111 skip=0 empty=0 fail=1 processed=5112 elapsed=28997s rate=0.18/s target=6000 remain=889 eta=5043s
+[10:33:44]   [3/3] 川崎 done new=11 R (total_new=5111)
+[10:33:44] [progress] new=5111 skip=0 empty=0 fail=1 processed=5112 elapsed=28997s rate=0.18/s target=6000 remain=889 eta=5043s
+[10:33:44] === day 171/365 2023-06-20 ===
+[10:33:45]   venues=3: ['水沢', '名古屋', '笠松']
+[10:33:51]   [1/3] 水沢 12R start
+[10:34:20] [progress] new=5112 skip=0 empty=0 fail=1 processed=5113 elapsed=29033s rate=0.18/s target=6000 remain=888 eta=5042s
+[10:34:24] [progress] new=5113 skip=0 empty=0 fail=1 processed=5114 elapsed=29037s rate=0.18/s target=6000 remain=887 eta=5036s
+[10:34:31] [progress] new=5116 skip=0 empty=0 fail=1 processed=5117 elapsed=29044s rate=0.18/s target=6000 remain=884 eta=5017s
+[10:34:37] [progress] new=5118 skip=0 empty=0 fail=1 processed=5119 elapsed=29049s rate=0.18/s target=6000 remain=882 eta=5005s
+[10:34:40] [progress] new=5119 skip=0 empty=0 fail=1 processed=5120 elapsed=29052s rate=0.18/s target=6000 remain=881 eta=4999s
+[10:34:45] [progress] new=5121 skip=0 empty=0 fail=1 processed=5122 elapsed=29058s rate=0.18/s target=6000 remain=879 eta=4987s
+[10:34:52] [progress] new=5123 skip=0 empty=0 fail=1 processed=5124 elapsed=29064s rate=0.18/s target=6000 remain=877 eta=4975s
+[10:34:52]   [1/3] 水沢 done new=12 R (total_new=5123)
+[10:34:52] [progress] new=5123 skip=0 empty=0 fail=1 processed=5124 elapsed=29064s rate=0.18/s target=6000 remain=877 eta=4975s
+[10:34:57]   [2/3] 名古屋 11R start
+[10:35:27] [progress] new=5124 skip=0 empty=0 fail=1 processed=5125 elapsed=29099s rate=0.18/s target=6000 remain=876 eta=4974s
+[10:35:30] [progress] new=5126 skip=0 empty=0 fail=1 processed=5127 elapsed=29103s rate=0.18/s target=6000 remain=874 eta=4961s
+[10:35:36] [progress] new=5128 skip=0 empty=0 fail=1 processed=5129 elapsed=29108s rate=0.18/s target=6000 remain=872 eta=4949s
+[10:35:42] [progress] new=5130 skip=0 empty=0 fail=1 processed=5131 elapsed=29114s rate=0.18/s target=6000 remain=870 eta=4937s
+[10:35:48] [progress] new=5132 skip=0 empty=0 fail=1 processed=5133 elapsed=29120s rate=0.18/s target=6000 remain=868 eta=4924s
+[10:35:52] [progress] new=5133 skip=0 empty=0 fail=1 processed=5134 elapsed=29124s rate=0.18/s target=6000 remain=867 eta=4918s
+[10:35:52]   [2/3] 名古屋 done new=11 R (total_new=5134)
+[10:35:52] [progress] new=5134 skip=0 empty=0 fail=1 processed=5135 elapsed=29125s rate=0.18/s target=6000 remain=866 eta=4912s
+[10:35:58]   [3/3] 笠松 11R start
+[10:36:27] [progress] new=5135 skip=0 empty=0 fail=1 processed=5136 elapsed=29160s rate=0.18/s target=6000 remain=865 eta=4911s
+[10:36:31] [progress] new=5137 skip=0 empty=0 fail=1 processed=5138 elapsed=29164s rate=0.18/s target=6000 remain=863 eta=4898s
+[10:36:35] [progress] new=5139 skip=0 empty=0 fail=1 processed=5140 elapsed=29168s rate=0.18/s target=6000 remain=861 eta=4886s
+[10:36:41] [progress] new=5141 skip=0 empty=0 fail=1 processed=5142 elapsed=29173s rate=0.18/s target=6000 remain=859 eta=4874s
+[10:36:45] [progress] new=5143 skip=0 empty=0 fail=1 processed=5144 elapsed=29177s rate=0.18/s target=6000 remain=857 eta=4861s
+[10:36:48] [progress] new=5144 skip=0 empty=0 fail=1 processed=5145 elapsed=29180s rate=0.18/s target=6000 remain=856 eta=4855s
+[10:36:49]   [3/3] 笠松 done new=11 R (total_new=5145)
+[10:36:49] [progress] new=5145 skip=0 empty=0 fail=1 processed=5146 elapsed=29182s rate=0.18/s target=6000 remain=855 eta=4848s
+[10:36:49] === day 172/365 2023-06-21 ===
+[10:36:51]   venues=2: ['笠松', '園田']
+[10:36:55]   [1/2] 笠松 11R start
+[10:37:23] [progress] new=5146 skip=0 empty=0 fail=1 processed=5147 elapsed=29215s rate=0.18/s target=6000 remain=854 eta=4847s
+[10:37:29] [progress] new=5149 skip=0 empty=0 fail=1 processed=5150 elapsed=29221s rate=0.18/s target=6000 remain=851 eta=4829s
+[10:37:34] [progress] new=5151 skip=0 empty=0 fail=1 processed=5152 elapsed=29226s rate=0.18/s target=6000 remain=849 eta=4816s
+[10:37:39] [progress] new=5153 skip=0 empty=0 fail=1 processed=5154 elapsed=29231s rate=0.18/s target=6000 remain=847 eta=4804s
+[10:37:44] [progress] new=5156 skip=0 empty=0 fail=1 processed=5157 elapsed=29237s rate=0.18/s target=6000 remain=844 eta=4785s
+[10:37:44]   [1/2] 笠松 done new=11 R (total_new=5156)
+[10:37:44] [progress] new=5156 skip=0 empty=0 fail=1 processed=5157 elapsed=29237s rate=0.18/s target=6000 remain=844 eta=4785s
+[10:37:48]   [2/2] 園田 12R start
+[10:38:16] [progress] new=5157 skip=0 empty=0 fail=1 processed=5158 elapsed=29268s rate=0.18/s target=6000 remain=843 eta=4783s
+[10:38:20] [progress] new=5159 skip=0 empty=0 fail=1 processed=5160 elapsed=29273s rate=0.18/s target=6000 remain=841 eta=4771s
+[10:38:25] [progress] new=5160 skip=0 empty=0 fail=1 processed=5161 elapsed=29277s rate=0.18/s target=6000 remain=840 eta=4765s
+[10:38:29] [progress] new=5161 skip=0 empty=0 fail=1 processed=5162 elapsed=29281s rate=0.18/s target=6000 remain=839 eta=4759s
+[10:38:34] [progress] new=5163 skip=0 empty=0 fail=1 processed=5164 elapsed=29287s rate=0.18/s target=6000 remain=837 eta=4747s
+[10:38:38] [progress] new=5164 skip=0 empty=0 fail=1 processed=5165 elapsed=29291s rate=0.18/s target=6000 remain=836 eta=4741s
+[10:38:43] [progress] new=5166 skip=0 empty=0 fail=1 processed=5167 elapsed=29296s rate=0.18/s target=6000 remain=834 eta=4729s
+[10:38:46] [progress] new=5167 skip=0 empty=0 fail=1 processed=5168 elapsed=29299s rate=0.18/s target=6000 remain=833 eta=4723s
+[10:38:50] [progress] new=5168 skip=0 empty=0 fail=1 processed=5169 elapsed=29303s rate=0.18/s target=6000 remain=832 eta=4717s
+[10:38:50]   [2/2] 園田 done new=12 R (total_new=5168)
+[10:38:50] [progress] new=5168 skip=0 empty=0 fail=1 processed=5169 elapsed=29303s rate=0.18/s target=6000 remain=832 eta=4717s
+[10:38:50] === day 173/365 2023-06-22 ===
+[10:38:53]   venues=2: ['笠松', '園田']
+[10:38:58]   [1/2] 笠松 11R start
+[10:39:25] [progress] new=5169 skip=0 empty=0 fail=1 processed=5170 elapsed=29338s rate=0.18/s target=6000 remain=831 eta=4716s
+[10:39:29] [progress] new=5171 skip=0 empty=0 fail=1 processed=5172 elapsed=29341s rate=0.18/s target=6000 remain=829 eta=4703s
+[10:39:33] [progress] new=5173 skip=0 empty=0 fail=1 processed=5174 elapsed=29345s rate=0.18/s target=6000 remain=827 eta=4690s
+[10:39:36] [progress] new=5174 skip=0 empty=0 fail=1 processed=5175 elapsed=29349s rate=0.18/s target=6000 remain=826 eta=4685s
+[10:39:41] [progress] new=5176 skip=0 empty=0 fail=1 processed=5177 elapsed=29354s rate=0.18/s target=6000 remain=824 eta=4672s
+[10:39:45] [progress] new=5177 skip=0 empty=0 fail=1 processed=5178 elapsed=29357s rate=0.18/s target=6000 remain=823 eta=4666s
+[10:39:50] [progress] new=5179 skip=0 empty=0 fail=1 processed=5180 elapsed=29363s rate=0.18/s target=6000 remain=821 eta=4654s
+[10:39:50]   [1/2] 笠松 done new=11 R (total_new=5179)
+[10:39:50] [progress] new=5179 skip=0 empty=0 fail=1 processed=5180 elapsed=29363s rate=0.18/s target=6000 remain=821 eta=4654s
+[10:39:57]   [2/2] 園田 12R start
+[10:40:29] [progress] new=5180 skip=0 empty=0 fail=1 processed=5181 elapsed=29401s rate=0.18/s target=6000 remain=820 eta=4653s
+[10:40:32] [progress] new=5181 skip=0 empty=0 fail=1 processed=5182 elapsed=29405s rate=0.18/s target=6000 remain=819 eta=4647s
+[10:40:37] [progress] new=5183 skip=0 empty=0 fail=1 processed=5184 elapsed=29410s rate=0.18/s target=6000 remain=817 eta=4635s
+[10:40:43] [progress] new=5184 skip=0 empty=0 fail=1 processed=5185 elapsed=29415s rate=0.18/s target=6000 remain=816 eta=4629s
+[10:40:46] [progress] new=5185 skip=0 empty=0 fail=1 processed=5186 elapsed=29419s rate=0.18/s target=6000 remain=815 eta=4623s
+[10:40:50] [progress] new=5186 skip=0 empty=0 fail=1 processed=5187 elapsed=29423s rate=0.18/s target=6000 remain=814 eta=4617s
+[10:40:55] [progress] new=5187 skip=0 empty=0 fail=1 processed=5188 elapsed=29427s rate=0.18/s target=6000 remain=813 eta=4611s
+[10:41:01] [progress] new=5189 skip=0 empty=0 fail=1 processed=5190 elapsed=29433s rate=0.18/s target=6000 remain=811 eta=4599s
+[10:41:06] [progress] new=5191 skip=0 empty=0 fail=1 processed=5192 elapsed=29439s rate=0.18/s target=6000 remain=809 eta=4587s
+[10:41:06]   [2/2] 園田 done new=12 R (total_new=5191)
+[10:41:06] [progress] new=5191 skip=0 empty=0 fail=1 processed=5192 elapsed=29439s rate=0.18/s target=6000 remain=809 eta=4587s
+[10:41:06] === day 174/365 2023-06-23 ===
+[10:41:09]   venues=2: ['笠松', '園田']
+[10:41:12]   [1/2] 笠松 12R start
+[10:41:39] [progress] new=5192 skip=0 empty=0 fail=1 processed=5193 elapsed=29472s rate=0.18/s target=6000 remain=808 eta=4586s
+[10:41:44] [progress] new=5194 skip=0 empty=0 fail=1 processed=5195 elapsed=29477s rate=0.18/s target=6000 remain=806 eta=4573s
+[10:41:48] [progress] new=5195 skip=0 empty=0 fail=1 processed=5196 elapsed=29481s rate=0.18/s target=6000 remain=805 eta=4567s
+[10:41:53] [progress] new=5197 skip=0 empty=0 fail=1 processed=5198 elapsed=29486s rate=0.18/s target=6000 remain=803 eta=4555s
+[10:42:00] [progress] new=5200 skip=0 empty=0 fail=1 processed=5201 elapsed=29493s rate=0.18/s target=6000 remain=800 eta=4536s
+[10:42:06] [progress] new=5202 skip=0 empty=0 fail=1 processed=5203 elapsed=29498s rate=0.18/s target=6000 remain=798 eta=4524s
+[10:42:09] [progress] new=5203 skip=0 empty=0 fail=1 processed=5204 elapsed=29502s rate=0.18/s target=6000 remain=797 eta=4518s
+[10:42:09]   [1/2] 笠松 done new=12 R (total_new=5203)
+[10:42:09] [progress] new=5203 skip=0 empty=0 fail=1 processed=5204 elapsed=29502s rate=0.18/s target=6000 remain=797 eta=4518s
+[10:42:14]   [2/2] 園田 12R start
+[10:42:46] [progress] new=5204 skip=0 empty=0 fail=1 processed=5205 elapsed=29538s rate=0.18/s target=6000 remain=796 eta=4517s
+[10:42:49] [progress] new=5205 skip=0 empty=0 fail=1 processed=5206 elapsed=29542s rate=0.18/s target=6000 remain=795 eta=4511s
+[10:42:53] [progress] new=5206 skip=0 empty=0 fail=1 processed=5207 elapsed=29545s rate=0.18/s target=6000 remain=794 eta=4505s
+[10:42:57] [progress] new=5208 skip=0 empty=0 fail=1 processed=5209 elapsed=29549s rate=0.18/s target=6000 remain=792 eta=4493s
+[10:43:02] [progress] new=5209 skip=0 empty=0 fail=1 processed=5210 elapsed=29554s rate=0.18/s target=6000 remain=791 eta=4487s
+[10:43:07] [progress] new=5211 skip=0 empty=0 fail=1 processed=5212 elapsed=29560s rate=0.18/s target=6000 remain=789 eta=4475s
+[10:43:12] [progress] new=5212 skip=0 empty=0 fail=1 processed=5213 elapsed=29564s rate=0.18/s target=6000 remain=788 eta=4469s
+[10:43:16] [progress] new=5214 skip=0 empty=0 fail=1 processed=5215 elapsed=29568s rate=0.18/s target=6000 remain=786 eta=4457s
+[10:43:21] [progress] new=5215 skip=0 empty=0 fail=1 processed=5216 elapsed=29573s rate=0.18/s target=6000 remain=785 eta=4451s
+[10:43:21]   [2/2] 園田 done new=12 R (total_new=5215)
+[10:43:21] [progress] new=5215 skip=0 empty=0 fail=1 processed=5216 elapsed=29573s rate=0.18/s target=6000 remain=785 eta=4451s
+[10:43:21] === day 175/365 2023-06-24 ===
+[10:43:22]   venues=3: ['船橋', '高知', '川崎']
+[10:43:26]   [1/3] 船橋 12R start
+[10:44:01] [progress] new=5216 skip=0 empty=0 fail=1 processed=5217 elapsed=29614s rate=0.18/s target=6000 remain=784 eta=4450s
+[10:44:06] [progress] new=5217 skip=0 empty=0 fail=1 processed=5218 elapsed=29618s rate=0.18/s target=6000 remain=783 eta=4444s
+[10:44:09] [progress] new=5218 skip=0 empty=0 fail=1 processed=5219 elapsed=29622s rate=0.18/s target=6000 remain=782 eta=4438s
+[10:44:14] [progress] new=5219 skip=0 empty=0 fail=1 processed=5220 elapsed=29626s rate=0.18/s target=6000 remain=781 eta=4433s
+[10:44:20] [progress] new=5221 skip=0 empty=0 fail=1 processed=5222 elapsed=29632s rate=0.18/s target=6000 remain=779 eta=4420s
+[10:44:23] [progress] new=5222 skip=0 empty=0 fail=1 processed=5223 elapsed=29636s rate=0.18/s target=6000 remain=778 eta=4414s
+[10:44:26] [progress] new=5223 skip=0 empty=0 fail=1 processed=5224 elapsed=29639s rate=0.18/s target=6000 remain=777 eta=4408s
+[10:44:32] [progress] new=5225 skip=0 empty=0 fail=1 processed=5226 elapsed=29644s rate=0.18/s target=6000 remain=775 eta=4396s
+[10:44:36] [progress] new=5226 skip=0 empty=0 fail=1 processed=5227 elapsed=29649s rate=0.18/s target=6000 remain=774 eta=4390s
+[10:44:41] [progress] new=5227 skip=0 empty=0 fail=1 processed=5228 elapsed=29654s rate=0.18/s target=6000 remain=773 eta=4385s
+[10:44:41]   [1/3] 船橋 done new=12 R (total_new=5227)
+[10:44:41] [progress] new=5227 skip=0 empty=0 fail=1 processed=5228 elapsed=29654s rate=0.18/s target=6000 remain=773 eta=4385s
+[10:44:46]   [2/3] 高知 11R start
+[10:45:19] [progress] new=5228 skip=0 empty=0 fail=1 processed=5229 elapsed=29692s rate=0.18/s target=6000 remain=772 eta=4384s
+[10:45:26] [progress] new=5230 skip=0 empty=0 fail=1 processed=5231 elapsed=29698s rate=0.18/s target=6000 remain=770 eta=4372s
+[10:45:30] [progress] new=5231 skip=0 empty=0 fail=1 processed=5232 elapsed=29702s rate=0.18/s target=6000 remain=769 eta=4366s
+[10:45:37] [progress] new=5233 skip=0 empty=0 fail=1 processed=5234 elapsed=29709s rate=0.18/s target=6000 remain=767 eta=4354s
+[10:45:43] [progress] new=5235 skip=0 empty=0 fail=1 processed=5236 elapsed=29716s rate=0.18/s target=6000 remain=765 eta=4342s
+[10:45:48] [progress] new=5237 skip=0 empty=0 fail=1 processed=5238 elapsed=29721s rate=0.18/s target=6000 remain=763 eta=4329s
+[10:45:52] [progress] new=5238 skip=0 empty=0 fail=1 processed=5239 elapsed=29725s rate=0.18/s target=6000 remain=762 eta=4323s
+[10:45:52]   [2/3] 高知 done new=11 R (total_new=5238)
+[10:45:52] [progress] new=5238 skip=0 empty=0 fail=1 processed=5239 elapsed=29725s rate=0.18/s target=6000 remain=762 eta=4323s
+[10:45:57]   [3/3] 川崎 11R start
+[10:46:29] [progress] new=5239 skip=0 empty=0 fail=1 processed=5240 elapsed=29762s rate=0.18/s target=6000 remain=761 eta=4322s
+[10:46:33] [progress] new=5240 skip=0 empty=0 fail=1 processed=5241 elapsed=29766s rate=0.18/s target=6000 remain=760 eta=4316s
+[10:46:39] [progress] new=5242 skip=0 empty=0 fail=1 processed=5243 elapsed=29772s rate=0.18/s target=6000 remain=758 eta=4304s
+[10:46:46] [progress] new=5244 skip=0 empty=0 fail=1 processed=5245 elapsed=29778s rate=0.18/s target=6000 remain=756 eta=4292s
+[10:46:50] [progress] new=5246 skip=0 empty=0 fail=1 processed=5247 elapsed=29783s rate=0.18/s target=6000 remain=754 eta=4280s
+[10:46:53] [progress] new=5247 skip=0 empty=0 fail=1 processed=5248 elapsed=29786s rate=0.18/s target=6000 remain=753 eta=4274s
+[10:46:59] [progress] new=5249 skip=0 empty=0 fail=1 processed=5250 elapsed=29791s rate=0.18/s target=6000 remain=751 eta=4262s
+[10:46:59]   [3/3] 川崎 done new=11 R (total_new=5249)
+[10:46:59] [progress] new=5249 skip=0 empty=0 fail=1 processed=5250 elapsed=29791s rate=0.18/s target=6000 remain=751 eta=4262s
+[10:46:59] === day 176/365 2023-06-25 ===
+[10:47:01]   venues=5: ['船橋', '水沢', '名古屋', '高知', '川崎']
+[10:47:08]   [1/5] 船橋 12R start
+[10:47:36] [progress] new=5250 skip=0 empty=0 fail=1 processed=5251 elapsed=29829s rate=0.18/s target=6000 remain=750 eta=4260s
+[10:47:40] [progress] new=5251 skip=0 empty=0 fail=1 processed=5252 elapsed=29833s rate=0.18/s target=6000 remain=749 eta=4255s
+[10:47:44] [progress] new=5253 skip=0 empty=0 fail=1 processed=5254 elapsed=29837s rate=0.18/s target=6000 remain=747 eta=4242s
+[10:47:48] [progress] new=5254 skip=0 empty=0 fail=1 processed=5255 elapsed=29841s rate=0.18/s target=6000 remain=746 eta=4236s
+[10:47:52] [progress] new=5255 skip=0 empty=0 fail=1 processed=5256 elapsed=29845s rate=0.18/s target=6000 remain=745 eta=4230s
+[10:47:56] [progress] new=5256 skip=0 empty=0 fail=1 processed=5257 elapsed=29849s rate=0.18/s target=6000 remain=744 eta=4224s
+[10:48:02] [progress] new=5258 skip=0 empty=0 fail=1 processed=5259 elapsed=29854s rate=0.18/s target=6000 remain=742 eta=4212s
+[10:48:08] [progress] new=5260 skip=0 empty=0 fail=1 processed=5261 elapsed=29861s rate=0.18/s target=6000 remain=740 eta=4200s
+[10:48:11] [progress] new=5261 skip=0 empty=0 fail=1 processed=5262 elapsed=29864s rate=0.18/s target=6000 remain=739 eta=4194s
+[10:48:11]   [1/5] 船橋 done new=12 R (total_new=5261)
+[10:48:11] [progress] new=5261 skip=0 empty=0 fail=1 processed=5262 elapsed=29864s rate=0.18/s target=6000 remain=739 eta=4194s
+[10:48:14]   [2/5] 水沢 11R start
+[10:48:44] [progress] new=5262 skip=0 empty=0 fail=1 processed=5263 elapsed=29897s rate=0.18/s target=6000 remain=738 eta=4192s
+[10:48:49] [progress] new=5263 skip=0 empty=0 fail=1 processed=5264 elapsed=29901s rate=0.18/s target=6000 remain=737 eta=4186s
+[10:48:53] [progress] new=5265 skip=0 empty=0 fail=1 processed=5266 elapsed=29906s rate=0.18/s target=6000 remain=735 eta=4174s
+[10:48:59] [progress] new=5267 skip=0 empty=0 fail=1 processed=5268 elapsed=29911s rate=0.18/s target=6000 remain=733 eta=4162s
+[10:49:03] [progress] new=5268 skip=0 empty=0 fail=1 processed=5269 elapsed=29915s rate=0.18/s target=6000 remain=732 eta=4156s
+[10:49:07] [progress] new=5269 skip=0 empty=0 fail=1 processed=5270 elapsed=29920s rate=0.18/s target=6000 remain=731 eta=4150s
+[10:49:12] [progress] new=5271 skip=0 empty=0 fail=1 processed=5272 elapsed=29925s rate=0.18/s target=6000 remain=729 eta=4138s
+[10:49:14]   [2/5] 水沢 done new=11 R (total_new=5272)
+[10:49:14] [progress] new=5272 skip=0 empty=0 fail=1 processed=5273 elapsed=29927s rate=0.18/s target=6000 remain=728 eta=4132s
+[10:49:20]   [3/5] 名古屋 11R start
+[10:49:50] [progress] new=5273 skip=0 empty=0 fail=1 processed=5274 elapsed=29963s rate=0.18/s target=6000 remain=727 eta=4130s
+[10:49:56] [progress] new=5275 skip=0 empty=0 fail=1 processed=5276 elapsed=29969s rate=0.18/s target=6000 remain=725 eta=4118s
+[10:50:01] [progress] new=5277 skip=0 empty=0 fail=1 processed=5278 elapsed=29974s rate=0.18/s target=6000 remain=723 eta=4106s
+[10:50:04] [progress] new=5278 skip=0 empty=0 fail=1 processed=5279 elapsed=29977s rate=0.18/s target=6000 remain=722 eta=4100s
+[10:50:08] [progress] new=5279 skip=0 empty=0 fail=1 processed=5280 elapsed=29981s rate=0.18/s target=6000 remain=721 eta=4094s
+[10:50:12] [progress] new=5281 skip=0 empty=0 fail=1 processed=5282 elapsed=29984s rate=0.18/s target=6000 remain=719 eta=4082s
+[10:50:19] [progress] new=5283 skip=0 empty=0 fail=1 processed=5284 elapsed=29992s rate=0.18/s target=6000 remain=717 eta=4070s
+[10:50:19]   [3/5] 名古屋 done new=11 R (total_new=5283)
+[10:50:19] [progress] new=5283 skip=0 empty=0 fail=1 processed=5284 elapsed=29992s rate=0.18/s target=6000 remain=717 eta=4070s
+[10:50:24]   [4/5] 高知 11R start
+[10:50:52] [progress] new=5284 skip=0 empty=0 fail=1 processed=5285 elapsed=30025s rate=0.18/s target=6000 remain=716 eta=4068s
+[10:50:57] [progress] new=5286 skip=0 empty=0 fail=1 processed=5287 elapsed=30030s rate=0.18/s target=6000 remain=714 eta=4055s
+[10:51:01] [progress] new=5288 skip=0 empty=0 fail=1 processed=5289 elapsed=30034s rate=0.18/s target=6000 remain=712 eta=4043s
+[10:51:05] [progress] new=5289 skip=0 empty=0 fail=1 processed=5290 elapsed=30038s rate=0.18/s target=6000 remain=711 eta=4037s
+[10:51:10] [progress] new=5291 skip=0 empty=0 fail=1 processed=5292 elapsed=30042s rate=0.18/s target=6000 remain=709 eta=4025s
+[10:51:14] [progress] new=5292 skip=0 empty=0 fail=1 processed=5293 elapsed=30046s rate=0.18/s target=6000 remain=708 eta=4019s
+[10:51:20] [progress] new=5294 skip=0 empty=0 fail=1 processed=5295 elapsed=30053s rate=0.18/s target=6000 remain=706 eta=4007s
+[10:51:20]   [4/5] 高知 done new=11 R (total_new=5294)
+[10:51:20] [progress] new=5294 skip=0 empty=0 fail=1 processed=5295 elapsed=30053s rate=0.18/s target=6000 remain=706 eta=4007s
+[10:51:24]   [5/5] 川崎 11R start
+[10:51:55] [progress] new=5295 skip=0 empty=0 fail=1 processed=5296 elapsed=30087s rate=0.18/s target=6000 remain=705 eta=4005s
+[10:51:59] [progress] new=5296 skip=0 empty=0 fail=1 processed=5297 elapsed=30092s rate=0.18/s target=6000 remain=704 eta=3999s
+[10:52:07] [progress] new=5298 skip=0 empty=0 fail=1 processed=5299 elapsed=30099s rate=0.18/s target=6000 remain=702 eta=3987s
+[10:52:13] [progress] new=5300 skip=0 empty=0 fail=1 processed=5301 elapsed=30105s rate=0.18/s target=6000 remain=700 eta=3975s
+[10:52:19] [progress] new=5302 skip=0 empty=0 fail=1 processed=5303 elapsed=30112s rate=0.18/s target=6000 remain=698 eta=3963s
+[10:52:24] [progress] new=5304 skip=0 empty=0 fail=1 processed=5305 elapsed=30116s rate=0.18/s target=6000 remain=696 eta=3951s
+[10:52:28] [progress] new=5305 skip=0 empty=0 fail=1 processed=5306 elapsed=30120s rate=0.18/s target=6000 remain=695 eta=3945s
+[10:52:28]   [5/5] 川崎 done new=11 R (total_new=5305)
+[10:52:28] [progress] new=5305 skip=0 empty=0 fail=1 processed=5306 elapsed=30120s rate=0.18/s target=6000 remain=695 eta=3945s
+[10:52:28] === day 177/365 2023-06-26 ===
+[10:52:29]   venues=2: ['船橋', '水沢']
+[10:52:35]   [1/2] 船橋 12R start
+[10:53:07] [progress] new=5306 skip=0 empty=0 fail=1 processed=5307 elapsed=30159s rate=0.18/s target=6000 remain=694 eta=3944s
+[10:53:12] [progress] new=5308 skip=0 empty=0 fail=1 processed=5309 elapsed=30165s rate=0.18/s target=6000 remain=692 eta=3932s
+[10:53:15] [progress] new=5309 skip=0 empty=0 fail=1 processed=5310 elapsed=30168s rate=0.18/s target=6000 remain=691 eta=3926s
+[10:53:21] [progress] new=5311 skip=0 empty=0 fail=1 processed=5312 elapsed=30173s rate=0.18/s target=6000 remain=689 eta=3914s
+[10:53:27] [progress] new=5313 skip=0 empty=0 fail=1 processed=5314 elapsed=30180s rate=0.18/s target=6000 remain=687 eta=3902s
+[10:53:33] [progress] new=5315 skip=0 empty=0 fail=1 processed=5316 elapsed=30186s rate=0.18/s target=6000 remain=685 eta=3890s
+[10:53:37] [progress] new=5316 skip=0 empty=0 fail=1 processed=5317 elapsed=30190s rate=0.18/s target=6000 remain=684 eta=3884s
+[10:53:40] [progress] new=5317 skip=0 empty=0 fail=1 processed=5318 elapsed=30193s rate=0.18/s target=6000 remain=683 eta=3878s
+[10:53:40]   [1/2] 船橋 done new=12 R (total_new=5317)
+[10:53:40] [progress] new=5317 skip=0 empty=0 fail=1 processed=5318 elapsed=30193s rate=0.18/s target=6000 remain=683 eta=3878s
+[10:53:47]   [2/2] 水沢 12R start
+[10:54:20] [progress] new=5318 skip=0 empty=0 fail=1 processed=5319 elapsed=30233s rate=0.18/s target=6000 remain=682 eta=3876s
+[10:54:24] [progress] new=5319 skip=0 empty=0 fail=1 processed=5320 elapsed=30236s rate=0.18/s target=6000 remain=681 eta=3870s
+[10:54:27] [progress] new=5320 skip=0 empty=0 fail=1 processed=5321 elapsed=30240s rate=0.18/s target=6000 remain=680 eta=3864s
+[10:54:33] [progress] new=5322 skip=0 empty=0 fail=1 processed=5323 elapsed=30246s rate=0.18/s target=6000 remain=678 eta=3852s
+[10:54:37] [progress] new=5323 skip=0 empty=0 fail=1 processed=5324 elapsed=30249s rate=0.18/s target=6000 remain=677 eta=3847s
+[10:54:42] [progress] new=5325 skip=0 empty=0 fail=1 processed=5326 elapsed=30254s rate=0.18/s target=6000 remain=675 eta=3834s
+[10:54:46] [progress] new=5327 skip=0 empty=0 fail=1 processed=5328 elapsed=30259s rate=0.18/s target=6000 remain=673 eta=3822s
+[10:54:52] [progress] new=5329 skip=0 empty=0 fail=1 processed=5330 elapsed=30264s rate=0.18/s target=6000 remain=671 eta=3810s
+[10:54:52]   [2/2] 水沢 done new=12 R (total_new=5329)
+[10:54:52] [progress] new=5329 skip=0 empty=0 fail=1 processed=5330 elapsed=30264s rate=0.18/s target=6000 remain=671 eta=3810s
+[10:54:52] === day 178/365 2023-06-27 ===
+[10:54:53]   venues=3: ['水沢', '名古屋', '金沢']
+[10:54:58]   [1/3] 水沢 11R start
+[10:55:26] [progress] new=5330 skip=0 empty=0 fail=1 processed=5331 elapsed=30299s rate=0.18/s target=6000 remain=670 eta=3808s
+[10:55:30] [progress] new=5332 skip=0 empty=0 fail=1 processed=5333 elapsed=30302s rate=0.18/s target=6000 remain=668 eta=3796s
+[10:55:33] [progress] new=5334 skip=0 empty=0 fail=1 processed=5335 elapsed=30306s rate=0.18/s target=6000 remain=666 eta=3783s
+[10:55:38] [progress] new=5336 skip=0 empty=0 fail=1 processed=5337 elapsed=30311s rate=0.18/s target=6000 remain=664 eta=3771s
+[10:55:43] [progress] new=5337 skip=0 empty=0 fail=1 processed=5338 elapsed=30315s rate=0.18/s target=6000 remain=663 eta=3765s
+[10:55:49] [progress] new=5339 skip=0 empty=0 fail=1 processed=5340 elapsed=30322s rate=0.18/s target=6000 remain=661 eta=3753s
+[10:55:52]   [1/3] 水沢 done new=11 R (total_new=5340)
+[10:55:52] [progress] new=5340 skip=0 empty=0 fail=1 processed=5341 elapsed=30324s rate=0.18/s target=6000 remain=660 eta=3747s
+[10:55:57]   [2/3] 名古屋 12R start
+[10:56:28] [progress] new=5341 skip=0 empty=0 fail=1 processed=5342 elapsed=30361s rate=0.18/s target=6000 remain=659 eta=3745s
+[10:56:34] [progress] new=5343 skip=0 empty=0 fail=1 processed=5344 elapsed=30367s rate=0.18/s target=6000 remain=657 eta=3733s
+[10:56:38] [progress] new=5344 skip=0 empty=0 fail=1 processed=5345 elapsed=30371s rate=0.18/s target=6000 remain=656 eta=3727s
+[10:56:43] [progress] new=5346 skip=0 empty=0 fail=1 processed=5347 elapsed=30376s rate=0.18/s target=6000 remain=654 eta=3715s
+[10:56:50] [progress] new=5348 skip=0 empty=0 fail=1 processed=5349 elapsed=30382s rate=0.18/s target=6000 remain=652 eta=3703s
+[10:56:55] [progress] new=5350 skip=0 empty=0 fail=1 processed=5351 elapsed=30387s rate=0.18/s target=6000 remain=650 eta=3691s
+[10:57:01] [progress] new=5352 skip=0 empty=0 fail=1 processed=5353 elapsed=30394s rate=0.18/s target=6000 remain=648 eta=3679s
+[10:57:01]   [2/3] 名古屋 done new=12 R (total_new=5352)
+[10:57:01] [progress] new=5352 skip=0 empty=0 fail=1 processed=5353 elapsed=30394s rate=0.18/s target=6000 remain=648 eta=3679s
+[10:57:06]   [3/3] 金沢 12R start
+[10:57:37] [progress] new=5353 skip=0 empty=0 fail=1 processed=5354 elapsed=30430s rate=0.18/s target=6000 remain=647 eta=3677s
+[10:57:43] [progress] new=5355 skip=0 empty=0 fail=1 processed=5356 elapsed=30436s rate=0.18/s target=6000 remain=645 eta=3665s
+[10:57:46] [progress] new=5356 skip=0 empty=0 fail=1 processed=5357 elapsed=30439s rate=0.18/s target=6000 remain=644 eta=3659s
+[10:57:50] [progress] new=5357 skip=0 empty=0 fail=1 processed=5358 elapsed=30443s rate=0.18/s target=6000 remain=643 eta=3653s
+[10:57:54] [progress] new=5358 skip=0 empty=0 fail=1 processed=5359 elapsed=30446s rate=0.18/s target=6000 remain=642 eta=3647s
+[10:57:58] [progress] new=5359 skip=0 empty=0 fail=1 processed=5360 elapsed=30451s rate=0.18/s target=6000 remain=641 eta=3642s
+[10:58:02] [progress] new=5360 skip=0 empty=0 fail=1 processed=5361 elapsed=30455s rate=0.18/s target=6000 remain=640 eta=3636s
+[10:58:06] [progress] new=5361 skip=0 empty=0 fail=1 processed=5362 elapsed=30459s rate=0.18/s target=6000 remain=639 eta=3630s
+[10:58:09] [progress] new=5362 skip=0 empty=0 fail=1 processed=5363 elapsed=30462s rate=0.18/s target=6000 remain=638 eta=3624s
+[10:58:14] [progress] new=5363 skip=0 empty=0 fail=1 processed=5364 elapsed=30467s rate=0.18/s target=6000 remain=637 eta=3618s
+[10:58:18] [progress] new=5364 skip=0 empty=0 fail=1 processed=5365 elapsed=30470s rate=0.18/s target=6000 remain=636 eta=3612s
+[10:58:18]   [3/3] 金沢 done new=12 R (total_new=5364)
+[10:58:18] [progress] new=5364 skip=0 empty=0 fail=1 processed=5365 elapsed=30470s rate=0.18/s target=6000 remain=636 eta=3612s
+[10:58:18] === day 179/365 2023-06-28 ===
+[10:58:22]   venues=3: ['33', '金沢', '園田']
+[10:58:30]   [1/3] 33 12R start
+[10:59:02] [progress] new=5365 skip=0 empty=0 fail=1 processed=5366 elapsed=30515s rate=0.18/s target=6000 remain=635 eta=3611s
+[10:59:06] [progress] new=5366 skip=0 empty=0 fail=1 processed=5367 elapsed=30519s rate=0.18/s target=6000 remain=634 eta=3605s
+[10:59:09] [progress] new=5367 skip=0 empty=0 fail=1 processed=5368 elapsed=30522s rate=0.18/s target=6000 remain=633 eta=3599s
+[10:59:14] [progress] new=5368 skip=0 empty=0 fail=1 processed=5369 elapsed=30527s rate=0.18/s target=6000 remain=632 eta=3593s
+[10:59:21] [progress] new=5370 skip=0 empty=0 fail=1 processed=5371 elapsed=30533s rate=0.18/s target=6000 remain=630 eta=3581s
+[10:59:25] [progress] new=5371 skip=0 empty=0 fail=1 processed=5372 elapsed=30537s rate=0.18/s target=6000 remain=629 eta=3576s
+[10:59:30] [progress] new=5372 skip=0 empty=0 fail=1 processed=5373 elapsed=30543s rate=0.18/s target=6000 remain=628 eta=3570s
+[10:59:34] [progress] new=5373 skip=0 empty=0 fail=1 processed=5374 elapsed=30546s rate=0.18/s target=6000 remain=627 eta=3564s
+[10:59:37] [progress] new=5374 skip=0 empty=0 fail=1 processed=5375 elapsed=30550s rate=0.18/s target=6000 remain=626 eta=3558s
+[10:59:42] [progress] new=5375 skip=0 empty=0 fail=1 processed=5376 elapsed=30555s rate=0.18/s target=6000 remain=625 eta=3552s
+[10:59:46] [progress] new=5376 skip=0 empty=0 fail=1 processed=5377 elapsed=30558s rate=0.18/s target=6000 remain=624 eta=3546s
+[10:59:46]   [1/3] 33 done new=12 R (total_new=5376)
+[10:59:46] [progress] new=5376 skip=0 empty=0 fail=1 processed=5377 elapsed=30558s rate=0.18/s target=6000 remain=624 eta=3546s
+[10:59:54]   [2/3] 金沢 12R start
+[11:00:24] [progress] new=5377 skip=0 empty=0 fail=1 processed=5378 elapsed=30596s rate=0.18/s target=6000 remain=623 eta=3544s
+[11:00:28] [progress] new=5378 skip=0 empty=0 fail=1 processed=5379 elapsed=30600s rate=0.18/s target=6000 remain=622 eta=3538s
+[11:00:34] [progress] new=5380 skip=0 empty=0 fail=1 processed=5381 elapsed=30607s rate=0.18/s target=6000 remain=620 eta=3527s
+[11:00:38] [progress] new=5381 skip=0 empty=0 fail=1 processed=5382 elapsed=30611s rate=0.18/s target=6000 remain=619 eta=3521s
+[11:00:43] [progress] new=5382 skip=0 empty=0 fail=1 processed=5383 elapsed=30616s rate=0.18/s target=6000 remain=618 eta=3515s
+[11:00:50] [progress] new=5384 skip=0 empty=0 fail=1 processed=5385 elapsed=30623s rate=0.18/s target=6000 remain=616 eta=3503s
+[11:00:54] [progress] new=5385 skip=0 empty=0 fail=1 processed=5386 elapsed=30626s rate=0.18/s target=6000 remain=615 eta=3497s
+[11:00:57] [progress] new=5386 skip=0 empty=0 fail=1 processed=5387 elapsed=30630s rate=0.18/s target=6000 remain=614 eta=3491s
+[11:01:01] [progress] new=5387 skip=0 empty=0 fail=1 processed=5388 elapsed=30634s rate=0.18/s target=6000 remain=613 eta=3485s
+[11:01:05] [progress] new=5388 skip=0 empty=0 fail=1 processed=5389 elapsed=30638s rate=0.18/s target=6000 remain=612 eta=3479s
+[11:01:05]   [2/3] 金沢 done new=12 R (total_new=5388)
+[11:01:05] [progress] new=5388 skip=0 empty=0 fail=1 processed=5389 elapsed=30638s rate=0.18/s target=6000 remain=612 eta=3479s
+[11:01:10]   [3/3] 園田 12R start
+[11:01:38] [progress] new=5389 skip=0 empty=0 fail=1 processed=5390 elapsed=30671s rate=0.18/s target=6000 remain=611 eta=3477s
+[11:01:42] [progress] new=5391 skip=0 empty=0 fail=1 processed=5392 elapsed=30675s rate=0.18/s target=6000 remain=609 eta=3465s
+[11:01:46] [progress] new=5392 skip=0 empty=0 fail=1 processed=5393 elapsed=30679s rate=0.18/s target=6000 remain=608 eta=3459s
+[11:01:51] [progress] new=5394 skip=0 empty=0 fail=1 processed=5395 elapsed=30683s rate=0.18/s target=6000 remain=606 eta=3447s
+[11:01:55] [progress] new=5395 skip=0 empty=0 fail=1 processed=5396 elapsed=30687s rate=0.18/s target=6000 remain=605 eta=3441s
+[11:01:59] [progress] new=5396 skip=0 empty=0 fail=1 processed=5397 elapsed=30691s rate=0.18/s target=6000 remain=604 eta=3435s
+[11:02:02] [progress] new=5397 skip=0 empty=0 fail=1 processed=5398 elapsed=30695s rate=0.18/s target=6000 remain=603 eta=3429s
+[11:02:05] [progress] new=5399 skip=0 empty=0 fail=1 processed=5400 elapsed=30698s rate=0.18/s target=6000 remain=601 eta=3417s
+[11:02:09] [progress] new=5400 skip=0 empty=0 fail=1 processed=5401 elapsed=30702s rate=0.18/s target=6000 remain=600 eta=3411s
+[11:02:09]   [3/3] 園田 done new=12 R (total_new=5400)
+[11:02:09] [progress] new=5400 skip=0 empty=0 fail=1 processed=5401 elapsed=30702s rate=0.18/s target=6000 remain=600 eta=3411s
+[11:02:09] === day 180/365 2023-06-29 ===
+[11:02:11]   venues=2: ['金沢', '園田']
+[11:02:16]   [1/2] 金沢 12R start
+[11:02:47] [progress] new=5401 skip=0 empty=0 fail=1 processed=5402 elapsed=30739s rate=0.18/s target=6000 remain=599 eta=3409s
+[11:02:51] [progress] new=5402 skip=0 empty=0 fail=1 processed=5403 elapsed=30743s rate=0.18/s target=6000 remain=598 eta=3403s
+[11:02:56] [progress] new=5404 skip=0 empty=0 fail=1 processed=5405 elapsed=30749s rate=0.18/s target=6000 remain=596 eta=3391s
+[11:03:00] [progress] new=5405 skip=0 empty=0 fail=1 processed=5406 elapsed=30753s rate=0.18/s target=6000 remain=595 eta=3385s
+[11:03:04] [progress] new=5406 skip=0 empty=0 fail=1 processed=5407 elapsed=30756s rate=0.18/s target=6000 remain=594 eta=3379s
+[11:03:07] [progress] new=5407 skip=0 empty=0 fail=1 processed=5408 elapsed=30759s rate=0.18/s target=6000 remain=593 eta=3373s
+[11:03:11] [progress] new=5408 skip=0 empty=0 fail=1 processed=5409 elapsed=30763s rate=0.18/s target=6000 remain=592 eta=3367s
+[11:03:15] [progress] new=5409 skip=0 empty=0 fail=1 processed=5410 elapsed=30768s rate=0.18/s target=6000 remain=591 eta=3361s
+[11:03:19] [progress] new=5410 skip=0 empty=0 fail=1 processed=5411 elapsed=30772s rate=0.18/s target=6000 remain=590 eta=3355s
+[11:03:23] [progress] new=5411 skip=0 empty=0 fail=1 processed=5412 elapsed=30775s rate=0.18/s target=6000 remain=589 eta=3349s
+[11:03:27] [progress] new=5412 skip=0 empty=0 fail=1 processed=5413 elapsed=30779s rate=0.18/s target=6000 remain=588 eta=3343s
+[11:03:27]   [1/2] 金沢 done new=12 R (total_new=5412)
+[11:03:27] [progress] new=5412 skip=0 empty=0 fail=1 processed=5413 elapsed=30779s rate=0.18/s target=6000 remain=588 eta=3343s
+[11:03:31]   [2/2] 園田 12R start
+[11:04:03] [progress] new=5413 skip=0 empty=0 fail=1 processed=5414 elapsed=30816s rate=0.18/s target=6000 remain=587 eta=3341s
+[11:04:08] [progress] new=5415 skip=0 empty=0 fail=1 processed=5416 elapsed=30821s rate=0.18/s target=6000 remain=585 eta=3329s
+[11:04:12] [progress] new=5416 skip=0 empty=0 fail=1 processed=5417 elapsed=30824s rate=0.18/s target=6000 remain=584 eta=3323s
+[11:04:18] [progress] new=5418 skip=0 empty=0 fail=1 processed=5419 elapsed=30831s rate=0.18/s target=6000 remain=582 eta=3311s
+[11:04:24] [progress] new=5420 skip=0 empty=0 fail=1 processed=5421 elapsed=30837s rate=0.18/s target=6000 remain=580 eta=3299s
+[11:04:30] [progress] new=5422 skip=0 empty=0 fail=1 processed=5423 elapsed=30843s rate=0.18/s target=6000 remain=578 eta=3287s
+[11:04:34] [progress] new=5423 skip=0 empty=0 fail=1 processed=5424 elapsed=30847s rate=0.18/s target=6000 remain=577 eta=3281s
+[11:04:37]   [2/2] 園田 done new=12 R (total_new=5424)
+[11:04:37] [progress] new=5424 skip=0 empty=0 fail=1 processed=5425 elapsed=30849s rate=0.18/s target=6000 remain=576 eta=3275s
+[11:04:37] === day 181/365 2023-06-30 ===
+[11:04:39]   venues=2: ['金沢', '園田']
+[11:04:44]   [1/2] 金沢 12R start
+[11:05:12] [progress] new=5425 skip=0 empty=0 fail=1 processed=5426 elapsed=30885s rate=0.18/s target=6000 remain=575 eta=3273s
+[11:05:19] [progress] new=5427 skip=0 empty=0 fail=1 processed=5428 elapsed=30892s rate=0.18/s target=6000 remain=573 eta=3261s
+[11:05:23] [progress] new=5428 skip=0 empty=0 fail=1 processed=5429 elapsed=30896s rate=0.18/s target=6000 remain=572 eta=3255s
+[11:05:30] [progress] new=5430 skip=0 empty=0 fail=1 processed=5431 elapsed=30903s rate=0.18/s target=6000 remain=570 eta=3243s
+[11:05:37] [progress] new=5432 skip=0 empty=0 fail=1 processed=5433 elapsed=30910s rate=0.18/s target=6000 remain=568 eta=3231s
+[11:05:41] [progress] new=5433 skip=0 empty=0 fail=1 processed=5434 elapsed=30914s rate=0.18/s target=6000 remain=567 eta=3226s
+[11:05:44] [progress] new=5434 skip=0 empty=0 fail=1 processed=5435 elapsed=30917s rate=0.18/s target=6000 remain=566 eta=3220s
+[11:05:51] [progress] new=5436 skip=0 empty=0 fail=1 processed=5437 elapsed=30924s rate=0.18/s target=6000 remain=564 eta=3208s
+[11:05:51]   [1/2] 金沢 done new=12 R (total_new=5436)
+[11:05:51] [progress] new=5436 skip=0 empty=0 fail=1 processed=5437 elapsed=30924s rate=0.18/s target=6000 remain=564 eta=3208s
+[11:05:57]   [2/2] 園田 12R start
+[11:06:28] [progress] new=5437 skip=0 empty=0 fail=1 processed=5438 elapsed=30960s rate=0.18/s target=6000 remain=563 eta=3205s
+[11:06:35] [progress] new=5439 skip=0 empty=0 fail=1 processed=5440 elapsed=30968s rate=0.18/s target=6000 remain=561 eta=3194s
+[11:06:39] [progress] new=5440 skip=0 empty=0 fail=1 processed=5441 elapsed=30972s rate=0.18/s target=6000 remain=560 eta=3188s
+[11:06:43] [progress] new=5441 skip=0 empty=0 fail=1 processed=5442 elapsed=30976s rate=0.18/s target=6000 remain=559 eta=3182s
+[11:06:46] [progress] new=5442 skip=0 empty=0 fail=1 processed=5443 elapsed=30979s rate=0.18/s target=6000 remain=558 eta=3176s
+[11:06:49] [progress] new=5443 skip=0 empty=0 fail=1 processed=5444 elapsed=30982s rate=0.18/s target=6000 remain=557 eta=3170s
+[11:06:53] [progress] new=5444 skip=0 empty=0 fail=1 processed=5445 elapsed=30986s rate=0.18/s target=6000 remain=556 eta=3164s
+[11:06:58] [progress] new=5445 skip=0 empty=0 fail=1 processed=5446 elapsed=30991s rate=0.18/s target=6000 remain=555 eta=3158s
+[11:07:03] [progress] new=5447 skip=0 empty=0 fail=1 processed=5448 elapsed=30996s rate=0.18/s target=6000 remain=553 eta=3146s
+[11:07:06]   [2/2] 園田 done new=12 R (total_new=5448)
+[11:07:06] [progress] new=5448 skip=0 empty=0 fail=1 processed=5449 elapsed=30999s rate=0.18/s target=6000 remain=552 eta=3140s
+[11:07:06] === day 182/365 2023-07-01 ===
+[11:07:09]   venues=3: ['船橋', '高知', '川崎']
+[11:07:12]   [1/3] 船橋 12R start
+[11:07:44] [progress] new=5449 skip=0 empty=0 fail=1 processed=5450 elapsed=31036s rate=0.18/s target=6000 remain=551 eta=3138s
+[11:07:48] [progress] new=5450 skip=0 empty=0 fail=1 processed=5451 elapsed=31040s rate=0.18/s target=6000 remain=550 eta=3132s
+[11:07:53] [progress] new=5452 skip=0 empty=0 fail=1 processed=5453 elapsed=31046s rate=0.18/s target=6000 remain=548 eta=3120s
+[11:07:58] [progress] new=5454 skip=0 empty=0 fail=1 processed=5455 elapsed=31051s rate=0.18/s target=6000 remain=546 eta=3108s
+[11:08:02] [progress] new=5455 skip=0 empty=0 fail=1 processed=5456 elapsed=31055s rate=0.18/s target=6000 remain=545 eta=3102s
+[11:08:07] [progress] new=5457 skip=0 empty=0 fail=1 processed=5458 elapsed=31059s rate=0.18/s target=6000 remain=543 eta=3090s
+[11:08:13] [progress] new=5459 skip=0 empty=0 fail=1 processed=5460 elapsed=31065s rate=0.18/s target=6000 remain=541 eta=3078s
+[11:08:15]   [1/3] 船橋 done new=12 R (total_new=5460)
+[11:08:15] [progress] new=5460 skip=0 empty=0 fail=1 processed=5461 elapsed=31068s rate=0.18/s target=6000 remain=540 eta=3072s
+[11:08:19]   [2/3] 高知 12R start
+[11:08:49] [progress] new=5461 skip=0 empty=0 fail=1 processed=5462 elapsed=31102s rate=0.18/s target=6000 remain=539 eta=3069s
+[11:08:55] [progress] new=5463 skip=0 empty=0 fail=1 processed=5464 elapsed=31108s rate=0.18/s target=6000 remain=537 eta=3057s
+[11:09:00] [progress] new=5465 skip=0 empty=0 fail=1 processed=5466 elapsed=31113s rate=0.18/s target=6000 remain=535 eta=3045s
+[11:09:04] [progress] new=5466 skip=0 empty=0 fail=1 processed=5467 elapsed=31117s rate=0.18/s target=6000 remain=534 eta=3039s
+[11:09:09] [progress] new=5468 skip=0 empty=0 fail=1 processed=5469 elapsed=31122s rate=0.18/s target=6000 remain=532 eta=3027s
+[11:09:16] [progress] new=5470 skip=0 empty=0 fail=1 processed=5471 elapsed=31128s rate=0.18/s target=6000 remain=530 eta=3016s
+[11:09:22] [progress] new=5472 skip=0 empty=0 fail=1 processed=5473 elapsed=31134s rate=0.18/s target=6000 remain=528 eta=3004s
+[11:09:22]   [2/3] 高知 done new=12 R (total_new=5472)
+[11:09:22] [progress] new=5472 skip=0 empty=0 fail=1 processed=5473 elapsed=31134s rate=0.18/s target=6000 remain=528 eta=3004s
+[11:09:25]   [3/3] 川崎 11R start
+[11:09:53] [progress] new=5473 skip=0 empty=0 fail=1 processed=5474 elapsed=31166s rate=0.18/s target=6000 remain=527 eta=3000s
+[11:10:01] [progress] new=5475 skip=0 empty=0 fail=1 processed=5476 elapsed=31173s rate=0.18/s target=6000 remain=525 eta=2989s
+[11:10:05] [progress] new=5476 skip=0 empty=0 fail=1 processed=5477 elapsed=31178s rate=0.18/s target=6000 remain=524 eta=2983s
+[11:10:11] [progress] new=5478 skip=0 empty=0 fail=1 processed=5479 elapsed=31184s rate=0.18/s target=6000 remain=522 eta=2971s
+[11:10:18] [progress] new=5480 skip=0 empty=0 fail=1 processed=5481 elapsed=31191s rate=0.18/s target=6000 remain=520 eta=2959s
+[11:10:22] [progress] new=5481 skip=0 empty=0 fail=1 processed=5482 elapsed=31195s rate=0.18/s target=6000 remain=519 eta=2953s
+[11:10:27] [progress] new=5482 skip=0 empty=0 fail=1 processed=5483 elapsed=31199s rate=0.18/s target=6000 remain=518 eta=2947s
+[11:10:28]   [3/3] 川崎 done new=11 R (total_new=5483)
+[11:10:28] [progress] new=5483 skip=0 empty=0 fail=1 processed=5484 elapsed=31201s rate=0.18/s target=6000 remain=517 eta=2941s
+[11:10:28] === day 183/365 2023-07-02 ===
+[11:10:31]   venues=4: ['船橋', '水沢', '高知', '川崎']
+[11:10:36]   [1/4] 船橋 12R start
+[11:11:08] [progress] new=5484 skip=0 empty=0 fail=1 processed=5485 elapsed=31241s rate=0.18/s target=6000 remain=516 eta=2939s
+[11:11:14] [progress] new=5486 skip=0 empty=0 fail=1 processed=5487 elapsed=31247s rate=0.18/s target=6000 remain=514 eta=2927s
+[11:11:18] [progress] new=5488 skip=0 empty=0 fail=1 processed=5489 elapsed=31251s rate=0.18/s target=6000 remain=512 eta=2915s
+[11:11:22] [progress] new=5489 skip=0 empty=0 fail=1 processed=5490 elapsed=31255s rate=0.18/s target=6000 remain=511 eta=2909s
+[11:11:28] [progress] new=5491 skip=0 empty=0 fail=1 processed=5492 elapsed=31261s rate=0.18/s target=6000 remain=509 eta=2897s
+[11:11:32] [progress] new=5492 skip=0 empty=0 fail=1 processed=5493 elapsed=31265s rate=0.18/s target=6000 remain=508 eta=2891s
+[11:11:37] [progress] new=5494 skip=0 empty=0 fail=1 processed=5495 elapsed=31269s rate=0.18/s target=6000 remain=506 eta=2879s
+[11:11:41] [progress] new=5495 skip=0 empty=0 fail=1 processed=5496 elapsed=31273s rate=0.18/s target=6000 remain=505 eta=2874s
+[11:11:41]   [1/4] 船橋 done new=12 R (total_new=5495)
+[11:11:41] [progress] new=5495 skip=0 empty=0 fail=1 processed=5496 elapsed=31273s rate=0.18/s target=6000 remain=505 eta=2874s
+[11:11:47]   [2/4] 水沢 11R start
+[11:12:16] [progress] new=5496 skip=0 empty=0 fail=1 processed=5497 elapsed=31309s rate=0.18/s target=6000 remain=504 eta=2871s
+[11:12:20] [progress] new=5498 skip=0 empty=0 fail=1 processed=5499 elapsed=31313s rate=0.18/s target=6000 remain=502 eta=2859s
+[11:12:24] [progress] new=5499 skip=0 empty=0 fail=1 processed=5500 elapsed=31317s rate=0.18/s target=6000 remain=501 eta=2853s
+[11:12:28] [progress] new=5500 skip=0 empty=0 fail=1 processed=5501 elapsed=31321s rate=0.18/s target=6000 remain=500 eta=2847s
+[11:12:32] [progress] new=5501 skip=0 empty=0 fail=1 processed=5502 elapsed=31324s rate=0.18/s target=6000 remain=499 eta=2841s
+[11:12:35] [progress] new=5502 skip=0 empty=0 fail=1 processed=5503 elapsed=31327s rate=0.18/s target=6000 remain=498 eta=2835s
+[11:12:39] [progress] new=5503 skip=0 empty=0 fail=1 processed=5504 elapsed=31332s rate=0.18/s target=6000 remain=497 eta=2829s
+[11:12:42] [progress] new=5504 skip=0 empty=0 fail=1 processed=5505 elapsed=31335s rate=0.18/s target=6000 remain=496 eta=2823s
+[11:12:49] [progress] new=5506 skip=0 empty=0 fail=1 processed=5507 elapsed=31341s rate=0.18/s target=6000 remain=494 eta=2811s
+[11:12:49]   [2/4] 水沢 done new=11 R (total_new=5506)
+[11:12:49] [progress] new=5506 skip=0 empty=0 fail=1 processed=5507 elapsed=31341s rate=0.18/s target=6000 remain=494 eta=2811s
+[11:12:55]   [3/4] 高知 11R start
+[11:13:26] [progress] new=5507 skip=0 empty=0 fail=1 processed=5508 elapsed=31379s rate=0.18/s target=6000 remain=493 eta=2809s
+[11:13:31] [progress] new=5509 skip=0 empty=0 fail=1 processed=5510 elapsed=31384s rate=0.18/s target=6000 remain=491 eta=2797s
+[11:13:34] [progress] new=5510 skip=0 empty=0 fail=1 processed=5511 elapsed=31387s rate=0.18/s target=6000 remain=490 eta=2791s
+[11:13:38] [progress] new=5511 skip=0 empty=0 fail=1 processed=5512 elapsed=31390s rate=0.18/s target=6000 remain=489 eta=2785s
+[11:13:44] [progress] new=5513 skip=0 empty=0 fail=1 processed=5514 elapsed=31396s rate=0.18/s target=6000 remain=487 eta=2773s
+[11:13:48] [progress] new=5514 skip=0 empty=0 fail=1 processed=5515 elapsed=31401s rate=0.18/s target=6000 remain=486 eta=2767s
+[11:13:54] [progress] new=5516 skip=0 empty=0 fail=1 processed=5517 elapsed=31406s rate=0.18/s target=6000 remain=484 eta=2755s
+[11:13:56]   [3/4] 高知 done new=11 R (total_new=5517)
+[11:13:56] [progress] new=5517 skip=0 empty=0 fail=1 processed=5518 elapsed=31409s rate=0.18/s target=6000 remain=483 eta=2749s
+[11:14:01]   [4/4] 川崎 11R start
+[11:14:31] [progress] new=5518 skip=0 empty=0 fail=1 processed=5519 elapsed=31444s rate=0.18/s target=6000 remain=482 eta=2746s
+[11:14:34] [progress] new=5519 skip=0 empty=0 fail=1 processed=5520 elapsed=31447s rate=0.18/s target=6000 remain=481 eta=2740s
+[11:14:39] [progress] new=5520 skip=0 empty=0 fail=1 processed=5521 elapsed=31452s rate=0.18/s target=6000 remain=480 eta=2734s
+[11:14:46] [progress] new=5522 skip=0 empty=0 fail=1 processed=5523 elapsed=31458s rate=0.18/s target=6000 remain=478 eta=2723s
+[11:14:52] [progress] new=5524 skip=0 empty=0 fail=1 processed=5525 elapsed=31465s rate=0.18/s target=6000 remain=476 eta=2711s
+[11:14:58] [progress] new=5526 skip=0 empty=0 fail=1 processed=5527 elapsed=31470s rate=0.18/s target=6000 remain=474 eta=2699s
+[11:15:02] [progress] new=5527 skip=0 empty=0 fail=1 processed=5528 elapsed=31475s rate=0.18/s target=6000 remain=473 eta=2693s
+[11:15:05]   [4/4] 川崎 done new=11 R (total_new=5528)
+[11:15:05] [progress] new=5528 skip=0 empty=0 fail=1 processed=5529 elapsed=31477s rate=0.18/s target=6000 remain=472 eta=2687s
+[11:15:05] === day 184/365 2023-07-03 ===
+[11:15:07]   venues=3: ['船橋', '水沢', '名古屋']
+[11:15:12]   [1/3] 船橋 12R start
+[11:15:45] [progress] new=5529 skip=0 empty=0 fail=1 processed=5530 elapsed=31517s rate=0.18/s target=6000 remain=471 eta=2684s
+[11:15:50] [progress] new=5531 skip=0 empty=0 fail=1 processed=5532 elapsed=31522s rate=0.18/s target=6000 remain=469 eta=2672s
+[11:15:54] [progress] new=5532 skip=0 empty=0 fail=1 processed=5533 elapsed=31526s rate=0.18/s target=6000 remain=468 eta=2667s
+[11:15:57] [progress] new=5533 skip=0 empty=0 fail=1 processed=5534 elapsed=31529s rate=0.18/s target=6000 remain=467 eta=2661s
+[11:16:01] [progress] new=5534 skip=0 empty=0 fail=1 processed=5535 elapsed=31534s rate=0.18/s target=6000 remain=466 eta=2655s
+[11:16:06] [progress] new=5536 skip=0 empty=0 fail=1 processed=5537 elapsed=31538s rate=0.18/s target=6000 remain=464 eta=2643s
+[11:16:09] [progress] new=5537 skip=0 empty=0 fail=1 processed=5538 elapsed=31542s rate=0.18/s target=6000 remain=463 eta=2637s
+[11:16:14] [progress] new=5538 skip=0 empty=0 fail=1 processed=5539 elapsed=31546s rate=0.18/s target=6000 remain=462 eta=2631s
+[11:16:19] [progress] new=5540 skip=0 empty=0 fail=1 processed=5541 elapsed=31552s rate=0.18/s target=6000 remain=460 eta=2619s
+[11:16:19]   [1/3] 船橋 done new=12 R (total_new=5540)
+[11:16:19] [progress] new=5540 skip=0 empty=0 fail=1 processed=5541 elapsed=31552s rate=0.18/s target=6000 remain=460 eta=2619s
+[11:16:26]   [2/3] 水沢 12R start
+[11:17:00] [progress] new=5541 skip=0 empty=0 fail=1 processed=5542 elapsed=31593s rate=0.18/s target=6000 remain=459 eta=2617s
+[11:17:06] [progress] new=5543 skip=0 empty=0 fail=1 processed=5544 elapsed=31598s rate=0.18/s target=6000 remain=457 eta=2605s
+[11:17:13] [progress] new=5545 skip=0 empty=0 fail=1 processed=5546 elapsed=31605s rate=0.18/s target=6000 remain=455 eta=2593s
+[11:17:17] [progress] new=5546 skip=0 empty=0 fail=1 processed=5547 elapsed=31610s rate=0.18/s target=6000 remain=454 eta=2587s
+[11:17:24] [progress] new=5548 skip=0 empty=0 fail=1 processed=5549 elapsed=31617s rate=0.18/s target=6000 remain=452 eta=2575s
+[11:17:29] [progress] new=5549 skip=0 empty=0 fail=1 processed=5550 elapsed=31621s rate=0.18/s target=6000 remain=451 eta=2570s
+[11:17:34] [progress] new=5551 skip=0 empty=0 fail=1 processed=5552 elapsed=31627s rate=0.18/s target=6000 remain=449 eta=2558s
+[11:17:39] [progress] new=5552 skip=0 empty=0 fail=1 processed=5553 elapsed=31631s rate=0.18/s target=6000 remain=448 eta=2552s
+[11:17:39]   [2/3] 水沢 done new=12 R (total_new=5552)
+[11:17:39] [progress] new=5552 skip=0 empty=0 fail=1 processed=5553 elapsed=31631s rate=0.18/s target=6000 remain=448 eta=2552s
+[11:17:43]   [3/3] 名古屋 12R start
+[11:18:15] [progress] new=5553 skip=0 empty=0 fail=1 processed=5554 elapsed=31667s rate=0.18/s target=6000 remain=447 eta=2549s
+[11:18:24] [progress] new=5555 skip=0 empty=0 fail=1 processed=5556 elapsed=31676s rate=0.18/s target=6000 remain=445 eta=2537s
+[11:18:31] [progress] new=5557 skip=0 empty=0 fail=1 processed=5558 elapsed=31683s rate=0.18/s target=6000 remain=443 eta=2525s
+[11:18:35] [progress] new=5559 skip=0 empty=0 fail=1 processed=5560 elapsed=31688s rate=0.18/s target=6000 remain=441 eta=2513s
+[11:18:39] [progress] new=5560 skip=0 empty=0 fail=1 processed=5561 elapsed=31691s rate=0.18/s target=6000 remain=440 eta=2507s
+[11:18:42] [progress] new=5561 skip=0 empty=0 fail=1 processed=5562 elapsed=31694s rate=0.18/s target=6000 remain=439 eta=2502s
+[11:18:46] [progress] new=5563 skip=0 empty=0 fail=1 processed=5564 elapsed=31699s rate=0.18/s target=6000 remain=437 eta=2490s
+[11:18:50] [progress] new=5564 skip=0 empty=0 fail=1 processed=5565 elapsed=31703s rate=0.18/s target=6000 remain=436 eta=2484s
+[11:18:50]   [3/3] 名古屋 done new=12 R (total_new=5564)
+[11:18:50] [progress] new=5564 skip=0 empty=0 fail=1 processed=5565 elapsed=31703s rate=0.18/s target=6000 remain=436 eta=2484s
+[11:18:50] === day 185/365 2023-07-04 ===
+[11:18:52]   venues=4: ['水沢', '名古屋', '笠松', '川崎']
+[11:18:58]   [1/4] 水沢 12R start
+[11:19:31] [progress] new=5565 skip=0 empty=0 fail=1 processed=5566 elapsed=31744s rate=0.18/s target=6000 remain=435 eta=2481s
+[11:19:37] [progress] new=5567 skip=0 empty=0 fail=1 processed=5568 elapsed=31750s rate=0.18/s target=6000 remain=433 eta=2469s
+[11:19:41] [progress] new=5568 skip=0 empty=0 fail=1 processed=5569 elapsed=31753s rate=0.18/s target=6000 remain=432 eta=2463s
+[11:19:46] [progress] new=5570 skip=0 empty=0 fail=1 processed=5571 elapsed=31758s rate=0.18/s target=6000 remain=430 eta=2451s
+[11:19:49] [progress] new=5571 skip=0 empty=0 fail=1 processed=5572 elapsed=31761s rate=0.18/s target=6000 remain=429 eta=2445s
+[11:19:53] [progress] new=5572 skip=0 empty=0 fail=1 processed=5573 elapsed=31766s rate=0.18/s target=6000 remain=428 eta=2440s
+[11:19:58] [progress] new=5574 skip=0 empty=0 fail=1 processed=5575 elapsed=31770s rate=0.18/s target=6000 remain=426 eta=2428s
+[11:20:02] [progress] new=5575 skip=0 empty=0 fail=1 processed=5576 elapsed=31775s rate=0.18/s target=6000 remain=425 eta=2422s
+[11:20:07] [progress] new=5576 skip=0 empty=0 fail=1 processed=5577 elapsed=31779s rate=0.18/s target=6000 remain=424 eta=2416s
+[11:20:07]   [1/4] 水沢 done new=12 R (total_new=5576)
+[11:20:07] [progress] new=5576 skip=0 empty=0 fail=1 processed=5577 elapsed=31779s rate=0.18/s target=6000 remain=424 eta=2416s
+[11:20:12]   [2/4] 名古屋 12R start
+[11:20:50] [progress] new=5577 skip=0 empty=0 fail=1 processed=5578 elapsed=31823s rate=0.18/s target=6000 remain=423 eta=2413s
+[11:20:54] [progress] new=5579 skip=0 empty=0 fail=1 processed=5580 elapsed=31827s rate=0.18/s target=6000 remain=421 eta=2401s
+[11:21:00] [progress] new=5581 skip=0 empty=0 fail=1 processed=5582 elapsed=31832s rate=0.18/s target=6000 remain=419 eta=2389s
+[11:21:06] [progress] new=5583 skip=0 empty=0 fail=1 processed=5584 elapsed=31838s rate=0.18/s target=6000 remain=417 eta=2378s
+[11:21:10] [progress] new=5585 skip=0 empty=0 fail=1 processed=5586 elapsed=31843s rate=0.18/s target=6000 remain=415 eta=2366s
+[11:21:15] [progress] new=5586 skip=0 empty=0 fail=1 processed=5587 elapsed=31848s rate=0.18/s target=6000 remain=414 eta=2360s
+[11:21:20] [progress] new=5588 skip=0 empty=0 fail=1 processed=5589 elapsed=31852s rate=0.18/s target=6000 remain=412 eta=2348s
+[11:21:20]   [2/4] 名古屋 done new=12 R (total_new=5588)
+[11:21:20] [progress] new=5588 skip=0 empty=0 fail=1 processed=5589 elapsed=31852s rate=0.18/s target=6000 remain=412 eta=2348s
+[11:21:24]   [3/4] 笠松 10R start
+[11:21:54] [progress] new=5589 skip=0 empty=0 fail=1 processed=5590 elapsed=31886s rate=0.18/s target=6000 remain=411 eta=2344s
+[11:21:58] [progress] new=5591 skip=0 empty=0 fail=1 processed=5592 elapsed=31891s rate=0.18/s target=6000 remain=409 eta=2332s
+[11:22:03] [progress] new=5592 skip=0 empty=0 fail=1 processed=5593 elapsed=31895s rate=0.18/s target=6000 remain=408 eta=2327s
+[11:22:09] [progress] new=5594 skip=0 empty=0 fail=1 processed=5595 elapsed=31902s rate=0.18/s target=6000 remain=406 eta=2315s
+[11:22:16] [progress] new=5596 skip=0 empty=0 fail=1 processed=5597 elapsed=31908s rate=0.18/s target=6000 remain=404 eta=2303s
+[11:22:20] [progress] new=5598 skip=0 empty=0 fail=1 processed=5599 elapsed=31912s rate=0.18/s target=6000 remain=402 eta=2291s
+[11:22:20]   [3/4] 笠松 done new=10 R (total_new=5598)
+[11:22:20] [progress] new=5598 skip=0 empty=0 fail=1 processed=5599 elapsed=31912s rate=0.18/s target=6000 remain=402 eta=2291s
+[11:22:28]   [4/4] 川崎 11R start
+[11:22:59] [progress] new=5599 skip=0 empty=0 fail=1 processed=5600 elapsed=31951s rate=0.18/s target=6000 remain=401 eta=2288s
+[11:23:03] [progress] new=5601 skip=0 empty=0 fail=1 processed=5602 elapsed=31956s rate=0.18/s target=6000 remain=399 eta=2276s
+[11:23:09] [progress] new=5602 skip=0 empty=0 fail=1 processed=5603 elapsed=31962s rate=0.18/s target=6000 remain=398 eta=2270s
+[11:23:16] [progress] new=5604 skip=0 empty=0 fail=1 processed=5605 elapsed=31969s rate=0.18/s target=6000 remain=396 eta=2259s
+[11:23:21] [progress] new=5605 skip=0 empty=0 fail=1 processed=5606 elapsed=31974s rate=0.18/s target=6000 remain=395 eta=2253s
+[11:23:28] [progress] new=5607 skip=0 empty=0 fail=1 processed=5608 elapsed=31981s rate=0.18/s target=6000 remain=393 eta=2241s
+[11:23:33] [progress] new=5608 skip=0 empty=0 fail=1 processed=5609 elapsed=31985s rate=0.18/s target=6000 remain=392 eta=2235s
+[11:23:35]   [4/4] 川崎 done new=11 R (total_new=5609)
+[11:23:35] [progress] new=5609 skip=0 empty=0 fail=1 processed=5610 elapsed=31988s rate=0.18/s target=6000 remain=391 eta=2229s
+[11:23:35] === day 186/365 2023-07-05 ===
+[11:23:38]   venues=3: ['34', '笠松', '園田']
+[11:23:41]   [1/3] 34 12R start
+[11:24:15] [progress] new=5610 skip=0 empty=0 fail=1 processed=5611 elapsed=32028s rate=0.18/s target=6000 remain=390 eta=2226s
+[11:24:19] [progress] new=5612 skip=0 empty=0 fail=1 processed=5613 elapsed=32032s rate=0.18/s target=6000 remain=388 eta=2214s
+[11:24:24] [progress] new=5613 skip=0 empty=0 fail=1 processed=5614 elapsed=32037s rate=0.18/s target=6000 remain=387 eta=2208s
+[11:24:28] [progress] new=5615 skip=0 empty=0 fail=1 processed=5616 elapsed=32041s rate=0.18/s target=6000 remain=385 eta=2197s
+[11:24:33] [progress] new=5616 skip=0 empty=0 fail=1 processed=5617 elapsed=32045s rate=0.18/s target=6000 remain=384 eta=2191s
+[11:24:38] [progress] new=5618 skip=0 empty=0 fail=1 processed=5619 elapsed=32051s rate=0.18/s target=6000 remain=382 eta=2179s
+[11:24:45] [progress] new=5620 skip=0 empty=0 fail=1 processed=5621 elapsed=32058s rate=0.18/s target=6000 remain=380 eta=2167s
+[11:24:48] [progress] new=5621 skip=0 empty=0 fail=1 processed=5622 elapsed=32061s rate=0.18/s target=6000 remain=379 eta=2161s
+[11:24:48]   [1/3] 34 done new=12 R (total_new=5621)
+[11:24:48] [progress] new=5621 skip=0 empty=0 fail=1 processed=5622 elapsed=32061s rate=0.18/s target=6000 remain=379 eta=2161s
+[11:24:52]   [2/3] 笠松 11R start
+[11:25:24] [progress] new=5622 skip=0 empty=0 fail=1 processed=5623 elapsed=32096s rate=0.18/s target=6000 remain=378 eta=2158s
+[11:25:27] [progress] new=5623 skip=0 empty=0 fail=1 processed=5624 elapsed=32100s rate=0.18/s target=6000 remain=377 eta=2152s
+[11:25:31] [progress] new=5624 skip=0 empty=0 fail=1 processed=5625 elapsed=32104s rate=0.18/s target=6000 remain=376 eta=2146s
+[11:25:35] [progress] new=5626 skip=0 empty=0 fail=1 processed=5627 elapsed=32108s rate=0.18/s target=6000 remain=374 eta=2134s
+[11:25:40] [progress] new=5628 skip=0 empty=0 fail=1 processed=5629 elapsed=32113s rate=0.18/s target=6000 remain=372 eta=2122s
+[11:25:45] [progress] new=5630 skip=0 empty=0 fail=1 processed=5631 elapsed=32118s rate=0.18/s target=6000 remain=370 eta=2110s
+[11:25:48] [progress] new=5631 skip=0 empty=0 fail=1 processed=5632 elapsed=32121s rate=0.18/s target=6000 remain=369 eta=2105s
+[11:25:51]   [2/3] 笠松 done new=11 R (total_new=5632)
+[11:25:51] [progress] new=5632 skip=0 empty=0 fail=1 processed=5633 elapsed=32123s rate=0.18/s target=6000 remain=368 eta=2099s
+[11:25:58]   [3/3] 園田 12R start
+[11:26:33] [progress] new=5633 skip=0 empty=0 fail=1 processed=5634 elapsed=32166s rate=0.18/s target=6000 remain=367 eta=2095s
+[11:26:37] [progress] new=5634 skip=0 empty=0 fail=1 processed=5635 elapsed=32170s rate=0.18/s target=6000 remain=366 eta=2089s
+[11:26:43] [progress] new=5636 skip=0 empty=0 fail=1 processed=5637 elapsed=32175s rate=0.18/s target=6000 remain=364 eta=2078s
+[11:26:49] [progress] new=5638 skip=0 empty=0 fail=1 processed=5639 elapsed=32181s rate=0.18/s target=6000 remain=362 eta=2066s
+[11:26:52] [progress] new=5639 skip=0 empty=0 fail=1 processed=5640 elapsed=32185s rate=0.18/s target=6000 remain=361 eta=2060s
+[11:26:58] [progress] new=5641 skip=0 empty=0 fail=1 processed=5642 elapsed=32190s rate=0.18/s target=6000 remain=359 eta=2048s
+[11:27:03] [progress] new=5642 skip=0 empty=0 fail=1 processed=5643 elapsed=32195s rate=0.18/s target=6000 remain=358 eta=2043s
+[11:27:06] [progress] new=5643 skip=0 empty=0 fail=1 processed=5644 elapsed=32199s rate=0.18/s target=6000 remain=357 eta=2037s
+[11:27:11] [progress] new=5644 skip=0 empty=0 fail=1 processed=5645 elapsed=32203s rate=0.18/s target=6000 remain=356 eta=2031s
+[11:27:11]   [3/3] 園田 done new=12 R (total_new=5644)
+[11:27:11] [progress] new=5644 skip=0 empty=0 fail=1 processed=5645 elapsed=32203s rate=0.18/s target=6000 remain=356 eta=2031s
+[11:27:11] === day 187/365 2023-07-06 ===
+[11:27:14]   venues=2: ['笠松', '園田']
+[11:27:21]   [1/2] 笠松 11R start
+[11:27:51] [progress] new=5645 skip=0 empty=0 fail=1 processed=5646 elapsed=32243s rate=0.18/s target=6000 remain=355 eta=2027s
+[11:27:56] [progress] new=5647 skip=0 empty=0 fail=1 processed=5648 elapsed=32249s rate=0.18/s target=6000 remain=353 eta=2016s
+[11:28:02] [progress] new=5649 skip=0 empty=0 fail=1 processed=5650 elapsed=32254s rate=0.18/s target=6000 remain=351 eta=2004s
+[11:28:07] [progress] new=5651 skip=0 empty=0 fail=1 processed=5652 elapsed=32260s rate=0.18/s target=6000 remain=349 eta=1992s
+[11:28:15] [progress] new=5653 skip=0 empty=0 fail=1 processed=5654 elapsed=32267s rate=0.18/s target=6000 remain=347 eta=1980s
+[11:28:18] [progress] new=5654 skip=0 empty=0 fail=1 processed=5655 elapsed=32270s rate=0.18/s target=6000 remain=346 eta=1974s
+[11:28:20]   [1/2] 笠松 done new=11 R (total_new=5655)
+[11:28:20] [progress] new=5655 skip=0 empty=0 fail=1 processed=5656 elapsed=32273s rate=0.18/s target=6000 remain=345 eta=1969s
+[11:28:25]   [2/2] 園田 12R start
+[11:29:01] [progress] new=5656 skip=0 empty=0 fail=1 processed=5657 elapsed=32313s rate=0.18/s target=6000 remain=344 eta=1965s
+[11:29:05] [progress] new=5657 skip=0 empty=0 fail=1 processed=5658 elapsed=32318s rate=0.18/s target=6000 remain=343 eta=1959s
+[11:29:10] [progress] new=5658 skip=0 empty=0 fail=1 processed=5659 elapsed=32322s rate=0.18/s target=6000 remain=342 eta=1953s
+[11:29:14] [progress] new=5660 skip=0 empty=0 fail=1 processed=5661 elapsed=32326s rate=0.18/s target=6000 remain=340 eta=1942s
+[11:29:18] [progress] new=5661 skip=0 empty=0 fail=1 processed=5662 elapsed=32331s rate=0.18/s target=6000 remain=339 eta=1936s
+[11:29:23] [progress] new=5662 skip=0 empty=0 fail=1 processed=5663 elapsed=32336s rate=0.18/s target=6000 remain=338 eta=1930s
+[11:29:30] [progress] new=5664 skip=0 empty=0 fail=1 processed=5665 elapsed=32343s rate=0.18/s target=6000 remain=336 eta=1918s
+[11:29:34] [progress] new=5665 skip=0 empty=0 fail=1 processed=5666 elapsed=32347s rate=0.18/s target=6000 remain=335 eta=1912s
+[11:29:37] [progress] new=5666 skip=0 empty=0 fail=1 processed=5667 elapsed=32350s rate=0.18/s target=6000 remain=334 eta=1907s
+[11:29:42] [progress] new=5667 skip=0 empty=0 fail=1 processed=5668 elapsed=32355s rate=0.18/s target=6000 remain=333 eta=1901s
+[11:29:42]   [2/2] 園田 done new=12 R (total_new=5667)
+[11:29:42] [progress] new=5667 skip=0 empty=0 fail=1 processed=5668 elapsed=32355s rate=0.18/s target=6000 remain=333 eta=1901s
+[11:29:42] === day 188/365 2023-07-07 ===
+[11:29:46]   venues=2: ['笠松', '園田']
+[11:29:51]   [1/2] 笠松 12R start
+[11:30:22] [progress] new=5668 skip=0 empty=0 fail=1 processed=5669 elapsed=32395s rate=0.17/s target=6000 remain=332 eta=1897s
+[11:30:26] [progress] new=5669 skip=0 empty=0 fail=1 processed=5670 elapsed=32398s rate=0.18/s target=6000 remain=331 eta=1891s
+[11:30:30] [progress] new=5671 skip=0 empty=0 fail=1 processed=5672 elapsed=32403s rate=0.18/s target=6000 remain=329 eta=1880s
+[11:30:34] [progress] new=5672 skip=0 empty=0 fail=1 processed=5673 elapsed=32406s rate=0.18/s target=6000 remain=328 eta=1874s
+[11:30:38] [progress] new=5673 skip=0 empty=0 fail=1 processed=5674 elapsed=32410s rate=0.18/s target=6000 remain=327 eta=1868s
+[11:30:41] [progress] new=5674 skip=0 empty=0 fail=1 processed=5675 elapsed=32413s rate=0.18/s target=6000 remain=326 eta=1862s
+[11:30:48] [progress] new=5677 skip=0 empty=0 fail=1 processed=5678 elapsed=32421s rate=0.18/s target=6000 remain=323 eta=1844s
+[11:30:52] [progress] new=5679 skip=0 empty=0 fail=1 processed=5680 elapsed=32425s rate=0.18/s target=6000 remain=321 eta=1832s
+[11:30:52]   [1/2] 笠松 done new=12 R (total_new=5679)
+[11:30:52] [progress] new=5679 skip=0 empty=0 fail=1 processed=5680 elapsed=32425s rate=0.18/s target=6000 remain=321 eta=1832s
+[11:30:58]   [2/2] 園田 12R start
+[11:31:35] [progress] new=5680 skip=0 empty=0 fail=1 processed=5681 elapsed=32467s rate=0.17/s target=6000 remain=320 eta=1829s
+[11:31:42] [progress] new=5682 skip=0 empty=0 fail=1 processed=5683 elapsed=32475s rate=0.17/s target=6000 remain=318 eta=1817s
+[11:31:47] [progress] new=5683 skip=0 empty=0 fail=1 processed=5684 elapsed=32479s rate=0.18/s target=6000 remain=317 eta=1811s
+[11:31:51] [progress] new=5685 skip=0 empty=0 fail=1 processed=5686 elapsed=32484s rate=0.18/s target=6000 remain=315 eta=1800s
+[11:31:55] [progress] new=5686 skip=0 empty=0 fail=1 processed=5687 elapsed=32487s rate=0.18/s target=6000 remain=314 eta=1794s
+[11:32:01] [progress] new=5688 skip=0 empty=0 fail=1 processed=5689 elapsed=32494s rate=0.18/s target=6000 remain=312 eta=1782s
+[11:32:06] [progress] new=5689 skip=0 empty=0 fail=1 processed=5690 elapsed=32498s rate=0.18/s target=6000 remain=311 eta=1776s
+[11:32:11] [progress] new=5690 skip=0 empty=0 fail=1 processed=5691 elapsed=32503s rate=0.18/s target=6000 remain=310 eta=1771s
+[11:32:13]   [2/2] 園田 done new=12 R (total_new=5691)
+[11:32:13] [progress] new=5691 skip=0 empty=0 fail=1 processed=5692 elapsed=32506s rate=0.18/s target=6000 remain=309 eta=1765s
+[11:32:13] === day 189/365 2023-07-08 ===
+[11:32:15]   venues=3: ['船橋', '高知', '川崎']
+[11:32:22]   [1/3] 船橋 12R start
+[11:32:58] [progress] new=5692 skip=0 empty=0 fail=1 processed=5693 elapsed=32551s rate=0.17/s target=6000 remain=308 eta=1761s
+[11:33:03] [progress] new=5694 skip=0 empty=0 fail=1 processed=5695 elapsed=32556s rate=0.17/s target=6000 remain=306 eta=1749s
+[11:33:08] [progress] new=5695 skip=0 empty=0 fail=1 processed=5696 elapsed=32560s rate=0.17/s target=6000 remain=305 eta=1743s
+[11:33:14] [progress] new=5697 skip=0 empty=0 fail=1 processed=5698 elapsed=32567s rate=0.17/s target=6000 remain=303 eta=1732s
+[11:33:18] [progress] new=5698 skip=0 empty=0 fail=1 processed=5699 elapsed=32571s rate=0.17/s target=6000 remain=302 eta=1726s
+[11:33:25] [progress] new=5700 skip=0 empty=0 fail=1 processed=5701 elapsed=32578s rate=0.17/s target=6000 remain=300 eta=1714s
+[11:33:28] [progress] new=5701 skip=0 empty=0 fail=1 processed=5702 elapsed=32581s rate=0.18/s target=6000 remain=299 eta=1708s
+[11:33:31] [progress] new=5702 skip=0 empty=0 fail=1 processed=5703 elapsed=32584s rate=0.18/s target=6000 remain=298 eta=1703s
+[11:33:36] [progress] new=5703 skip=0 empty=0 fail=1 processed=5704 elapsed=32588s rate=0.18/s target=6000 remain=297 eta=1697s
+[11:33:36]   [1/3] 船橋 done new=12 R (total_new=5703)
+[11:33:36] [progress] new=5703 skip=0 empty=0 fail=1 processed=5704 elapsed=32588s rate=0.18/s target=6000 remain=297 eta=1697s
+[11:33:41]   [2/3] 高知 11R start
+[11:34:08] [progress] new=5704 skip=0 empty=0 fail=1 processed=5705 elapsed=32621s rate=0.17/s target=6000 remain=296 eta=1693s
+[11:34:14] [progress] new=5705 skip=0 empty=0 fail=1 processed=5706 elapsed=32626s rate=0.17/s target=6000 remain=295 eta=1687s
+[11:34:19] [progress] new=5706 skip=0 empty=0 fail=1 processed=5707 elapsed=32631s rate=0.17/s target=6000 remain=294 eta=1681s
+[11:34:24] [progress] new=5708 skip=0 empty=0 fail=1 processed=5709 elapsed=32637s rate=0.17/s target=6000 remain=292 eta=1669s
+[11:34:29] [progress] new=5709 skip=0 empty=0 fail=1 processed=5710 elapsed=32642s rate=0.17/s target=6000 remain=291 eta=1664s
+[11:34:34] [progress] new=5710 skip=0 empty=0 fail=1 processed=5711 elapsed=32647s rate=0.17/s target=6000 remain=290 eta=1658s
+[11:34:37] [progress] new=5711 skip=0 empty=0 fail=1 processed=5712 elapsed=32650s rate=0.17/s target=6000 remain=289 eta=1652s
+[11:34:42] [progress] new=5712 skip=0 empty=0 fail=1 processed=5713 elapsed=32655s rate=0.17/s target=6000 remain=288 eta=1646s
+[11:34:46] [progress] new=5713 skip=0 empty=0 fail=1 processed=5714 elapsed=32659s rate=0.17/s target=6000 remain=287 eta=1640s
+[11:34:51] [progress] new=5714 skip=0 empty=0 fail=1 processed=5715 elapsed=32664s rate=0.17/s target=6000 remain=286 eta=1635s
+[11:34:51]   [2/3] 高知 done new=11 R (total_new=5714)
+[11:34:51] [progress] new=5714 skip=0 empty=0 fail=1 processed=5715 elapsed=32664s rate=0.17/s target=6000 remain=286 eta=1635s
+[11:34:55]   [3/3] 川崎 11R start
+[11:35:32] [progress] new=5715 skip=0 empty=0 fail=1 processed=5716 elapsed=32704s rate=0.17/s target=6000 remain=285 eta=1631s
+[11:35:35] [progress] new=5716 skip=0 empty=0 fail=1 processed=5717 elapsed=32708s rate=0.17/s target=6000 remain=284 eta=1625s
+[11:35:39] [progress] new=5717 skip=0 empty=0 fail=1 processed=5718 elapsed=32712s rate=0.17/s target=6000 remain=283 eta=1619s
+[11:35:45] [progress] new=5719 skip=0 empty=0 fail=1 processed=5720 elapsed=32717s rate=0.17/s target=6000 remain=281 eta=1607s
+[11:35:49] [progress] new=5721 skip=0 empty=0 fail=1 processed=5722 elapsed=32722s rate=0.17/s target=6000 remain=279 eta=1595s
+[11:35:53] [progress] new=5722 skip=0 empty=0 fail=1 processed=5723 elapsed=32726s rate=0.17/s target=6000 remain=278 eta=1590s
+[11:36:00] [progress] new=5724 skip=0 empty=0 fail=1 processed=5725 elapsed=32732s rate=0.17/s target=6000 remain=276 eta=1578s
+[11:36:03] [progress] new=5725 skip=0 empty=0 fail=1 processed=5726 elapsed=32735s rate=0.17/s target=6000 remain=275 eta=1572s
+[11:36:03]   [3/3] 川崎 done new=11 R (total_new=5725)
+[11:36:03] [progress] new=5725 skip=0 empty=0 fail=1 processed=5726 elapsed=32735s rate=0.17/s target=6000 remain=275 eta=1572s
+[11:36:03] === day 190/365 2023-07-09 ===
+[11:36:04]   venues=5: ['船橋', '水沢', '41', '高知', '川崎']
+[11:36:09]   [1/5] 船橋 12R start
+[11:36:41] [progress] new=5726 skip=0 empty=0 fail=1 processed=5727 elapsed=32774s rate=0.17/s target=6000 remain=274 eta=1568s
+[11:36:45] [progress] new=5727 skip=0 empty=0 fail=1 processed=5728 elapsed=32777s rate=0.17/s target=6000 remain=273 eta=1562s
+[11:36:52] [progress] new=5729 skip=0 empty=0 fail=1 processed=5730 elapsed=32784s rate=0.17/s target=6000 remain=271 eta=1551s
+[11:36:59] [progress] new=5731 skip=0 empty=0 fail=1 processed=5732 elapsed=32791s rate=0.17/s target=6000 remain=269 eta=1539s
+[11:37:06] [progress] new=5733 skip=0 empty=0 fail=1 processed=5734 elapsed=32799s rate=0.17/s target=6000 remain=267 eta=1527s
+[11:37:10] [progress] new=5734 skip=0 empty=0 fail=1 processed=5735 elapsed=32802s rate=0.17/s target=6000 remain=266 eta=1521s
+[11:37:15] [progress] new=5735 skip=0 empty=0 fail=1 processed=5736 elapsed=32807s rate=0.17/s target=6000 remain=265 eta=1516s
+[11:37:21] [progress] new=5737 skip=0 empty=0 fail=1 processed=5738 elapsed=32813s rate=0.17/s target=6000 remain=263 eta=1504s
+[11:37:21]   [1/5] 船橋 done new=12 R (total_new=5737)
+[11:37:21] [progress] new=5737 skip=0 empty=0 fail=1 processed=5738 elapsed=32813s rate=0.17/s target=6000 remain=263 eta=1504s
+[11:37:28]   [2/5] 水沢 11R start
+[11:38:03] [progress] new=5738 skip=0 empty=0 fail=1 processed=5739 elapsed=32855s rate=0.17/s target=6000 remain=262 eta=1500s
+[11:38:07] [progress] new=5739 skip=0 empty=0 fail=1 processed=5740 elapsed=32860s rate=0.17/s target=6000 remain=261 eta=1494s
+[11:38:13] [progress] new=5741 skip=0 empty=0 fail=1 processed=5742 elapsed=32865s rate=0.17/s target=6000 remain=259 eta=1482s
+[11:38:19] [progress] new=5743 skip=0 empty=0 fail=1 processed=5744 elapsed=32871s rate=0.17/s target=6000 remain=257 eta=1471s
+[11:38:26] [progress] new=5745 skip=0 empty=0 fail=1 processed=5746 elapsed=32878s rate=0.17/s target=6000 remain=255 eta=1459s
+[11:38:31] [progress] new=5746 skip=0 empty=0 fail=1 processed=5747 elapsed=32883s rate=0.17/s target=6000 remain=254 eta=1453s
+[11:38:35] [progress] new=5748 skip=0 empty=0 fail=1 processed=5749 elapsed=32888s rate=0.17/s target=6000 remain=252 eta=1442s
+[11:38:35]   [2/5] 水沢 done new=11 R (total_new=5748)
+[11:38:35] [progress] new=5748 skip=0 empty=0 fail=1 processed=5749 elapsed=32888s rate=0.17/s target=6000 remain=252 eta=1442s
+[11:38:38]   [3/5] 41 12R start
+[11:39:11] [progress] new=5749 skip=0 empty=0 fail=1 processed=5750 elapsed=32924s rate=0.17/s target=6000 remain=251 eta=1437s
+[11:39:17] [progress] new=5751 skip=0 empty=0 fail=1 processed=5752 elapsed=32929s rate=0.17/s target=6000 remain=249 eta=1425s
+[11:39:20] [progress] new=5752 skip=0 empty=0 fail=1 processed=5753 elapsed=32933s rate=0.17/s target=6000 remain=248 eta=1420s
+[11:39:26] [progress] new=5754 skip=0 empty=0 fail=1 processed=5755 elapsed=32939s rate=0.17/s target=6000 remain=246 eta=1408s
+[11:39:31] [progress] new=5755 skip=0 empty=0 fail=1 processed=5756 elapsed=32943s rate=0.17/s target=6000 remain=245 eta=1402s
+[11:39:37] [progress] new=5757 skip=0 empty=0 fail=1 processed=5758 elapsed=32949s rate=0.17/s target=6000 remain=243 eta=1391s
+[11:39:41] [progress] new=5758 skip=0 empty=0 fail=1 processed=5759 elapsed=32954s rate=0.17/s target=6000 remain=242 eta=1385s
+[11:39:49] [progress] new=5760 skip=0 empty=0 fail=1 processed=5761 elapsed=32961s rate=0.17/s target=6000 remain=240 eta=1373s
+[11:39:49]   [3/5] 41 done new=12 R (total_new=5760)
+[11:39:49] [progress] new=5760 skip=0 empty=0 fail=1 processed=5761 elapsed=32961s rate=0.17/s target=6000 remain=240 eta=1373s
+[11:39:55]   [4/5] 高知 12R start
+[11:40:30] [progress] new=5761 skip=0 empty=0 fail=1 processed=5762 elapsed=33003s rate=0.17/s target=6000 remain=239 eta=1369s
+[11:40:34] [progress] new=5763 skip=0 empty=0 fail=1 processed=5764 elapsed=33007s rate=0.17/s target=6000 remain=237 eta=1357s
+[11:40:37] [progress] new=5764 skip=0 empty=0 fail=1 processed=5765 elapsed=33010s rate=0.17/s target=6000 remain=236 eta=1351s
+[11:40:42] [progress] new=5765 skip=0 empty=0 fail=1 processed=5766 elapsed=33015s rate=0.17/s target=6000 remain=235 eta=1346s
+[11:40:47] [progress] new=5766 skip=0 empty=0 fail=1 processed=5767 elapsed=33020s rate=0.17/s target=6000 remain=234 eta=1340s
+[11:40:52] [progress] new=5768 skip=0 empty=0 fail=1 processed=5769 elapsed=33024s rate=0.17/s target=6000 remain=232 eta=1328s
+[11:40:57] [progress] new=5769 skip=0 empty=0 fail=1 processed=5770 elapsed=33029s rate=0.17/s target=6000 remain=231 eta=1322s
+[11:41:03] [progress] new=5771 skip=0 empty=0 fail=1 processed=5772 elapsed=33035s rate=0.17/s target=6000 remain=229 eta=1311s
+[11:41:08] [progress] new=5772 skip=0 empty=0 fail=1 processed=5773 elapsed=33041s rate=0.17/s target=6000 remain=228 eta=1305s
+[11:41:08]   [4/5] 高知 done new=12 R (total_new=5772)
+[11:41:08] [progress] new=5772 skip=0 empty=0 fail=1 processed=5773 elapsed=33041s rate=0.17/s target=6000 remain=228 eta=1305s
+[11:41:14]   [5/5] 川崎 11R start
+[11:41:54] [progress] new=5773 skip=0 empty=0 fail=1 processed=5774 elapsed=33087s rate=0.17/s target=6000 remain=227 eta=1301s
+[11:42:00] [progress] new=5775 skip=0 empty=0 fail=1 processed=5776 elapsed=33093s rate=0.17/s target=6000 remain=225 eta=1289s
+[11:42:04] [progress] new=5776 skip=0 empty=0 fail=1 processed=5777 elapsed=33097s rate=0.17/s target=6000 remain=224 eta=1283s
+[11:42:10] [progress] new=5778 skip=0 empty=0 fail=1 processed=5779 elapsed=33103s rate=0.17/s target=6000 remain=222 eta=1272s
+[11:42:17] [progress] new=5780 skip=0 empty=0 fail=1 processed=5781 elapsed=33110s rate=0.17/s target=6000 remain=220 eta=1260s
+[11:42:21] [progress] new=5781 skip=0 empty=0 fail=1 processed=5782 elapsed=33113s rate=0.17/s target=6000 remain=219 eta=1254s
+[11:42:26] [progress] new=5782 skip=0 empty=0 fail=1 processed=5783 elapsed=33119s rate=0.17/s target=6000 remain=218 eta=1248s
+[11:42:27]   [5/5] 川崎 done new=11 R (total_new=5783)
+[11:42:27] [progress] new=5783 skip=0 empty=0 fail=1 processed=5784 elapsed=33120s rate=0.17/s target=6000 remain=217 eta=1243s
+[11:42:27] === day 191/365 2023-07-10 ===
+[11:42:29]   venues=2: ['船橋', '水沢']
+[11:42:35]   [1/2] 船橋 12R start
+[11:43:11] [progress] new=5784 skip=0 empty=0 fail=1 processed=5785 elapsed=33164s rate=0.17/s target=6000 remain=216 eta=1238s
+[11:43:16] [progress] new=5786 skip=0 empty=0 fail=1 processed=5787 elapsed=33168s rate=0.17/s target=6000 remain=214 eta=1227s
+[11:43:19] [progress] new=5787 skip=0 empty=0 fail=1 processed=5788 elapsed=33172s rate=0.17/s target=6000 remain=213 eta=1221s
+[11:43:25] [progress] new=5788 skip=0 empty=0 fail=1 processed=5789 elapsed=33178s rate=0.17/s target=6000 remain=212 eta=1215s
+[11:43:31] [progress] new=5790 skip=0 empty=0 fail=1 processed=5791 elapsed=33183s rate=0.17/s target=6000 remain=210 eta=1203s
+[11:43:38] [progress] new=5791 skip=0 empty=0 fail=1 processed=5792 elapsed=33191s rate=0.17/s target=6000 remain=209 eta=1198s
+[11:43:46] [progress] new=5793 skip=0 empty=0 fail=1 processed=5794 elapsed=33199s rate=0.17/s target=6000 remain=207 eta=1186s
+[11:43:52] [progress] new=5794 skip=0 empty=0 fail=1 processed=5795 elapsed=33204s rate=0.17/s target=6000 remain=206 eta=1180s
+[11:43:53]   [1/2] 船橋 done new=12 R (total_new=5795)
+[11:43:53] [progress] new=5795 skip=0 empty=0 fail=1 processed=5796 elapsed=33206s rate=0.17/s target=6000 remain=205 eta=1174s
+[11:43:58]   [2/2] 水沢 12R start
+[11:44:36] [progress] new=5796 skip=0 empty=0 fail=1 processed=5797 elapsed=33248s rate=0.17/s target=6000 remain=204 eta=1170s
+[11:44:41] [progress] new=5797 skip=0 empty=0 fail=1 processed=5798 elapsed=33253s rate=0.17/s target=6000 remain=203 eta=1164s
+[11:44:49] [progress] new=5799 skip=0 empty=0 fail=1 processed=5800 elapsed=33262s rate=0.17/s target=6000 remain=201 eta=1153s
+[11:44:53] [progress] new=5801 skip=0 empty=0 fail=1 processed=5802 elapsed=33266s rate=0.17/s target=6000 remain=199 eta=1141s
+[11:45:00] [progress] new=5802 skip=0 empty=0 fail=1 processed=5803 elapsed=33272s rate=0.17/s target=6000 remain=198 eta=1135s
+[11:45:08] [progress] new=5803 skip=0 empty=0 fail=1 processed=5804 elapsed=33281s rate=0.17/s target=6000 remain=197 eta=1130s
+[11:45:21] [progress] new=5805 skip=0 empty=0 fail=1 processed=5806 elapsed=33293s rate=0.17/s target=6000 remain=195 eta=1118s
+[11:45:31] [progress] new=5807 skip=0 empty=0 fail=1 processed=5808 elapsed=33304s rate=0.17/s target=6000 remain=193 eta=1107s
+[11:45:31]   [2/2] 水沢 done new=12 R (total_new=5807)
+[11:45:31] [progress] new=5807 skip=0 empty=0 fail=1 processed=5808 elapsed=33304s rate=0.17/s target=6000 remain=193 eta=1107s
+[11:45:31] === day 192/365 2023-07-11 ===
+[11:45:33]   venues=2: ['水沢', '41']
+[11:45:37]   [1/2] 水沢 11R start
+[11:46:09] [progress] new=5808 skip=0 empty=0 fail=1 processed=5809 elapsed=33342s rate=0.17/s target=6000 remain=192 eta=1102s
+[11:46:17] [progress] new=5810 skip=0 empty=0 fail=1 processed=5811 elapsed=33349s rate=0.17/s target=6000 remain=190 eta=1090s
+[11:46:23] [progress] new=5812 skip=0 empty=0 fail=1 processed=5813 elapsed=33356s rate=0.17/s target=6000 remain=188 eta=1079s
+[11:46:27] [progress] new=5813 skip=0 empty=0 fail=1 processed=5814 elapsed=33360s rate=0.17/s target=6000 remain=187 eta=1073s
+[11:46:34] [progress] new=5815 skip=0 empty=0 fail=1 processed=5816 elapsed=33367s rate=0.17/s target=6000 remain=185 eta=1061s
+[11:46:39] [progress] new=5816 skip=0 empty=0 fail=1 processed=5817 elapsed=33371s rate=0.17/s target=6000 remain=184 eta=1056s
+[11:46:45] [progress] new=5818 skip=0 empty=0 fail=1 processed=5819 elapsed=33378s rate=0.17/s target=6000 remain=182 eta=1044s
+[11:46:45]   [1/2] 水沢 done new=11 R (total_new=5818)
+[11:46:45] [progress] new=5818 skip=0 empty=0 fail=1 processed=5819 elapsed=33378s rate=0.17/s target=6000 remain=182 eta=1044s
+[11:46:52]   [2/2] 41 12R start
+[11:47:26] [progress] new=5819 skip=0 empty=0 fail=1 processed=5820 elapsed=33418s rate=0.17/s target=6000 remain=181 eta=1039s
+[11:47:34] [progress] new=5821 skip=0 empty=0 fail=1 processed=5822 elapsed=33427s rate=0.17/s target=6000 remain=179 eta=1028s
+[11:47:38] [progress] new=5822 skip=0 empty=0 fail=1 processed=5823 elapsed=33431s rate=0.17/s target=6000 remain=178 eta=1022s
+[11:47:43] [progress] new=5824 skip=0 empty=0 fail=1 processed=5825 elapsed=33435s rate=0.17/s target=6000 remain=176 eta=1010s
+[11:47:46] [progress] new=5825 skip=0 empty=0 fail=1 processed=5826 elapsed=33439s rate=0.17/s target=6000 remain=175 eta=1004s
+[11:47:52] [progress] new=5827 skip=0 empty=0 fail=1 processed=5828 elapsed=33444s rate=0.17/s target=6000 remain=173 eta=993s
+[11:47:55] [progress] new=5828 skip=0 empty=0 fail=1 processed=5829 elapsed=33447s rate=0.17/s target=6000 remain=172 eta=987s
+[11:47:58] [progress] new=5829 skip=0 empty=0 fail=1 processed=5830 elapsed=33451s rate=0.17/s target=6000 remain=171 eta=981s
+[11:47:59]   [2/2] 41 done new=12 R (total_new=5830)
+[11:47:59] [progress] new=5830 skip=0 empty=0 fail=1 processed=5831 elapsed=33452s rate=0.17/s target=6000 remain=170 eta=975s
+[11:47:59] === day 193/365 2023-07-12 ===
+[11:48:02]   venues=3: ['33', '金沢', '園田']
+[11:48:05]   [1/3] 33 12R start
+[11:48:44] [progress] new=5831 skip=0 empty=0 fail=1 processed=5832 elapsed=33497s rate=0.17/s target=6000 remain=169 eta=971s
+[11:48:48] [progress] new=5832 skip=0 empty=0 fail=1 processed=5833 elapsed=33500s rate=0.17/s target=6000 remain=168 eta=965s
+[11:48:52] [progress] new=5833 skip=0 empty=0 fail=1 processed=5834 elapsed=33505s rate=0.17/s target=6000 remain=167 eta=959s
+[11:48:56] [progress] new=5834 skip=0 empty=0 fail=1 processed=5835 elapsed=33508s rate=0.17/s target=6000 remain=166 eta=953s
+[11:48:59] [progress] new=5835 skip=0 empty=0 fail=1 processed=5836 elapsed=33512s rate=0.17/s target=6000 remain=165 eta=947s
+[11:49:07] [progress] new=5837 skip=0 empty=0 fail=1 processed=5838 elapsed=33519s rate=0.17/s target=6000 remain=163 eta=936s
+[11:49:10] [progress] new=5838 skip=0 empty=0 fail=1 processed=5839 elapsed=33523s rate=0.17/s target=6000 remain=162 eta=930s
+[11:49:13] [progress] new=5839 skip=0 empty=0 fail=1 processed=5840 elapsed=33526s rate=0.17/s target=6000 remain=161 eta=924s
+[11:49:17] [progress] new=5840 skip=0 empty=0 fail=1 processed=5841 elapsed=33530s rate=0.17/s target=6000 remain=160 eta=918s
+[11:49:25] [progress] new=5842 skip=0 empty=0 fail=1 processed=5843 elapsed=33537s rate=0.17/s target=6000 remain=158 eta=907s
+[11:49:25]   [1/3] 33 done new=12 R (total_new=5842)
+[11:49:25] [progress] new=5842 skip=0 empty=0 fail=1 processed=5843 elapsed=33537s rate=0.17/s target=6000 remain=158 eta=907s
+[11:49:31]   [2/3] 金沢 12R start
+[11:50:03] [progress] new=5843 skip=0 empty=0 fail=1 processed=5844 elapsed=33576s rate=0.17/s target=6000 remain=157 eta=902s
+[11:50:06] [progress] new=5844 skip=0 empty=0 fail=1 processed=5845 elapsed=33579s rate=0.17/s target=6000 remain=156 eta=896s
+[11:50:11] [progress] new=5845 skip=0 empty=0 fail=1 processed=5846 elapsed=33583s rate=0.17/s target=6000 remain=155 eta=890s
+[11:50:15] [progress] new=5846 skip=0 empty=0 fail=1 processed=5847 elapsed=33588s rate=0.17/s target=6000 remain=154 eta=885s
+[11:50:20] [progress] new=5847 skip=0 empty=0 fail=1 processed=5848 elapsed=33592s rate=0.17/s target=6000 remain=153 eta=879s
+[11:50:27] [progress] new=5849 skip=0 empty=0 fail=1 processed=5850 elapsed=33599s rate=0.17/s target=6000 remain=151 eta=867s
+[11:50:31] [progress] new=5850 skip=0 empty=0 fail=1 processed=5851 elapsed=33604s rate=0.17/s target=6000 remain=150 eta=861s
+[11:50:38] [progress] new=5852 skip=0 empty=0 fail=1 processed=5853 elapsed=33611s rate=0.17/s target=6000 remain=148 eta=850s
+[11:50:43] [progress] new=5853 skip=0 empty=0 fail=1 processed=5854 elapsed=33616s rate=0.17/s target=6000 remain=147 eta=844s
+[11:50:47] [progress] new=5854 skip=0 empty=0 fail=1 processed=5855 elapsed=33620s rate=0.17/s target=6000 remain=146 eta=838s
+[11:50:47]   [2/3] 金沢 done new=12 R (total_new=5854)
+[11:50:47] [progress] new=5854 skip=0 empty=0 fail=1 processed=5855 elapsed=33620s rate=0.17/s target=6000 remain=146 eta=838s
+[11:50:54]   [3/3] 園田 12R start
+[11:51:58] [progress] new=5855 skip=0 empty=0 fail=1 processed=5856 elapsed=33691s rate=0.17/s target=6000 remain=145 eta=834s
+[11:52:03] [progress] new=5856 skip=0 empty=0 fail=1 processed=5857 elapsed=33695s rate=0.17/s target=6000 remain=144 eta=828s
+[11:52:09] [progress] new=5857 skip=0 empty=0 fail=1 processed=5858 elapsed=33701s rate=0.17/s target=6000 remain=143 eta=823s
+[11:52:15] [progress] new=5859 skip=0 empty=0 fail=1 processed=5860 elapsed=33708s rate=0.17/s target=6000 remain=141 eta=811s
+[11:52:21] [progress] new=5861 skip=0 empty=0 fail=1 processed=5862 elapsed=33713s rate=0.17/s target=6000 remain=139 eta=799s
+[11:52:30] [progress] new=5863 skip=0 empty=0 fail=1 processed=5864 elapsed=33722s rate=0.17/s target=6000 remain=137 eta=788s
+[11:52:34] [progress] new=5864 skip=0 empty=0 fail=1 processed=5865 elapsed=33727s rate=0.17/s target=6000 remain=136 eta=782s
+[11:52:39] [progress] new=5866 skip=0 empty=0 fail=1 processed=5867 elapsed=33732s rate=0.17/s target=6000 remain=134 eta=770s
+[11:52:39]   [3/3] 園田 done new=12 R (total_new=5866)
+[11:52:39] [progress] new=5866 skip=0 empty=0 fail=1 processed=5867 elapsed=33732s rate=0.17/s target=6000 remain=134 eta=770s
+[11:52:39] === day 194/365 2023-07-13 ===
+[11:52:42]   venues=2: ['金沢', '園田']
+[11:52:48]   [1/2] 金沢 12R start
+[11:53:19] [progress] new=5867 skip=0 empty=0 fail=1 processed=5868 elapsed=33771s rate=0.17/s target=6000 remain=133 eta=765s
+[11:53:24] [progress] new=5868 skip=0 empty=0 fail=1 processed=5869 elapsed=33776s rate=0.17/s target=6000 remain=132 eta=760s
+[11:53:28] [progress] new=5869 skip=0 empty=0 fail=1 processed=5870 elapsed=33781s rate=0.17/s target=6000 remain=131 eta=754s
+[11:53:35] [progress] new=5871 skip=0 empty=0 fail=1 processed=5872 elapsed=33787s rate=0.17/s target=6000 remain=129 eta=742s
+[11:53:39] [progress] new=5872 skip=0 empty=0 fail=1 processed=5873 elapsed=33792s rate=0.17/s target=6000 remain=128 eta=736s
+[11:53:46] [progress] new=5874 skip=0 empty=0 fail=1 processed=5875 elapsed=33799s rate=0.17/s target=6000 remain=126 eta=725s
+[11:53:49] [progress] new=5875 skip=0 empty=0 fail=1 processed=5876 elapsed=33802s rate=0.17/s target=6000 remain=125 eta=719s
+[11:53:54] [progress] new=5876 skip=0 empty=0 fail=1 processed=5877 elapsed=33807s rate=0.17/s target=6000 remain=124 eta=713s
+[11:53:59] [progress] new=5877 skip=0 empty=0 fail=1 processed=5878 elapsed=33811s rate=0.17/s target=6000 remain=123 eta=708s
+[11:54:02] [progress] new=5878 skip=0 empty=0 fail=1 processed=5879 elapsed=33815s rate=0.17/s target=6000 remain=122 eta=702s
+[11:54:02]   [1/2] 金沢 done new=12 R (total_new=5878)
+[11:54:02] [progress] new=5878 skip=0 empty=0 fail=1 processed=5879 elapsed=33815s rate=0.17/s target=6000 remain=122 eta=702s
+[11:54:06]   [2/2] 園田 12R start
+[11:54:33] [progress] new=5879 skip=0 empty=0 fail=1 processed=5880 elapsed=33846s rate=0.17/s target=6000 remain=121 eta=696s
+[11:54:40] [progress] new=5881 skip=0 empty=0 fail=1 processed=5882 elapsed=33853s rate=0.17/s target=6000 remain=119 eta=685s
+[11:54:45] [progress] new=5882 skip=0 empty=0 fail=1 processed=5883 elapsed=33857s rate=0.17/s target=6000 remain=118 eta=679s
+[11:54:48] [progress] new=5883 skip=0 empty=0 fail=1 processed=5884 elapsed=33861s rate=0.17/s target=6000 remain=117 eta=673s
+[11:54:53] [progress] new=5885 skip=0 empty=0 fail=1 processed=5886 elapsed=33866s rate=0.17/s target=6000 remain=115 eta=662s
+[11:54:57] [progress] new=5887 skip=0 empty=0 fail=1 processed=5888 elapsed=33870s rate=0.17/s target=6000 remain=113 eta=650s
+[11:55:03] [progress] new=5889 skip=0 empty=0 fail=1 processed=5890 elapsed=33876s rate=0.17/s target=6000 remain=111 eta=638s
+[11:55:06] [progress] new=5890 skip=0 empty=0 fail=1 processed=5891 elapsed=33879s rate=0.17/s target=6000 remain=110 eta=633s
+[11:55:06]   [2/2] 園田 done new=12 R (total_new=5890)
+[11:55:06] [progress] new=5890 skip=0 empty=0 fail=1 processed=5891 elapsed=33879s rate=0.17/s target=6000 remain=110 eta=633s
+[11:55:06] === day 195/365 2023-07-14 ===
+[11:55:09]   venues=2: ['金沢', '園田']
+[11:55:14]   [1/2] 金沢 12R start
+[11:55:56] [progress] new=5891 skip=0 empty=0 fail=1 processed=5892 elapsed=33929s rate=0.17/s target=6000 remain=109 eta=628s
+[11:55:59] [progress] new=5892 skip=0 empty=0 fail=1 processed=5893 elapsed=33932s rate=0.17/s target=6000 remain=108 eta=622s
+[11:56:05] [progress] new=5893 skip=0 empty=0 fail=1 processed=5894 elapsed=33937s rate=0.17/s target=6000 remain=107 eta=616s
+[11:56:09] [progress] new=5894 skip=0 empty=0 fail=1 processed=5895 elapsed=33942s rate=0.17/s target=6000 remain=106 eta=610s
+[11:56:12] [progress] new=5895 skip=0 empty=0 fail=1 processed=5896 elapsed=33945s rate=0.17/s target=6000 remain=105 eta=605s
+[11:56:17] [progress] new=5896 skip=0 empty=0 fail=1 processed=5897 elapsed=33949s rate=0.17/s target=6000 remain=104 eta=599s
+[11:56:21] [progress] new=5897 skip=0 empty=0 fail=1 processed=5898 elapsed=33953s rate=0.17/s target=6000 remain=103 eta=593s
+[11:56:25] [progress] new=5898 skip=0 empty=0 fail=1 processed=5899 elapsed=33958s rate=0.17/s target=6000 remain=102 eta=587s
+[11:56:31] [progress] new=5900 skip=0 empty=0 fail=1 processed=5901 elapsed=33964s rate=0.17/s target=6000 remain=100 eta=576s
+[11:56:35] [progress] new=5901 skip=0 empty=0 fail=1 processed=5902 elapsed=33968s rate=0.17/s target=6000 remain=99 eta=570s
+[11:56:39] [progress] new=5902 skip=0 empty=0 fail=1 processed=5903 elapsed=33972s rate=0.17/s target=6000 remain=98 eta=564s
+[11:56:39]   [1/2] 金沢 done new=12 R (total_new=5902)
+[11:56:39] [progress] new=5902 skip=0 empty=0 fail=1 processed=5903 elapsed=33972s rate=0.17/s target=6000 remain=98 eta=564s
+[11:56:43]   [2/2] 園田 12R start
+[11:57:12] [progress] new=5903 skip=0 empty=0 fail=1 processed=5904 elapsed=34004s rate=0.17/s target=6000 remain=97 eta=559s
+[11:57:18] [progress] new=5905 skip=0 empty=0 fail=1 processed=5906 elapsed=34011s rate=0.17/s target=6000 remain=95 eta=547s
+[11:57:23] [progress] new=5907 skip=0 empty=0 fail=1 processed=5908 elapsed=34016s rate=0.17/s target=6000 remain=93 eta=535s
+[11:57:27] [progress] new=5908 skip=0 empty=0 fail=1 processed=5909 elapsed=34020s rate=0.17/s target=6000 remain=92 eta=530s
+[11:57:32] [progress] new=5910 skip=0 empty=0 fail=1 processed=5911 elapsed=34025s rate=0.17/s target=6000 remain=90 eta=518s
+[11:57:36] [progress] new=5911 skip=0 empty=0 fail=1 processed=5912 elapsed=34028s rate=0.17/s target=6000 remain=89 eta=512s
+[11:57:43] [progress] new=5913 skip=0 empty=0 fail=1 processed=5914 elapsed=34035s rate=0.17/s target=6000 remain=87 eta=501s
+[11:57:47] [progress] new=5914 skip=0 empty=0 fail=1 processed=5915 elapsed=34039s rate=0.17/s target=6000 remain=86 eta=495s
+[11:57:47]   [2/2] 園田 done new=12 R (total_new=5914)
+[11:57:47] [progress] new=5914 skip=0 empty=0 fail=1 processed=5915 elapsed=34039s rate=0.17/s target=6000 remain=86 eta=495s
+[11:57:47] === day 196/365 2023-07-15 ===
+[11:57:50]   venues=2: ['船橋', '川崎']
+[11:57:54]   [1/2] 船橋 12R start
+[11:58:29] [progress] new=5915 skip=0 empty=0 fail=1 processed=5916 elapsed=34081s rate=0.17/s target=6000 remain=85 eta=490s
+[11:58:34] [progress] new=5917 skip=0 empty=0 fail=1 processed=5918 elapsed=34086s rate=0.17/s target=6000 remain=83 eta=478s
+[11:58:37] [progress] new=5918 skip=0 empty=0 fail=1 processed=5919 elapsed=34090s rate=0.17/s target=6000 remain=82 eta=472s
+[11:58:43] [progress] new=5920 skip=0 empty=0 fail=1 processed=5921 elapsed=34096s rate=0.17/s target=6000 remain=80 eta=461s
+[11:58:47] [progress] new=5921 skip=0 empty=0 fail=1 processed=5922 elapsed=34100s rate=0.17/s target=6000 remain=79 eta=455s
+[11:58:52] [progress] new=5923 skip=0 empty=0 fail=1 processed=5924 elapsed=34105s rate=0.17/s target=6000 remain=77 eta=443s
+[11:58:56] [progress] new=5924 skip=0 empty=0 fail=1 processed=5925 elapsed=34108s rate=0.17/s target=6000 remain=76 eta=438s
+[11:59:01] [progress] new=5926 skip=0 empty=0 fail=1 processed=5927 elapsed=34114s rate=0.17/s target=6000 remain=74 eta=426s
+[11:59:01]   [1/2] 船橋 done new=12 R (total_new=5926)
+[11:59:01] [progress] new=5926 skip=0 empty=0 fail=1 processed=5927 elapsed=34114s rate=0.17/s target=6000 remain=74 eta=426s
+[11:59:07]   [2/2] 川崎 11R start
+[11:59:36] [progress] new=5927 skip=0 empty=0 fail=1 processed=5928 elapsed=34148s rate=0.17/s target=6000 remain=73 eta=421s
+[11:59:42] [progress] new=5929 skip=0 empty=0 fail=1 processed=5930 elapsed=34155s rate=0.17/s target=6000 remain=71 eta=409s
+[11:59:46] [progress] new=5930 skip=0 empty=0 fail=1 processed=5931 elapsed=34159s rate=0.17/s target=6000 remain=70 eta=403s
+[11:59:49] [progress] new=5931 skip=0 empty=0 fail=1 processed=5932 elapsed=34162s rate=0.17/s target=6000 remain=69 eta=397s
+[11:59:52] [progress] new=5932 skip=0 empty=0 fail=1 processed=5933 elapsed=34165s rate=0.17/s target=6000 remain=68 eta=392s
+[11:59:55] [progress] new=5933 skip=0 empty=0 fail=1 processed=5934 elapsed=34168s rate=0.17/s target=6000 remain=67 eta=386s
+[11:59:59] [progress] new=5934 skip=0 empty=0 fail=1 processed=5935 elapsed=34172s rate=0.17/s target=6000 remain=66 eta=380s
+[12:00:04] [progress] new=5935 skip=0 empty=0 fail=1 processed=5936 elapsed=34176s rate=0.17/s target=6000 remain=65 eta=374s
+[12:00:08] [progress] new=5936 skip=0 empty=0 fail=1 processed=5937 elapsed=34180s rate=0.17/s target=6000 remain=64 eta=368s
+[12:00:11] [progress] new=5937 skip=0 empty=0 fail=1 processed=5938 elapsed=34184s rate=0.17/s target=6000 remain=63 eta=363s
+[12:00:11]   [2/2] 川崎 done new=11 R (total_new=5937)
+[12:00:11] [progress] new=5937 skip=0 empty=0 fail=1 processed=5938 elapsed=34184s rate=0.17/s target=6000 remain=63 eta=363s
+[12:00:11] === day 197/365 2023-07-16 ===
+[12:00:14]   venues=5: ['船橋', '水沢', '41', '高知', '川崎']
+[12:00:18]   [1/5] 船橋 12R start
+[12:00:47] [progress] new=5938 skip=0 empty=0 fail=1 processed=5939 elapsed=34220s rate=0.17/s target=6000 remain=62 eta=357s

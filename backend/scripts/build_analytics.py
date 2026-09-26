@@ -97,7 +97,7 @@ def payout_yen(payouts_dict, ticket_jp, combo):
 
 
 def _row(label, samples):
-    """samples: [(prob, odds, hit)] のリスト。
+    """samples: [(prob, odds, hit, payout_yen)] のリスト。
     戻り値の % 系は全て % 数値（77.5 = 77.5%）。"""
     n = len(samples)
     if n == 0:
@@ -106,7 +106,7 @@ def _row(label, samples):
     sum_odds = sum(x[1] for x in samples)
     sum_prob_odds = sum(x[0] * x[1] for x in samples)
     hits = sum(x[2] for x in samples)
-    sum_payout_yen = sum(x[1] for x in samples if x[2])
+    sum_payout_yen = sum(x[3] for x in samples if x[2])
     return {
         "range": label,
         "count": n,
@@ -254,14 +254,14 @@ def build():
                     continue
                 ev = calc_ev(prob, ro)
                 hit = hit_check(t, combo, finish)
-                sample = (prob, ro, hit)
+                ticket_jp = _TICKET_LABEL.get(t, t)
+                payout = payout_yen(payouts_dict, ticket_jp, combo) or 0
+                sample = (prob, ro, hit, payout)
 
                 # 全組み合わせ
                 scopes_samples["all_combos"].append(sample)
 
                 # 券種別集計
-                ticket_jp = _TICKET_LABEL.get(t, t)
-                payout = payout_yen(payouts_dict, ticket_jp, combo)
                 ta = ticket_agg[t]
                 ta["count"] += 1
                 ta["hits"] += hit
@@ -269,7 +269,7 @@ def build():
                 ta["odds_sum"] += ro
                 ta["prob_odds_sum"] += prob * ro
                 ta["stake"] += 100
-                if hit and payout:
+                if hit:
                     ta["payout"] += payout
 
                 # features（全スコープへ）
@@ -418,6 +418,7 @@ def build():
             "count": ta["count"],
             "hits": ta["hits"],
             "expected_hit_rate_pct": (ta["prob_sum"] / ta["count"]) * 100,
+            "avg_odds": ta["odds_sum"] / ta["count"],
             "actual_hit_rate_pct": (ta["hits"] / ta["count"]) * 100,
             "expected_profit_pct": (ta["prob_odds_sum"] / ta["count"] - 1) * 100,
             "actual_profit_pct": (ta["payout"] / ta["stake"] - 1) * 100 if ta["stake"] else 0.0,
