@@ -19,6 +19,8 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   var betsSummary = $("bets-summary"), betsList = $("bets-list"), curveCanvas = $("curve-chart");
   var analyticsData = null, currentScope = "all", currentView = "ev", filters = {}, currentBets = [];
   var currentFeatureTab = null;
+  var analyticsFeaturesData = null;
+  var singleFeatureFilter = "sig";
   var currentTicket = "mixed";
   var currentAnaScope = "all";
   var currentTabName = "predict";
@@ -368,6 +370,77 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   }
 
 
+  function renderSingleFeatureTable(rows, mode){
+    // mode: "roi" or "hr"
+    if (!rows || !rows.length) return "<p>該当データなし</p>";
+    var html = "<table class=\"ev-table\"><thead><tr>";
+    if (mode === "roi") {
+      html += "<th>特徴</th><th>ビン</th><th>n</th><th>ROI</th><th>比較ROI</th><th>差</th><th>CI下限</th><th>CI上限</th>";
+    } else {
+      html += "<th>特徴</th><th>ビン</th><th>n</th><th>的中率</th><th>比較的中率</th><th>オッズ</th><th>比較オッズ</th><th>払戻</th>";
+    }
+    html += "</tr></thead><tbody>";
+    rows.forEach(function(r){
+      var cls = "";
+      var diff, ci_lo, ci_hi;
+      if (mode === "roi") {
+        diff = r.roi_diff; ci_lo = r.roi_ci_lo; ci_hi = r.roi_ci_hi;
+      } else {
+        diff = r.hr_diff; ci_lo = r.hr_ci_lo; ci_hi = r.hr_ci_hi;
+      }
+      cls = KeibaTheme.evClass(diff, 0);
+      html += "<tr class=\"" + cls + "\">";
+      html += "<td>" + esc(r.feature) + "</td>";
+      html += "<td>" + esc(r.label) + "</td>";
+      html += "<td>" + r.n + "</td>";
+      if (mode === "roi") {
+        html += "<td>" + fmtNum(r.roi, 3) + "</td>";
+        html += "<td>" + fmtNum(r.roi_other, 3) + "</td>";
+        html += "<td>" + fmtSigned(diff, 4) + "</td>";
+        html += "<td>" + fmtSigned(ci_lo, 4) + "</td>";
+        html += "<td>" + fmtSigned(ci_hi, 4) + "</td>";
+      } else {
+        html += "<td>" + fmtPct(r.hit_rate, 2) + "</td>";
+        html += "<td>" + fmtPct(r.hit_rate_other, 2) + "</td>";
+        html += "<td>" + fmtNum(r.avg_odds, 1) + "</td>";
+        html += "<td>" + fmtNum(r.avg_odds_other, 1) + "</td>";
+        html += "<td>" + fmtNum(r.avg_payout_hit, 0) + "</td>";
+      }
+      html += "</tr>";
+    });
+    html += "</tbody></table>";
+    return html;
+  }
+
+
+
+  function renderSingleFeatures(){
+    if (!analyticsFeaturesData) {
+      anaView.textContent = "読み込み中...";
+      fetchWithTimeout(API_BASE + "/analytics/features", 60000)
+        .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+        .then(function(d){ analyticsFeaturesData = d; renderSingleFeatures(); })
+        .catch(function(err){ anaView.textContent = "取得失敗: " + err.message; });
+      return;
+    }
+    var results = analyticsFeaturesData.results || [];
+    var sig_up_roi = results.filter(function(r){ return r.roi_sig_up; }).sort(function(a,b){ return b.roi_diff - a.roi_diff; });
+    var sig_dn_roi = results.filter(function(r){ return r.roi_sig_down; }).sort(function(a,b){ return a.roi_diff - b.roi_diff; });
+    var sig_up_hr = results.filter(function(r){ return r.hr_sig_up; }).sort(function(a,b){ return b.hr_diff - a.hr_diff; });
+    var sig_dn_hr = results.filter(function(r){ return r.hr_sig_down; }).sort(function(a,b){ return a.hr_diff - b.hr_diff; });
+
+    var html = "";
+    html += "<h4 class=\"feature-title\">ROI 有意優位 (B > B^c)</h4>";
+    html += renderSingleFeatureTable(sig_up_roi, "roi");
+    html += "<h4 class=\"feature-title\">ROI 有意劣位 (B < B^c)</h4>";
+    html += renderSingleFeatureTable(sig_dn_roi, "roi");
+    html += "<h4 class=\"feature-title\">的中率 有意優位 (B > B^c)</h4>";
+    html += renderSingleFeatureTable(sig_up_hr, "hr");
+    html += "<h4 class=\"feature-title\">的中率 有意劣位 (B < B^c)</h4>";
+    html += renderSingleFeatureTable(sig_dn_hr, "hr");
+    anaView.innerHTML = html;
+  }
+
   function renderView(){
     if (!analyticsData) return;
     var scopeData = (analyticsData.scopes || {})[currentAnaScope] || {};
@@ -391,6 +464,10 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     }
     if (currentView === "tickets") {
       renderTicketStatsFromData();
+      return;
+    }
+    if (currentView === "single_features") {
+      renderSingleFeatures();
       return;
     }
     anaView.innerHTML = tableRows(scopeData.ev_bins || [], "期待値帯") + renderCumTable(scopeData.ev_cum || [], "期待値帯");

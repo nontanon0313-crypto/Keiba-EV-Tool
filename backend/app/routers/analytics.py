@@ -76,3 +76,38 @@ def get_status():
     else:
         info["file"] = {"available": False}
     return info
+
+def _load_features_from_turso():
+    url = os.getenv("TURSO_URL")
+    token = os.getenv("TURSO_TOKEN")
+    if not url or not token:
+        return None, "TURSO_URL/TURSO_TOKEN not set"
+    try:
+        import libsql_client
+    except ImportError:
+        return None, "libsql_client not installed"
+    http_url = url.replace("libsql://", "https://").replace("wss://", "https://")
+    try:
+        client = libsql_client.create_client_sync(url=http_url, auth_token=token)
+        r = client.execute("SELECT payload, updated_at FROM analytics_feature_cache WHERE id=1")
+        rows = list(r.rows)
+        try:
+            client.close()
+        except Exception:
+            pass
+        if not rows:
+            return None, "no feature cache row"
+        payload = json.loads(rows[0][0])
+        payload["_updated_at"] = rows[0][1]
+        payload["_source"] = "turso"
+        return payload, None
+    except Exception as e:
+        return None, str(e)
+
+
+@router.get("/features")
+def get_features():
+    data, err = _load_features_from_turso()
+    if data is None:
+        raise HTTPException(503, "feature cache not available: " + str(err))
+    return data

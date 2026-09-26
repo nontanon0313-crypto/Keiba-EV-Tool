@@ -1,0 +1,9 @@
+nohup: ignoring input
+races: 6006
+[odds_store] backend=turso
+  1000/6006 processed=960 435s
+  2000/6006 processed=1949 880s
+  3000/6006 processed=2927 1335s
+  4000/6006 processed=3904 1786s
+  5000/6006 processed=4852 2238s
+  6000/6006 processed=5817 2688s

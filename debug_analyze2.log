@@ -1,0 +1,10 @@
+nohup: ignoring input
+[race_store] backend=turso
+[odds_store] backend=turso
+  i=1000/6006 processed=960
+  i=2000/6006 processed=1949
+  i=3000/6006 processed=2927
+  i=4000/6006 processed=3904
+  i=5000/6006 processed=4852
+  i=6000/6006 processed=5817
+完了: processed=5823

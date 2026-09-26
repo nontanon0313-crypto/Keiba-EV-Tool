@@ -1,0 +1,49 @@
+nohup: ignoring input
+=== build_dataset ===
+jockeys(top20): ['岡部誠', '今井貴', '加藤聡', '島津新', '塚本征']...
+races: 6006
+  1000/6006 0s X=9340
+  2000/6006 0s X=18774
+  3000/6006 0s X=28202
+  4000/6006 0s X=37551
+  5000/6006 1s X=46790
+  6000/6006 1s X=55999
+X shape: (56053, 17)
+y sum: 3835370  y>0: 5824
+
+baseline ROI: 0.6842  mean=-0.3158  se=0.02319
+=== build_tree (depth=5, min_leaf=500) ===
+build_tree done 0s
+leaves: 21
+
+=== Bonferroni z_adj = 3.038 (k=21) ===
+市場ベースラインを有意に上回る葉: 2 / 21
+
+ROI=1.0785 diff=+0.3942 n=3583 CI=[0.1641, 0.6243]
+    odds <= 52.400001525878906
+    odds <= 25.700000762939453
+    odds_rank > 5.5
+    hw <= 906.0
+    age <= 6.5
+
+ROI=0.8237 diff=+0.1395 n=12531 CI=[0.0474, 0.2316]
+    odds <= 52.400001525878906
+    odds <= 25.700000762939453
+    odds_rank <= 5.5
+    odds <= 19.100000381469727
+    frame > 5.5
+
+
+=== 参考: 差の大きい上位10葉（有意でなくても） ===
+ROI=1.5887 diff=+0.9045 n=700 CI_lo=-2.5822
+ROI=1.2028 diff=+0.5185 n=867 CI_lo=-0.1817
+ROI=1.0785 diff=+0.3942 n=3583 CI_lo=0.1641
+ROI=0.9927 diff=+0.3085 n=1441 CI_lo=-0.1851
+ROI=0.9189 diff=+0.2346 n=525 CI_lo=-0.2811
+ROI=0.8237 diff=+0.1395 n=12531 CI_lo=0.0474
+ROI=0.7770 diff=+0.0928 n=623 CI_lo=-0.4087
+ROI=0.7340 diff=+0.0498 n=13869 CI_lo=-0.0381
+ROI=0.6821 diff=-0.0021 n=840 CI_lo=-0.3790
+ROI=0.5862 diff=-0.0981 n=506 CI_lo=-0.7366
+
+saved scratch/cart_single_result.json
