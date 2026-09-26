@@ -10,10 +10,10 @@
   --waku-6:#009944;
   --waku-7:#f68b1e;
   --waku-8:#f5a0c0;
-  --ev-neg:#7a7a7a;
+  --ev-neg:#ff4d4d;
   --ev-low:#ffffff;
-  --ev-mid:#D4AF37;
-  --ev-high:#ff4d4d;
+  --ev-mid:#4dff4d;
+  --ev-high:#00ff00;
 }
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;background:var(--keiba-bg);color:var(--keiba-text);font-family:-apple-system,"Noto Sans JP",sans-serif;}

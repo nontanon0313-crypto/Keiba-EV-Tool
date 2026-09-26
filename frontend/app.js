@@ -372,26 +372,27 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     }
     html += "</tr></thead><tbody>";
     rows.forEach(function(r){
-      var cls1 = KeibaTheme.evClass(r.roi_diff_pct / 100, 0);
-      var cls2 = KeibaTheme.evClass(r.hr_diff_pct / 100, 0);
       html += "<tr>";
       html += "<td>" + esc(r.label) + "</td>";
       html += "<td>" + r.n + "</td>";
       if (mode === "roi") {
+        var cls_roi = KeibaTheme.evClass(r.roi_pct / 100, 0);
+        var cls_roi_o = KeibaTheme.evClass(r.roi_other_pct / 100, 0);
+        var cls_diff = KeibaTheme.evClass(r.roi_diff_pct / 100, 0);
         if (filter === "all" || filter === "on") {
-          html += "<td class=\"" + cls1 + "\">" + fmtSignedPct(r.roi_pct, 1) + "</td>";
+          html += "<td class=\"" + cls_roi + "\">" + fmtSignedPct(r.roi_pct, 1) + "</td>";
         }
         if (filter === "all" || filter === "off") {
-          html += "<td>" + fmtSignedPct(r.roi_other_pct, 1) + "</td>";
+          html += "<td class=\"" + cls_roi_o + "\">" + fmtSignedPct(r.roi_other_pct, 1) + "</td>";
         }
         if (filter === "all") {
-          html += "<td>" + fmtSignedPct(r.roi_diff_pct, 1) + "</td>";
+          html += "<td class=\"" + cls_diff + "\">" + fmtSignedPct(r.roi_diff_pct, 1) + "</td>";
           var sig = r.roi_sig_up ? "優位" : (r.roi_sig_down ? "劣位" : "-");
           html += "<td>" + sig + "</td>";
         }
       } else {
         if (filter === "all" || filter === "on") {
-          html += "<td class=\"" + cls2 + "\">" + fmtPct(r.hit_rate_pct, 2) + "</td>";
+          html += "<td>" + fmtPct(r.hit_rate_pct, 2) + "</td>";
           html += "<td>" + fmtNum(r.avg_odds, 1) + "</td>";
         }
         if (filter === "all" || filter === "off") {
@@ -399,7 +400,8 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
           html += "<td>" + fmtNum(r.avg_odds_other, 1) + "</td>";
         }
         if (filter === "all") {
-          html += "<td>" + fmtSignedPct(r.hr_diff_pct, 2) + "</td>";
+          var cls_hrd = KeibaTheme.evClass(r.hr_diff_pct / 100, 0);
+          html += "<td class=\"" + cls_hrd + "\">" + fmtSignedPct(r.hr_diff_pct, 2) + "</td>";
           var sig2 = r.hr_sig_up ? "優位" : (r.hr_sig_down ? "劣位" : "-");
           html += "<td>" + sig2 + "</td>";
         }
