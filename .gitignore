@@ -1,21 +1,18 @@
-__pycache__
-.env
-.venv
+# ログ
+*.log
 
-# personal data
-bets.json
-results.json
-predictions.json
-*.local.json
+# Python キャッシュ
+__pycache__/
+*.pyc
 
-# predictions snapshot
-predictions.json
-
-# debug
-race_debug.html
-*.debug.html
+# 実行時の生成物
+analytics_cache.json
+grid_search_result.json
 scraped_races.json
 scraped_odds.json
-analytics_cache.json
+results.json
+bets.json
+
+# 検証用の一時ディレクトリ
 debug_html/
-grid_search_result.json
+scratch/checkpoint_*/
