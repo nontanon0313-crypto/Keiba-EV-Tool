@@ -325,7 +325,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     if (!analyticsData) return;
     var rows = analyticsData.ticket_stats || [];
     if (!rows.length) { anaView.textContent = "データなし"; return; }
-    var html = "<table class=\"ev-table\"><thead><tr><th>券種</th><th>件数</th><th>予想的中率</th><th>オッズ平均</th><th>想定利益%</th><th>実的中率</th><th>実利益%</th><th>実測控除率%</th><th>理論控除率%</th></tr></thead><tbody>";
+    var html = "<table class=\"ev-table ev-table-9col\"><thead><tr><th>券種</th><th>件数</th><th>予想的中率</th><th>オッズ平均</th><th>想定利益%</th><th>実的中率</th><th>実利益%</th><th>実測控除率%</th><th>理論控除率%</th></tr></thead><tbody>";
     rows.forEach(function(r){
       var cls = KeibaTheme.evClass(r.expected_profit_pct / 100, EV_THRESHOLD);
       var ehr = r.expected_hit_rate_pct == null ? "-" : fmtPct(r.expected_hit_rate_pct, 2);
@@ -362,7 +362,9 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
 
   function renderFeatureTable(rows, mode, filter){
     if (!rows || !rows.length) return "<p>該当データなし</p>";
-    var html = "<table class=\"ev-table\"><thead><tr>";
+    // filter="all" のとき8列、それ以外は5列
+    var colCls = (filter === "all") ? " ev-table-8col" : "";
+    var html = "<table class=\"ev-table" + colCls + "\"><thead><tr>";
     html += "<th>ビン</th><th>件数</th>";
     if (mode === "roi") {
       if (filter === "all" || filter === "on") html += "<th>適用 実%</th><th>適用 市場%</th><th>適用 差</th>";
