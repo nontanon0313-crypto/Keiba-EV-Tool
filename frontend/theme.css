@@ -149,3 +149,21 @@ label.bulk-btn.inline{cursor:pointer;}
   #ana-view .ev-table th,
   #ana-view .ev-table td { padding: 3px 1px; }
 }
+
+/* 8列テーブル（券種別検証）用の幅指定 */
+#ana-view .ev-table.ev-table-8col td:nth-child(1),
+#ana-view .ev-table.ev-table-8col th:nth-child(1) { width: 13%; }
+#ana-view .ev-table.ev-table-8col td:nth-child(2),
+#ana-view .ev-table.ev-table-8col th:nth-child(2) { width: 10%; }
+#ana-view .ev-table.ev-table-8col td:nth-child(3),
+#ana-view .ev-table.ev-table-8col th:nth-child(3) { width: 12%; }
+#ana-view .ev-table.ev-table-8col td:nth-child(4),
+#ana-view .ev-table.ev-table-8col th:nth-child(4) { width: 12%; }
+#ana-view .ev-table.ev-table-8col td:nth-child(5),
+#ana-view .ev-table.ev-table-8col th:nth-child(5) { width: 12%; }
+#ana-view .ev-table.ev-table-8col td:nth-child(6),
+#ana-view .ev-table.ev-table-8col th:nth-child(6) { width: 13%; }
+#ana-view .ev-table.ev-table-8col td:nth-child(7),
+#ana-view .ev-table.ev-table-8col th:nth-child(7) { width: 14%; }
+#ana-view .ev-table.ev-table-8col td:nth-child(8),
+#ana-view .ev-table.ev-table-8col th:nth-child(8) { width: 14%; }

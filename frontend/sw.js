@@ -1,5 +1,5 @@
 // 修正のたびにこのバージョン文字列を更新すること
-const CACHE_NAME = "keiba-ev-v35";
+const CACHE_NAME = "keiba-ev-v36";
 const ASSETS = [
   "./",
   "./index.html",

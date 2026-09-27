@@ -516,7 +516,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
 
   function renderMultiTableBvsC(rows){
     if (!rows || !rows.length) return "<p>該当データなし</p>";
-    var html = "<table class=\"ev-table\"><thead><tr>";
+    var html = "<table class=\"ev-table ev-table-8col\"><thead><tr>";
     html += "<th>ビン</th><th>件数</th>";
     html += "<th>ROI(B)</th><th>ROI(B^c)</th><th>差</th>";
     html += "<th>実的中率</th><th>的中率差</th>";
@@ -541,7 +541,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
 
   function renderMultiTableVsMarket(rows){
     if (!rows || !rows.length) return "<p>該当データなし</p>";
-    var html = "<table class=\"ev-table\"><thead><tr>";
+    var html = "<table class=\"ev-table ev-table-8col\"><thead><tr>";
     html += "<th>ビン</th><th>件数</th>";
     html += "<th>実的中率</th><th>市場的中率</th><th>差</th>";
     html += "<th>実利益%</th><th>市場利益%</th><th>差</th>";
