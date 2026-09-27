@@ -378,11 +378,12 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
       html += "<tr>";
       html += "<td>" + esc(r.label) + "</td>";
       var total_n = r.n + (r.n_other || 0);
+      var n_display = (filter === "off") ? (r.n_other || 0) : r.n;
       var ratio_str = "";
       if (total_n > 0) {
-        ratio_str = " (" + (r.n / total_n * 100).toFixed(1) + "%)";
+        ratio_str = " (" + (n_display / total_n * 100).toFixed(1) + "%)";
       }
-      html += "<td>" + r.n + ratio_str + "</td>";
+      html += "<td>" + n_display + ratio_str + "</td>";
       if (mode === "roi") {
         var real_on = r.roi_pct;
         var market_on = -(r.market_rho_pct || 0);
