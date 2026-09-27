@@ -575,18 +575,8 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     return "";
   }
 
-  function renderMultiView(){
-    if (!analyticsMultiData) {
-      anaView.textContent = "読み込み中...";
-      fetchWithTimeout(API_BASE + "/analytics/multi", 120000)
-        .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
-        .then(function(d){ analyticsMultiData = d; renderMultiView(); })
-        .catch(function(err){ anaView.textContent = "取得失敗: " + err.message; });
-      return;
-    }
-    var tickets = analyticsMultiData.tickets || {};
+  function buildMultiTicketTabsHtml(tickets){
     var ticketKeys = ["quinella", "wide", "exacta", "trio", "trifecta"];
-    // 券種タブ
     var html = "<div class=\"subtabs\">";
     ticketKeys.forEach(function(tk){
       var label = MULTI_TICKET_LABELS[tk] || tk;
@@ -597,35 +587,15 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
       html += "<button class=\"subtab" + active + disabled + "\" data-multi-ticket=\"" + tk + "\" type=\"button\">" + label + suffix + "</button>";
     });
     html += "</div>";
-    anaView.innerHTML = html;
-    bindMultiTicketTabs(tickets);
-    if (currentMultiTicket && tickets[currentMultiTicket]) {
-      renderMultiTicketBody(tickets[currentMultiTicket]);
-    }
+    return html;
   }
 
-  function bindMultiTicketTabs(tickets){
-    var tabs = anaView.querySelectorAll("[data-multi-ticket]");
-    for (var i = 0; i < tabs.length; i++) {
-      (function(t){
-        if (t.disabled) return;
-        t.addEventListener("click", function(){
-          currentMultiTicket = t.getAttribute("data-multi-ticket");
-          currentMultiFeature = null;
-          renderMultiView();
-        });
-      })(tabs[i]);
-    }
-  }
-
-  function renderMultiTicketBody(ticketData){
+  function buildMultiTicketBodyHtml(ticketData){
     var results = ticketData.results || {};
     var featureKeys = Object.keys(results);
     if (!featureKeys.length) {
-      anaView.innerHTML += "<p>データなし</p>";
-      return;
+      return "<p>データなし</p>";
     }
-    // 特徴タブ
     var html = "<div class=\"subtabs\">";
     featureKeys.forEach(function(fk, i){
       var label = MULTI_FEATURE_LABELS[fk] || fk;
@@ -639,11 +609,46 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     html += renderMultiTableVsMarket(rows);
     html += "<h4 class=\"feature-title\">B vs B^c</h4>";
     html += renderMultiTableBvsC(rows);
-    anaView.innerHTML += html;
-    bindMultiFeatureTabs(results, target);
+    return html;
   }
 
-  function bindMultiFeatureTabs(results, target){
+  function renderMultiView(){
+    if (!analyticsMultiData) {
+      anaView.textContent = "読み込み中...";
+      fetchWithTimeout(API_BASE + "/analytics/multi", 120000)
+        .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+        .then(function(d){ analyticsMultiData = d; renderMultiView(); })
+        .catch(function(err){ anaView.textContent = "取得失敗: " + err.message; });
+      return;
+    }
+    var tickets = analyticsMultiData.tickets || {};
+    var html = buildMultiTicketTabsHtml(tickets);
+    var bodyReady = currentMultiTicket && tickets[currentMultiTicket];
+    if (bodyReady) {
+      html += buildMultiTicketBodyHtml(tickets[currentMultiTicket]);
+    }
+    anaView.innerHTML = html;
+    bindMultiTicketTabs();
+    if (bodyReady) {
+      bindMultiFeatureTabs();
+    }
+  }
+
+  function bindMultiTicketTabs(){
+    var tabs = anaView.querySelectorAll("[data-multi-ticket]");
+    for (var i = 0; i < tabs.length; i++) {
+      (function(t){
+        if (t.disabled) return;
+        t.addEventListener("click", function(){
+          currentMultiTicket = t.getAttribute("data-multi-ticket");
+          currentMultiFeature = null;
+          renderMultiView();
+        });
+      })(tabs[i]);
+    }
+  }
+
+  function bindMultiFeatureTabs(){
     var tabs = anaView.querySelectorAll("[data-multi-feature]");
     for (var i = 0; i < tabs.length; i++) {
       (function(t){
