@@ -14,6 +14,11 @@ import numpy as np
 import libsql_client
 from scipy import stats
 
+from backend.constants import (
+    AGE_BINS, WEIGHT_BINS, HW_CHG_BINS, DISTANCE_BINS, POP_BINS,
+    N_RUNNERS_MIN, N_RUNNERS_MAX, ODDS_MISSING_LEGACY,
+)
+
 
 def build_dataset():
     url = os.getenv("TURSO_URL")
@@ -82,20 +87,31 @@ def build_dataset():
             if n is not None:
                 rr_map[n] = rr
 
+        # 50.0（旧パーサの取得失敗痕跡）を1頭でも含むレースは丸ごと除外
+        has_missing = any(r0.get("odds_win") == ODDS_MISSING_LEGACY for r0 in runners)
+        if has_missing:
+            continue
+        # odds=1.0（元返し）を1頭でも含むレースは丸ごと除外
+        # 理由: 元返しは控除率の原理から外れ、Σ(1/odds) が理論値と比較できない
+        has_min_odds = any(r0.get("odds_win") == 1.0 for r0 in runners)
+        if has_min_odds:
+            continue
         # レース排除率（単勝のΣ(1/odds)から逆算）
         inv_sum = 0.0
         for r0 in runners:
             o = r0.get("odds_win")
             if o and o > 1:
                 inv_sum += 1.0 / float(o)
-        race_rho = (1.0 - 1.0 / inv_sum) if inv_sum > 0 else 0.20
+        if inv_sum <= 0:
+            continue
+        race_rho = 1.0 - 1.0 / inv_sum
 
         for r0 in runners:
             num = r0.get("horse_number")
             odds = r0.get("odds_win")
             pop = r0.get("popularity")
             frame = r0.get("frame_number")
-            if num is None or odds is None:
+            if num is None or odds is None or odds == ODDS_MISSING_LEGACY:
                 continue
             rr = rr_map.get(num)
             weight = rr.get("weight") if rr else None
@@ -191,19 +207,19 @@ def main():
 
     def make_bins():
         bins = []
-        for lo, hi in [(3,4),(4,5),(5,6),(6,7),(7,8),(8,20)]:
+        for lo, hi in AGE_BINS:
             bins.append(("age", f"{lo}-{hi-1}歳", lambda r, lo=lo, hi=hi: lo <= r["age"] < hi))
-        for lo, hi in [(0,53),(53,54),(54,55),(55,56),(56,57),(57,58),(58,100)]:
+        for lo, hi in WEIGHT_BINS:
             bins.append(("weight", f"斤量 {lo}-{hi}", lambda r, lo=lo, hi=hi: r["has_weight"] and lo <= r["weight"] < hi))
-        for lo, hi in [(-100,-10),(-10,-5),(-5,0),(0,1),(1,5),(5,10),(10,100)]:
+        for lo, hi in HW_CHG_BINS:
             bins.append(("hw_chg", f"体重増減 {lo}~{hi}", lambda r, lo=lo, hi=hi: r["has_hw_chg"] and lo <= r["hw_chg"] < hi))
         for f in range(1, 9):
             bins.append(("frame", f"枠 {f}", lambda r, f=f: r["frame"] == f))
         for sid, name in [(0,"牡"),(1,"牝"),(2,"セ"),(-1,"不明")]:
             bins.append(("sex_id", f"性別 {name}", lambda r, sid=sid: r["sex_id"] == sid))
-        for nr in range(6, 17):
+        for nr in range(N_RUNNERS_MIN, N_RUNNERS_MAX + 1):
             bins.append(("n_runners", f"頭数 {nr}", lambda r, nr=nr: int(r["n_runners"]) == nr))
-        for lo, hi in [(0,1000),(1000,1200),(1200,1400),(1400,1600),(1600,1800),(1800,2000),(2000,3000)]:
+        for lo, hi in DISTANCE_BINS:
             bins.append(("distance", f"距離 {lo}-{hi}", lambda r, lo=lo, hi=hi: lo <= r["distance"] < hi))
         for sid, name in [(0,"ダート"),(1,"芝"),(2,"障害")]:
             bins.append(("surface_id", f"馬場 {name}", lambda r, sid=sid: r["surface_id"] == sid))
@@ -213,8 +229,7 @@ def main():
         jk_set = set(int(r["jockey_id"]) for r in records)
         for jid in sorted(jk_set):
             bins.append(("jockey_id", f"騎手ID {jid}", lambda r, jid=jid: int(r["jockey_id"]) == jid))
-        for lo, hi, name in [(1,2,"1番人気"),(2,3,"2番人気"),(3,4,"3番人気"),
-                             (4,7,"4-6番人気"),(7,10,"7-9番人気"),(10,100,"10番人気+")]:
+        for lo, hi, name in POP_BINS:
             bins.append(("pop", name, lambda r, lo=lo, hi=hi: lo <= r["pop"] < hi))
         for lo, hi, name in [(1,3,"オッズ1-3"),(3,5,"オッズ3-5"),(5,10,"オッズ5-10"),
                              (10,20,"オッズ10-20"),(20,50,"オッズ20-50"),

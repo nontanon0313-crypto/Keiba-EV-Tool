@@ -5,8 +5,7 @@ from backend.app.services.seeding import seed_for
 
 TICKET_TYPES = ("trifecta", "trio", "exacta", "quinella", "wide", "win", "place")
 
-# オッズパークの表示上限値。実数として保存するが、投票プラン候補からは除外する。
-ODDS_DISPLAY_MAX = 9999.9
+from backend.constants import ODDS_DISPLAY_MAX
 
 
 def is_bettable_odds(odds):

@@ -12,6 +12,12 @@ from pathlib import Path
 from datetime import datetime
 from collections import defaultdict
 
+from backend.constants import (
+    STAKE_PER_BET, HITS_PER_RACE, THEORY_DEDUCTION_PCT, ODDS_DISPLAY_MAX,
+    prob_bins as _prob_bins_const, odds_bins as _odds_bins_const,
+    ev_bins as _ev_bins_const,
+    PROB_THRESHOLDS, ODDS_THRESHOLDS, EV_THRESHOLDS,
+)
 from backend.app.services import race_store, odds_store
 from backend.app.services.prediction import predict_race
 from backend.app.services.ev_calc import calc_ev, _candidates, TICKET_TYPES, _TICKET_LABEL
@@ -31,7 +37,7 @@ def race_obj(rid, payload):
             frame_number=r.get("frame_number", 0),
             horse_id="", horse_name="", jockey="", trainer="",
             weight=r.get("weight", 55.0) or 55.0,
-            odds_win=r.get("odds_win") or 50.0,
+            odds_win=r.get("odds_win"),
             popularity=r.get("popularity"),
         ))
     surf = payload.get("surface") or "ダート"
@@ -129,30 +135,8 @@ class Agg:
             "actual_hits": self.hits,
             "actual_attempts": n,
             "actual_hit_rate_pct": (self.hits / n) * 100,
-            "actual_profit_pct": (self.sum_payout_yen / (n * 100) - 1) * 100,
+            "actual_profit_pct": (self.sum_payout_yen / (n * STAKE_PER_BET) - 1) * 100,
         }
-
-
-def _prob_bins():
-    bins = []
-    for i in range(50): bins.append((i * 0.001, (i + 1) * 0.001))
-    for i in range(10): bins.append((0.050 + i * 0.005, 0.050 + (i + 1) * 0.005))
-    for i in range(10): bins.append((0.100 + i * 0.010, 0.100 + (i + 1) * 0.010))
-    for i in range(6): bins.append((0.200 + i * 0.050, 0.200 + (i + 1) * 0.050))
-    return bins
-
-
-def _odds_bins():
-    bins = []
-    for i in range(200): bins.append((1 + i, 2 + i))
-    for i in range(16): bins.append((200 + i * 50, 200 + (i + 1) * 50))
-    bins.append((1000, 999999))
-    return bins
-
-
-def _ev_bins():
-    return [(-1.0, 0.0), (0.0, 0.05), (0.05, 0.10), (0.10, 0.15), (0.15, 0.20),
-            (0.20, 0.30), (0.30, 0.50), (0.50, 1.0), (1.0, 5.0), (5.0, 99999.0)]
 
 
 def _features_conf():
@@ -216,13 +200,13 @@ def build():
     t0 = time.time()
     print("[build] start", flush=True)
     tickets = list(TICKET_TYPES)
-    pb = _prob_bins()
-    ob = _odds_bins()
-    eb = _ev_bins()
+    pb = _prob_bins_const()
+    ob = _odds_bins_const()
+    eb = _ev_bins_const()
     fc = _features_conf()
-    prob_th = [0.0, 0.005, 0.01, 0.015, 0.02, 0.03, 0.05, 0.08, 0.10, 0.15, 0.20]
-    odds_th = [0, 10, 20, 30, 50, 80, 100, 150, 200, 300, 500]
-    ev_th = [-1.0, 0.0, 0.2, 0.5, 1.0, 2.0, 5.0]
+    prob_th = PROB_THRESHOLDS
+    odds_th = ODDS_THRESHOLDS
+    ev_th = EV_THRESHOLDS
 
     # scope集計: scope -> {"total": Agg, "prob_bins": [Agg,...], "odds_bins": [...], "ev_bins": [...],
     #                      "prob_cum": [Agg,...], "odds_cum": [...], "ev_cum": [...],
@@ -437,10 +421,6 @@ def build():
             "features": features_out(scope),
         }
 
-    HITS_PER_RACE = {"trifecta": 1, "trio": 1, "exacta": 1, "quinella": 1, "wide": 3,
-                     "win": 1, "place": 3}
-    THEORY_DEDUCTION = {"trifecta": 25.0, "trio": 25.0, "exacta": 22.5,
-                        "quinella": 22.5, "wide": 22.5, "win": 20.0, "place": 20.0}
     ticket_stats = []
     for t in tickets:
         ta = ticket_agg[t]
@@ -460,7 +440,7 @@ def build():
             "expected_profit_pct": (ta["prob_odds_sum"] / ta["count"] - 1) * 100,
             "actual_profit_pct": (ta["payout"] / ta["stake"] - 1) * 100 if ta["stake"] else 0.0,
             "measured_deduction_pct": measured_deduction,
-            "theory_deduction_pct": THEORY_DEDUCTION.get(t),
+            "theory_deduction_pct": THEORY_DEDUCTION_PCT.get(t),
         })
 
     result = {

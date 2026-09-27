@@ -111,3 +111,35 @@ def get_features():
     if data is None:
         raise HTTPException(503, "feature cache not available: " + str(err))
     return data
+
+@router.get("/multi")
+def get_multi():
+    """券種別検証の結果を全券種分返す。"""
+    url = os.getenv("TURSO_URL")
+    token = os.getenv("TURSO_TOKEN")
+    if not url or not token:
+        raise HTTPException(503, "TURSO_URL/TURSO_TOKEN not set")
+    try:
+        import libsql_client
+    except ImportError:
+        raise HTTPException(503, "libsql_client not installed")
+    http_url = url.replace("libsql://", "https://").replace("wss://", "https://")
+    try:
+        client = libsql_client.create_client_sync(url=http_url, auth_token=token)
+        r = client.execute("SELECT ticket, payload, updated_at FROM analytics_multi_cache")
+        rows = list(r.rows)
+        try:
+            client.close()
+        except Exception:
+            pass
+    except Exception as e:
+        raise HTTPException(503, "multi cache load failed: " + str(e))
+    out = {}
+    for row in rows:
+        try:
+            payload = json.loads(row[1])
+            payload["_updated_at"] = row[2]
+            out[row[0]] = payload
+        except Exception:
+            continue
+    return {"tickets": out}

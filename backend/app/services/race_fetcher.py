@@ -25,7 +25,7 @@ def get_races():
                     weight=float(r.get("weight", 55.0) or 55.0),
                     horse_weight=r.get("horse_weight"),
                     horse_weight_change=r.get("horse_weight_change"),
-                    odds_win=float(r.get("odds_win", 50.0) or 50.0),
+                    odds_win=r.get("odds_win"),
                     popularity=r.get("popularity"),
                     status=r.get("status", "出走"),
                 ))

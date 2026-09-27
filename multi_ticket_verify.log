@@ -1,0 +1,220 @@
+nohup: ignoring input
+=== jockey ids ===
+top 20 jockeys
+races: 6006
+  200/6006 34s samples=7983
+  400/6006 69s samples=15132
+  600/6006 107s samples=23204
+  800/6006 137s samples=29553
+  1000/6006 170s samples=36376
+  1200/6006 210s samples=43740
+  1400/6006 253s samples=51226
+  2200/6006 395s samples=80841
+  2400/6006 432s samples=87422
+  2600/6006 466s samples=95145
+  3000/6006 538s samples=109658
+  3200/6006 575s samples=116518
+  3400/6006 611s samples=123532
+  3600/6006 647s samples=131039
+  3800/6006 683s samples=138771
+  4000/6006 721s samples=146173
+  4200/6006 762s samples=154573
+  4400/6006 805s samples=161802
+  4600/6006 833s samples=167865
+  4800/6006 871s samples=175134
+  5000/6006 909s samples=182990
+  5400/6006 981s samples=197049
+  5600/6006 1019s samples=204698
+  5800/6006 1058s samples=211870
+  6000/6006 1095s samples=219543
+
+=== 集計: 5257 レース, 219723 サンプル, 除外(50/1.0)=709 ===
+
+総検定数=175, z_adj=3.6279
+saved scratch/multi_quinella_result.json
+
+=== B vs B^c: ROI 有意優位 ===
+  [win1_pop] 1番人気 n=21177 roi=-30.26% (other=-45.80%)
+  [win1_win_odds] 0-3 n=22102 roi=-28.20% (other=-46.11%)
+  [win1_win_odds] 3-5 n=22060 roi=-25.28% (other=-46.43%)
+  [win2_pop] 1番人気 n=23182 roi=-29.30% (other=-46.08%)
+  [win2_win_odds] 0-3 n=24561 roi=-31.26% (other=-45.95%)
+
+=== B vs B^c: 的中率 有意優位 ===
+  [distance] 0-1000 n=45098 hr=2.60% (other=2.27%)
+  [n_runners] 9頭 n=39311 hr=2.78% (other=2.24%)
+  [n_runners] 8頭 n=20944 hr=3.57% (other=2.21%)
+  [n_runners] 7頭 n=5459 hr=4.76% (other=2.27%)
+  [n_runners] 6頭 n=1424 hr=6.67% (other=2.31%)
+  [n_runners] 5頭 n=329 hr=10.03% (other=2.32%)
+  [venue] 03 n=32561 hr=2.65% (other=2.28%)
+  [venue] 42 n=17137 hr=3.05% (other=2.28%)
+  [venue] 41 n=13163 hr=2.86% (other=2.30%)
+  [win1_age] 4-4歳 n=60409 hr=2.83% (other=2.12%)
+  [win1_sex] 牡 n=107458 hr=2.52% (other=2.16%)
+  [win1_weight] 56-57 n=83250 hr=2.52% (other=2.09%)
+  [win1_hw] 490-520 n=32071 hr=2.73% (other=2.22%)
+  [win1_hw] 520-550 n=8441 hr=3.08% (other=2.27%)
+  [win1_hw_chg] 10~100 n=12953 hr=2.87% (other=2.31%)
+  [win1_pop] 3番人気 n=21675 hr=3.70% (other=2.19%)
+  [win1_pop] 1番人気 n=21177 hr=7.39% (other=1.80%)
+  [win1_pop] 2番人気 n=21365 hr=5.46% (other=2.00%)
+  [win1_win_odds] 0-3 n=22102 hr=7.81% (other=1.72%)
+  [win1_win_odds] 3-5 n=22060 hr=5.11% (other=2.03%)
+  [win1_win_odds] 5-10 n=34731 hr=3.16% (other=2.18%)
+  [win1_jockey] 騎手0 n=2752 hr=3.71% (other=2.32%)
+  [win1_jockey] 騎手8 n=2314 hr=4.11% (other=2.32%)
+  [win1_jockey] 騎手11 n=2430 hr=3.87% (other=2.32%)
+  [win1_jockey] 騎手13 n=2630 hr=5.13% (other=2.30%)
+  [win2_age] 4-4歳 n=59919 hr=2.92% (other=2.09%)
+  [win2_sex] 牡 n=107428 hr=2.55% (other=2.13%)
+  [win2_weight] 56-57 n=83393 hr=2.53% (other=2.08%)
+  [win2_hw] 490-520 n=31743 hr=2.70% (other=2.23%)
+  [win2_pop] 1番人気 n=23182 hr=7.22% (other=1.76%)
+  [win2_pop] 2番人気 n=22907 hr=4.93% (other=2.03%)
+  [win2_pop] 3番人気 n=22532 hr=3.35% (other=2.22%)
+  [win2_win_odds] 0-3 n=24561 hr=7.43% (other=1.69%)
+  [win2_win_odds] 3-5 n=23474 hr=4.63% (other=2.06%)
+  [win2_win_odds] 5-10 n=36069 hr=2.99% (other=2.21%)
+  [win2_jockey] 騎手0 n=2796 hr=4.04% (other=2.31%)
+  [win2_jockey] 騎手18 n=2159 hr=3.84% (other=2.32%)
+  [win2_jockey] 騎手13 n=2649 hr=5.40% (other=2.30%)
+
+=== 実 vs 市場: 的中率 有意優位（実 > 市場） ===
+  [win1_age] 4-4歳 n=60409 実=2.83% 市場=2.27% diff=+0.561%
+  [win1_hw] 490-520 n=32071 実=2.73% 市場=2.27% diff=+0.465%
+  [win1_hw] 520-550 n=8441 実=3.08% 市場=2.25% diff=+0.833%
+  [win1_pop] 3番人気 n=21675 実=3.70% 市場=2.35% diff=+1.355%
+  [win1_pop] 1番人気 n=21177 実=7.39% 市場=1.93% diff=+5.460%
+  [win1_pop] 2番人気 n=21365 実=5.46% 市場=2.20% diff=+3.262%
+  [win1_win_odds] 0-3 n=22102 実=7.81% 市場=1.96% diff=+5.846%
+  [win1_win_odds] 3-5 n=22060 実=5.11% 市場=2.24% diff=+2.873%
+  [win1_win_odds] 5-10 n=34731 実=3.16% 市場=2.36% diff=+0.800%
+  [win1_frame] 枠8 n=4119 実=3.01% 市場=1.98% diff=+1.034%
+  [win1_jockey] 騎手15 n=2410 実=3.65% 市場=2.06% diff=+1.591%
+  [win1_jockey] 騎手0 n=2752 実=3.71% 市場=2.17% diff=+1.541%
+  [win1_jockey] 騎手8 n=2314 実=4.11% 市場=2.52% diff=+1.589%
+  [win1_jockey] 騎手11 n=2430 実=3.87% 市場=2.18% diff=+1.691%
+  [win1_jockey] 騎手13 n=2630 実=5.13% 市場=2.03% diff=+3.101%
+
+=== 実 vs 市場: 的中率 有意劣位（実 < 市場） ===
+  [win1_age] 8-19歳 n=22419 実=1.82% 市場=2.52% diff=-0.692%
+  [win1_age] 6-6歳 n=30567 実=2.01% 市場=2.41% diff=-0.398%
+  [win1_age] 5-5歳 n=41863 実=2.09% 市場=2.39% diff=-0.299%
+  [win1_sex] 牝 n=97233 実=2.10% 市場=2.39% diff=-0.296%
+  [win1_weight] 54-55 n=73487 実=2.08% 市場=2.35% diff=-0.271%
+  [win1_weight] 0-53 n=10449 実=1.64% 市場=2.46% diff=-0.819%
+  [win1_weight] 53-54 n=7825 実=1.67% 市場=2.37% diff=-0.691%
+  [win1_hw] 400-430 n=23449 実=1.73% 市場=2.47% diff=-0.737%
+  [win1_hw] 430-460 n=55087 実=2.08% 市場=2.38% diff=-0.301%
+  [win1_hw] 0-400 n=4334 実=1.06% 市場=2.47% diff=-1.408%
+  [win1_pop] 4-6番人気 n=65585 実=1.81% 市場=2.61% diff=-0.807%
+  [win1_pop] 7-9番人気 n=62987 実=0.59% 市場=2.55% diff=-1.961%
+  [win1_pop] 10番人気+ n=26934 実=0.16% 市場=2.04% diff=-1.880%
+  [win1_win_odds] 10-20 n=35423 実=1.80% 市場=2.55% diff=-0.751%
+  [win1_win_odds] 20-50 n=44188 実=0.94% 市場=2.56% diff=-1.621%
+  [win1_win_odds] 50-100 n=26535 実=0.37% 市場=2.48% diff=-2.114%
+  [win1_win_odds] 100-99999 n=34684 実=0.10% 市場=2.36% diff=-2.262%
+  [win1_frame] 枠1 n=40365 実=2.17% 市場=2.58% diff=-0.408%
+  [win1_jockey] その他騎手 n=174132 実=2.16% 市場=2.40% diff=-0.247%
+  [win2_win_odds] 50-100 n=24842 実=0.32% 市場=0.48% diff=-0.155%
+  [win2_win_odds] 100-99999 n=31459 実=0.09% 市場=0.21% diff=-0.119%
+
+=== 実 vs 市場: ROI 有意優位（実 > 市場） ===
+
+=== 実 vs 市場: ROI 有意劣位（実 < 市場） ===
+  [distance] 0-1000 n=45098 diff=-16.429%
+  [distance] 1400-1600 n=118121 diff=-24.808%
+  [distance] 1600-1800 n=21694 diff=-24.538%
+  [distance] 2000-3000 n=1812 diff=-39.796%
+  [distance] 1800-2000 n=3747 diff=-39.148%
+  [n_runners] 10頭 n=66695 diff=-21.712%
+  [n_runners] 9頭 n=39311 diff=-21.480%
+  [n_runners] 12頭 n=51525 diff=-31.711%
+  [surface] ダート n=219088 diff=-22.951%
+  [surface] 芝 n=635 diff=-51.344%
+  [venue] 43 n=34170 diff=-27.547%
+  [venue] 55 n=24672 diff=-28.160%
+  [venue] 03 n=32561 diff=-14.274%
+  [venue] 12 n=14561 diff=-22.129%
+  [venue] 51 n=26592 diff=-30.695%
+  [venue] 42 n=17137 diff=-26.958%
+  [venue] 52 n=14756 diff=-31.782%
+  [venue] 34 n=192 diff=-104.639%
+  [venue] 32 n=136 diff=-64.579%
+  [win1_age] 4-4歳 n=60409 diff=-24.294%
+  [win1_age] 5-5歳 n=41863 diff=-23.323%
+  [win1_age] 3-3歳 n=42051 diff=-22.523%
+  [win1_sex] 牡 n=107458 diff=-21.221%
+  [win1_sex] 牝 n=97233 diff=-26.955%
+  [win1_weight] 54-55 n=73487 diff=-28.663%
+  [win1_weight] 56-57 n=83250 diff=-18.793%
+  [win1_weight] 0-53 n=10449 diff=-36.706%
+  [win1_weight] 55-56 n=8942 diff=-33.672%
+  [win1_hw] 400-430 n=23449 diff=-34.357%
+  [win1_hw] 460-490 n=62607 diff=-23.986%
+  [win1_hw] 490-520 n=32071 diff=-29.067%
+  [win1_hw] 520-550 n=8441 diff=-28.524%
+  [win1_hw_chg] 1~5 n=56228 diff=-19.691%
+  [win1_hw_chg] -5~0 n=71664 diff=-27.583%
+  [win1_hw_chg] -100~-10 n=8076 diff=-29.540%
+  [win1_hw_chg] 10~100 n=12953 diff=-30.355%
+  [win1_pop] 3番人気 n=21675 diff=-19.635%
+  [win1_pop] 4-6番人気 n=65585 diff=-20.691%
+  [win1_pop] 7-9番人気 n=62987 diff=-28.439%
+  [win1_pop] 10番人気+ n=26934 diff=-44.479%
+  [win1_win_odds] 10-20 n=35423 diff=-18.725%
+  [win1_win_odds] 50-100 n=26535 diff=-30.422%
+  [win1_win_odds] 100-99999 n=34684 diff=-54.155%
+  [win1_win_odds] 5-10 n=34731 diff=-18.316%
+  [win1_frame] 枠1 n=40365 diff=-23.077%
+  [win1_frame] 枠2 n=38140 diff=-22.813%
+  [win1_frame] 枠3 n=34399 diff=-28.906%
+  [win1_frame] 枠4 n=30016 diff=-24.921%
+  [win1_frame] 枠5 n=29906 diff=-21.540%
+  [win1_frame] 枠6 n=24709 diff=-29.635%
+  [win1_jockey] 騎手19 n=1934 diff=-47.420%
+  [win1_jockey] その他騎手 n=174132 diff=-24.299%
+  [win1_jockey] 騎手10 n=2231 diff=-31.692%
+  [win1_jockey] 騎手5 n=2063 diff=-39.230%
+  [win1_jockey] 騎手11 n=2430 diff=-34.658%
+  [win2_age] 4-4歳 n=59919 diff=-20.956%
+  [win2_age] 6-6歳 n=30301 diff=-28.269%
+  [win2_age] 5-5歳 n=42349 diff=-24.588%
+  [win2_age] 3-3歳 n=41958 diff=-23.320%
+  [win2_sex] 牝 n=97168 diff=-22.668%
+  [win2_sex] 牡 n=107428 diff=-23.190%
+  [win2_sex] セ n=15127 diff=-24.269%
+  [win2_weight] 54-55 n=73667 diff=-21.464%
+  [win2_weight] 56-57 n=83393 diff=-22.916%
+  [win2_weight] 53-54 n=7551 diff=-34.308%
+  [win2_weight] 0-53 n=10448 diff=-44.400%
+  [win2_weight] 55-56 n=9036 diff=-30.666%
+  [win2_hw] 430-460 n=54997 diff=-28.202%
+  [win2_hw] 0-400 n=4377 diff=-42.102%
+  [win2_hw] 460-490 n=62780 diff=-21.580%
+  [win2_hw] 490-520 n=31743 diff=-25.560%
+  [win2_hw] 520-550 n=9268 diff=-30.242%
+  [win2_hw_chg] -5~0 n=71360 diff=-23.883%
+  [win2_hw_chg] 5~10 n=26220 diff=-25.765%
+  [win2_hw_chg] -10~-5 n=22690 diff=-31.856%
+  [win2_hw_chg] 1~5 n=56592 diff=-20.767%
+  [win2_pop] 4-6番人気 n=66982 diff=-16.277%
+  [win2_pop] 7-9番人気 n=59548 diff=-34.924%
+  [win2_pop] 10番人気+ n=24572 diff=-39.656%
+  [win2_pop] 3番人気 n=22532 diff=-20.879%
+  [win2_win_odds] 20-50 n=43554 diff=-22.453%
+  [win2_win_odds] 50-100 n=24842 diff=-43.996%
+  [win2_win_odds] 100-99999 n=31459 diff=-50.012%
+  [win2_win_odds] 3-5 n=23474 diff=-12.935%
+  [win2_frame] 枠4 n=15780 diff=-25.956%
+  [win2_frame] 枠5 n=25336 diff=-27.169%
+  [win2_frame] 枠6 n=36917 diff=-26.189%
+  [win2_frame] 枠7 n=55857 diff=-28.457%
+  [win2_frame] 枠8 n=70060 diff=-17.436%
+  [win2_jockey] その他騎手 n=173995 diff=-22.467%
+  [win2_jockey] 騎手15 n=2349 diff=-61.669%
+  [win2_jockey] 騎手4 n=3140 diff=-41.895%
+  [win2_jockey] 騎手19 n=1988 diff=-44.832%
+  [win2_jockey] 騎手8 n=2172 diff=-28.898%
+  [win2_jockey] 騎手11 n=2443 diff=-51.341%

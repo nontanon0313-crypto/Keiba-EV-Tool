@@ -1,0 +1,11 @@
+nohup: ignoring input
+=== ticket: trifecta (3連単) ===
+top 20 jockeys
+races: 6006
+  200/6006 39s samples=140518
+  400/6006 84s samples=254988
+  600/6006 134s samples=392247
+  800/6006 180s samples=498392
+  1000/6006 228s samples=611740
+  1200/6006 285s samples=730594
+  1400/6006 339s samples=856429

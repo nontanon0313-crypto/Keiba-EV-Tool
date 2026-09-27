@@ -1,0 +1,53 @@
+nohup: ignoring input
+=== ticket: quinella (馬連) ===
+top 20 jockeys
+races: 6006
+  200/6006 34s samples=7983
+  400/6006 68s samples=15132
+  600/6006 103s samples=23204
+  800/6006 132s samples=29553
+  1000/6006 164s samples=36376
+  1200/6006 204s samples=43740
+  1400/6006 242s samples=51226
+  2200/6006 385s samples=80841
+  2400/6006 422s samples=87422
+  2600/6006 460s samples=95145
+  3000/6006 533s samples=109658
+  3200/6006 567s samples=116518
+  3400/6006 604s samples=123532
+  3600/6006 640s samples=131039
+  3800/6006 677s samples=138771
+  4000/6006 713s samples=146173
+  4200/6006 751s samples=154573
+  4400/6006 791s samples=161802
+  4600/6006 818s samples=167865
+  4800/6006 853s samples=175134
+  5000/6006 889s samples=182990
+  5400/6006 972s samples=197049
+  5600/6006 1014s samples=204698
+  5800/6006 1049s samples=211870
+  6000/6006 1084s samples=219543
+
+=== 集計: 5257 レース, 219723 サンプル, 除外(50/1.0)=709 ===
+
+総検定数=175, z_adj=3.6279
+saved scratch/multi_quinella_result.json
+
+=== 実 vs 市場: ROI 優位（実 > 市場） ===
+
+=== 実 vs 市場: 的中率 優位（実 > 市場） ===
+  [win1_age] 4-4歳 n=60409 diff=+0.561%
+  [win1_hw] 490-520 n=32071 diff=+0.465%
+  [win1_hw] 520-550 n=8441 diff=+0.833%
+  [win1_pop] 3番人気 n=21675 diff=+1.355%
+  [win1_pop] 1番人気 n=21177 diff=+5.460%
+  [win1_pop] 2番人気 n=21365 diff=+3.262%
+  [win1_win_odds] 0-3 n=22102 diff=+5.846%
+  [win1_win_odds] 3-5 n=22060 diff=+2.873%
+  [win1_win_odds] 5-10 n=34731 diff=+0.800%
+  [win1_frame] 枠8 n=4119 diff=+1.034%
+  [win1_jockey] 騎手15 n=2410 diff=+1.591%
+  [win1_jockey] 騎手0 n=2752 diff=+1.541%
+  [win1_jockey] 騎手8 n=2314 diff=+1.589%
+  [win1_jockey] 騎手11 n=2430 diff=+1.691%
+  [win1_jockey] 騎手13 n=2630 diff=+3.101%

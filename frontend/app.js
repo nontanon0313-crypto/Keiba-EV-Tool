@@ -20,6 +20,9 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   var analyticsData = null, currentScope = "all", currentView = "ev", filters = {}, currentBets = [];
   var currentFeatureTab = null;
   var analyticsFeaturesData = null;
+  var analyticsMultiData = null;
+  var currentMultiTicket = null;
+  var currentMultiFeature = null;
   var currentFeatureFilter = "all";
   var currentRaceTableFeature = null;
   var currentSingleFeature = null;
@@ -493,6 +496,165 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     });
   }
 
+  var MULTI_TICKET_LABELS = {
+    quinella: "馬連", wide: "ワイド", exacta: "馬単",
+    trio: "3連複", trifecta: "3連単",
+  };
+  var MULTI_FEATURE_LABELS = {
+    distance: "距離", n_runners: "頭数", surface: "馬場", venue: "会場",
+    win1_age: "1頭目 年齢", win2_age: "2頭目 年齢", win3_age: "3頭目 年齢",
+    win1_sex: "1頭目 性別", win2_sex: "2頭目 性別", win3_sex: "3頭目 性別",
+    win1_weight: "1頭目 斤量", win2_weight: "2頭目 斤量", win3_weight: "3頭目 斤量",
+    win1_hw: "1頭目 馬体重", win2_hw: "2頭目 馬体重", win3_hw: "3頭目 馬体重",
+    win1_hw_chg: "1頭目 体重増減", win2_hw_chg: "2頭目 体重増減", win3_hw_chg: "3頭目 体重増減",
+    win1_pop: "1頭目 人気", win2_pop: "2頭目 人気", win3_pop: "3頭目 人気",
+    win1_win_odds: "1頭目 単勝", win2_win_odds: "2頭目 単勝", win3_win_odds: "3頭目 単勝",
+    win1_frame: "1頭目 枠", win2_frame: "2頭目 枠", win3_frame: "3頭目 枠",
+    win1_jockey: "1頭目 騎手", win2_jockey: "2頭目 騎手", win3_jockey: "3頭目 騎手",
+  };
+
+
+  function renderMultiTableBvsC(rows){
+    if (!rows || !rows.length) return "<p>該当データなし</p>";
+    var html = "<table class=\"ev-table\"><thead><tr>";
+    html += "<th>ビン</th><th>件数</th>";
+    html += "<th>ROI(B)</th><th>ROI(B^c)</th><th>差</th>";
+    html += "<th>実的中率</th><th>的中率差</th>";
+    html += "</tr></thead><tbody>";
+    rows.forEach(function(r){
+      var roi_diff_pct = r.roi_diff * 100;
+      var hr_diff_pct = r.hr_diff * 100;
+      var cls = KeibaTheme.evClass(roi_diff_pct / 100, 0);
+      html += "<tr>";
+      html += "<td>" + esc(r.label) + "</td>";
+      html += "<td>" + r.n + "</td>";
+      html += "<td>" + fmtSignedPct(r.roi * 100, 1) + "</td>";
+      html += "<td>" + fmtSignedPct(r.roi_other * 100, 1) + "</td>";
+      html += "<td class=\"" + cls + "\">" + fmtSignedPct(roi_diff_pct, 2) + "</td>";
+      html += "<td>" + fmtPct(r.real_hr * 100, 2) + "</td>";
+      html += "<td>" + fmtSignedPct(hr_diff_pct, 2) + "</td>";
+      html += "</tr>";
+    });
+    html += "</tbody></table>";
+    return html;
+  }
+
+  function renderMultiTableVsMarket(rows){
+    if (!rows || !rows.length) return "<p>該当データなし</p>";
+    var html = "<table class=\"ev-table\"><thead><tr>";
+    html += "<th>ビン</th><th>件数</th>";
+    html += "<th>実的中率</th><th>市場的中率</th><th>差</th>";
+    html += "<th>実利益%</th><th>市場利益%</th><th>差</th>";
+    html += "</tr></thead><tbody>";
+    rows.forEach(function(r){
+      var hr_diff_pct = r.hr_vm_mean * 100;
+      var roi_diff_pct = r.roi_vm_mean * 100;
+      // 実利益%: roi = 実ROI(利益率). 市場利益%: -rho
+      var real_profit_pct = r.roi * 100;
+      var market_profit_pct = real_profit_pct - roi_diff_pct;
+      var cls_hr = KeibaTheme.evClass(hr_diff_pct / 100, 0);
+      var cls_roi = KeibaTheme.evClass(roi_diff_pct / 100, 0);
+      html += "<tr>";
+      html += "<td>" + esc(r.label) + "</td>";
+      html += "<td>" + r.n + "</td>";
+      html += "<td>" + fmtPct(r.real_hr * 100, 2) + "</td>";
+      html += "<td>" + fmtPct(r.market_hr * 100, 2) + "</td>";
+      html += "<td class=\"" + cls_hr + "\">" + fmtSignedPct(hr_diff_pct, 3) + "</td>";
+      html += "<td>" + fmtSignedPct(real_profit_pct, 1) + "</td>";
+      html += "<td>" + fmtSignedPct(market_profit_pct, 1) + "</td>";
+      html += "<td class=\"" + cls_roi + "\">" + fmtSignedPct(roi_diff_pct, 2) + "</td>";
+      html += "</tr>";
+    });
+    html += "</tbody></table>";
+    return html;
+  }
+
+  function renderMultiFeatureGroup(featureData, currentFeature){
+    if (!featureData || !featureData.length) return "<p>該当データなし</p>";
+    // featureData: [{label, rows}, ...] を想定 → 実際は dict 形式
+    return "";
+  }
+
+  function renderMultiView(){
+    if (!analyticsMultiData) {
+      anaView.textContent = "読み込み中...";
+      fetchWithTimeout(API_BASE + "/analytics/multi", 120000)
+        .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+        .then(function(d){ analyticsMultiData = d; renderMultiView(); })
+        .catch(function(err){ anaView.textContent = "取得失敗: " + err.message; });
+      return;
+    }
+    var tickets = analyticsMultiData.tickets || {};
+    var ticketKeys = ["quinella", "wide", "exacta", "trio", "trifecta"];
+    // 券種タブ
+    var html = "<div class=\"subtabs\">";
+    ticketKeys.forEach(function(tk){
+      var label = MULTI_TICKET_LABELS[tk] || tk;
+      var exists = !!tickets[tk];
+      var active = (currentMultiTicket === tk) ? " active" : "";
+      var suffix = exists ? "" : " (準備中)";
+      var disabled = exists ? "" : " disabled";
+      html += "<button class=\"subtab" + active + disabled + "\" data-multi-ticket=\"" + tk + "\" type=\"button\">" + label + suffix + "</button>";
+    });
+    html += "</div>";
+    anaView.innerHTML = html;
+    bindMultiTicketTabs(tickets);
+    if (currentMultiTicket && tickets[currentMultiTicket]) {
+      renderMultiTicketBody(tickets[currentMultiTicket]);
+    }
+  }
+
+  function bindMultiTicketTabs(tickets){
+    var tabs = anaView.querySelectorAll("[data-multi-ticket]");
+    for (var i = 0; i < tabs.length; i++) {
+      (function(t){
+        if (t.disabled) return;
+        t.addEventListener("click", function(){
+          currentMultiTicket = t.getAttribute("data-multi-ticket");
+          currentMultiFeature = null;
+          renderMultiView();
+        });
+      })(tabs[i]);
+    }
+  }
+
+  function renderMultiTicketBody(ticketData){
+    var results = ticketData.results || {};
+    var featureKeys = Object.keys(results);
+    if (!featureKeys.length) {
+      anaView.innerHTML += "<p>データなし</p>";
+      return;
+    }
+    // 特徴タブ
+    var html = "<div class=\"subtabs\">";
+    featureKeys.forEach(function(fk, i){
+      var label = MULTI_FEATURE_LABELS[fk] || fk;
+      var active = (currentMultiFeature === fk || (!currentMultiFeature && i === 0)) ? " active" : "";
+      html += "<button class=\"subtab" + active + "\" data-multi-feature=\"" + esc(fk) + "\" type=\"button\">" + esc(label) + "</button>";
+    });
+    html += "</div>";
+    var target = currentMultiFeature || featureKeys[0];
+    var rows = results[target] || [];
+    html += "<h4 class=\"feature-title\">実 vs 市場</h4>";
+    html += renderMultiTableVsMarket(rows);
+    html += "<h4 class=\"feature-title\">B vs B^c</h4>";
+    html += renderMultiTableBvsC(rows);
+    anaView.innerHTML += html;
+    bindMultiFeatureTabs(results, target);
+  }
+
+  function bindMultiFeatureTabs(results, target){
+    var tabs = anaView.querySelectorAll("[data-multi-feature]");
+    for (var i = 0; i < tabs.length; i++) {
+      (function(t){
+        t.addEventListener("click", function(){
+          currentMultiFeature = t.getAttribute("data-multi-feature");
+          renderMultiView();
+        });
+      })(tabs[i]);
+    }
+  }
+
   function renderView(){
     if (currentView === "features") {
       renderRaceTable();
@@ -500,6 +662,10 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     }
     if (currentView === "single_features") {
       renderSingleFeatures();
+      return;
+    }
+    if (currentView === "multi") {
+      renderMultiView();
       return;
     }
     if (!analyticsData) return;

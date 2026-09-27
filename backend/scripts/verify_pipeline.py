@@ -24,7 +24,7 @@ def race_obj(rid, payload):
                 horse_id="", horse_name=r.get("horse_name", ""),
                 jockey=r.get("jockey", ""), trainer="",
                 weight=float(r.get("weight", 55.0) or 55.0),
-                odds_win=float(r.get("odds_win", 50.0) or 50.0),
+                odds_win=r.get("odds_win"),
                 popularity=r.get("popularity"),
             ))
         except (ValueError, TypeError):

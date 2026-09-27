@@ -140,7 +140,7 @@ def _build_payload(date, track_cd, sponsor_cd, race_nb, shutuba, detail):
             "weight": 55.0,
             "horse_weight": r.get("horse_weight"),
             "horse_weight_change": None,
-            "odds_win": r.get("odds_win") or 50.0,
+            "odds_win": r.get("odds_win"),
             "popularity": r.get("popularity"),
             "status": "出走",
         })

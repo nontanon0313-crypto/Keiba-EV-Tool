@@ -17,7 +17,7 @@ def race_obj(rid, payload):
             horse_number=r.get("horse_number", 0), frame_number=r.get("frame_number", 0),
             horse_id="", horse_name="", jockey="", trainer="",
             weight=r.get("weight", 55.0) or 55.0,
-            odds_win=r.get("odds_win") or 50.0, popularity=r.get("popularity"),
+            odds_win=r.get("odds_win"), popularity=r.get("popularity"),
         ))
     surf = payload.get("surface") or "ダート"
     if surf not in ("芝", "ダート", "障害"):

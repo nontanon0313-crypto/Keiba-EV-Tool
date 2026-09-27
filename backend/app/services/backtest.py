@@ -76,7 +76,7 @@ def _race_from_payload(race_id, payload):
             jockey=r.get("jockey", ""),
             trainer="",
             weight=r.get("weight", 55.0) or 55.0,
-            odds_win=r.get("odds_win") or 50.0,
+            odds_win=r.get("odds_win"),
             popularity=r.get("popularity"),
         ))
     return Race(
