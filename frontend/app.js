@@ -377,7 +377,12 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     rows.forEach(function(r){
       html += "<tr>";
       html += "<td>" + esc(r.label) + "</td>";
-      html += "<td>" + r.n + "</td>";
+      var total_n = r.n + (r.n_other || 0);
+      var ratio_str = "";
+      if (total_n > 0) {
+        ratio_str = " (" + (r.n / total_n * 100).toFixed(1) + "%)";
+      }
+      html += "<td>" + r.n + ratio_str + "</td>";
       if (mode === "roi") {
         var real_on = r.roi_pct;
         var market_on = -(r.market_rho_pct || 0);
