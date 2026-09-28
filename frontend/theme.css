@@ -194,3 +194,38 @@ label.bulk-btn.inline{cursor:pointer;}
   color: var(--keiba-gold);
   margin: 4px 0;
 }
+
+/* 6列テーブル（特徴量 適用/適用外フィルタ）用の幅指定 */
+#ana-view .ev-table.ev-table-6col td:nth-child(1),
+#ana-view .ev-table.ev-table-6col th:nth-child(1) { width: 16%; }
+#ana-view .ev-table.ev-table-6col td:nth-child(2),
+#ana-view .ev-table.ev-table-6col th:nth-child(2) { width: 14%; }
+#ana-view .ev-table.ev-table-6col td:nth-child(3),
+#ana-view .ev-table.ev-table-6col th:nth-child(3) { width: 14%; }
+#ana-view .ev-table.ev-table-6col td:nth-child(4),
+#ana-view .ev-table.ev-table-6col th:nth-child(4) { width: 14%; }
+#ana-view .ev-table.ev-table-6col td:nth-child(5),
+#ana-view .ev-table.ev-table-6col th:nth-child(5) { width: 14%; }
+#ana-view .ev-table.ev-table-6col td:nth-child(6),
+#ana-view .ev-table.ev-table-6col th:nth-child(6) { width: 14%; }
+
+/* 9列テーブル（特徴量 全体フィルタ）用の幅指定
+   ビン/件数/適用実/適用市場/適用差/適用外実/適用外市場/適用外差/有意 */
+#ana-view .ev-table.ev-table-feat-9col td:nth-child(1),
+#ana-view .ev-table.ev-table-feat-9col th:nth-child(1) { width: 11%; }
+#ana-view .ev-table.ev-table-feat-9col td:nth-child(2),
+#ana-view .ev-table.ev-table-feat-9col th:nth-child(2) { width: 10%; }
+#ana-view .ev-table.ev-table-feat-9col td:nth-child(3),
+#ana-view .ev-table.ev-table-feat-9col th:nth-child(3) { width: 10%; }
+#ana-view .ev-table.ev-table-feat-9col td:nth-child(4),
+#ana-view .ev-table.ev-table-feat-9col th:nth-child(4) { width: 11%; }
+#ana-view .ev-table.ev-table-feat-9col td:nth-child(5),
+#ana-view .ev-table.ev-table-feat-9col th:nth-child(5) { width: 10%; }
+#ana-view .ev-table.ev-table-feat-9col td:nth-child(6),
+#ana-view .ev-table.ev-table-feat-9col th:nth-child(6) { width: 10%; }
+#ana-view .ev-table.ev-table-feat-9col td:nth-child(7),
+#ana-view .ev-table.ev-table-feat-9col th:nth-child(7) { width: 11%; }
+#ana-view .ev-table.ev-table-feat-9col td:nth-child(8),
+#ana-view .ev-table.ev-table-feat-9col th:nth-child(8) { width: 10%; }
+#ana-view .ev-table.ev-table-feat-9col td:nth-child(9),
+#ana-view .ev-table.ev-table-feat-9col th:nth-child(9) { width: 10%; }
