@@ -438,7 +438,31 @@ def main():
                 "avg_payout_hit": r["avg_payout_hit"],
                 "avg_payout_hit_other": r["avg_payout_hit_other"],
             })
-        return {"feature": feature_key, "label": "", "rows": rows}
+        # 順位相関（ビンの並び順 vs ROI の順位）
+        # ビン順序 = rows の定義順、ROI は roi_pct
+        corr = None
+        n_bins = len(rows)
+        if n_bins >= 3:
+            try:
+                from scipy.stats import spearmanr
+                order = list(range(n_bins))
+                rois = [x["roi_pct"] for x in rows]
+                rho_val, p_val = spearmanr(order, rois)
+                corr = {"rho": float(rho_val), "p_value": float(p_val), "n_bins": n_bins}
+            except Exception:
+                corr = None
+        # 最大ROIのビン
+        max_row = None
+        if rows:
+            max_row = max(rows, key=lambda x: x["roi_pct"])
+        return {
+            "feature": feature_key,
+            "label": "",
+            "rows": rows,
+            "order_corr": corr,
+            "max_roi_label": max_row["label"] if max_row else None,
+            "max_roi_pct": max_row["roi_pct"] if max_row else None,
+        }
 
     race_table_list = []
     for fk, flabel in RACE_TABLE_FEATURES:

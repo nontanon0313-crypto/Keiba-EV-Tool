@@ -187,3 +187,10 @@ label.bulk-btn.inline{cursor:pointer;}
 #ana-view .ev-table.ev-table-9col th:nth-child(8) { width: 12%; }
 #ana-view .ev-table.ev-table-9col td:nth-child(9),
 #ana-view .ev-table.ev-table-9col th:nth-child(9) { width: 13%; }
+
+/* 順位相関の表示 */
+.order-corr {
+  font-size: 12px;
+  color: var(--keiba-gold);
+  margin: 4px 0;
+}

@@ -442,7 +442,25 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     var target = null;
     features.forEach(function(f){ if (f.feature === currentKey) target = f; });
     if (!target) target = features[0];
-    var bodyHtml = "<h4 class=\"feature-title\">利益率</h4>";
+    var bodyHtml = "";
+    // 順位相関と最大ROIビン
+    if (target.order_corr && target.order_corr.rho != null) {
+      var rho = target.order_corr.rho;
+      var pv = target.order_corr.p_value;
+      var sig = (pv < 0.05) ? "有意" : "有意でない";
+      var rhoStr = (rho >= 0 ? "+" : "") + rho.toFixed(3);
+      var pvStr = pv < 0.001 ? "<0.001" : pv.toFixed(3);
+      bodyHtml += "<div class=\"order-corr\">";
+      bodyHtml += "順位相関: " + rhoStr + "（p=" + pvStr + ", " + sig + "）";
+      bodyHtml += "</div>";
+    }
+    if (target.max_roi_label != null) {
+      bodyHtml += "<div class=\"order-corr\">";
+      bodyHtml += "最大ROIビン: " + esc(target.max_roi_label)
+                + " (" + fmtSignedPct(target.max_roi_pct, 1) + ")";
+      bodyHtml += "</div>";
+    }
+    bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     bodyHtml += renderFeatureTable(target.rows, "roi", currentFeatureFilter);
     bodyHtml += "<h4 class=\"feature-title\">的中率</h4>";
     bodyHtml += renderFeatureTable(target.rows, "hr", currentFeatureFilter);
