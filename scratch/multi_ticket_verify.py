@@ -38,7 +38,7 @@ from scipy import stats
 from backend.constants import (
     STAKE_PER_BET, HITS_PER_RACE, ODDS_MISSING_LEGACY, JOCKEY_TOP_N,
     AGE_BINS, WEIGHT_BINS, HW_CHG_BINS, POP_BINS, WIN_ODDS_BINS, HORSE_WEIGHT_BINS,
-    DISTANCE_BINS,
+    DISTANCE_BINS, EXCLUDED_TRACK_CODES, TRACK_CD_TO_VENUE,
 )
 
 
@@ -46,6 +46,80 @@ TICKET_JP = {
     "quinella": "馬連", "wide": "ワイド", "exacta": "馬単",
     "trio": "3連複", "trifecta": "3連単",
 }
+
+
+def new_acc():
+    """1ビン分の累積値。サンプルリストを持たない。"""
+    return {
+        "n": 0,
+        "sum_hit": 0.0,
+        "sum_prob": 0.0,
+        "sum_payout": 0.0,
+        "sum_profit": 0.0,
+        "sum_profit_sq": 0.0,
+        "sum_hr_diff": 0.0,
+        "sum_hr_diff_sq": 0.0,
+        "sum_roi_diff": 0.0,
+        "sum_roi_diff_sq": 0.0,
+    }
+
+
+def acc_add(acc, market_prob, odds, hit, payout, rho_race):
+    profit = payout / STAKE_PER_BET - 1.0
+    hr_diff = float(hit) - market_prob
+    roi_diff = profit + rho_race
+    acc["n"] += 1
+    acc["sum_hit"] += hit
+    acc["sum_prob"] += market_prob
+    acc["sum_payout"] += payout
+    acc["sum_profit"] += profit
+    acc["sum_profit_sq"] += profit * profit
+    acc["sum_hr_diff"] += hr_diff
+    acc["sum_hr_diff_sq"] += hr_diff * hr_diff
+    acc["sum_roi_diff"] += roi_diff
+    acc["sum_roi_diff_sq"] += roi_diff * roi_diff
+
+
+def acc_sub(a, b):
+    """a - b を返す（B^c を求めるため）。"""
+    out = {}
+    for k in a:
+        out[k] = a[k] - b[k]
+    return out
+
+
+def acc_stats(acc):
+    """累積値から統計量を計算。"""
+    n = acc["n"]
+    if n == 0:
+        return None
+    mean_roi = acc["sum_payout"] / (n * STAKE_PER_BET) - 1.0
+    mean_market_hr = acc["sum_prob"] / n
+    mean_real_hr = acc["sum_hit"] / n
+    mean_profit = acc["sum_profit"] / n
+    var_profit = (acc["sum_profit_sq"] / n) - (mean_profit * mean_profit)
+    var_profit = max(var_profit, 0.0)
+    se_roi = math.sqrt(var_profit / n) if n > 0 else 0.0
+    mean_hr_diff = acc["sum_hr_diff"] / n
+    var_hr_diff = (acc["sum_hr_diff_sq"] / n) - (mean_hr_diff * mean_hr_diff)
+    var_hr_diff = max(var_hr_diff, 0.0)
+    se_hr_diff = math.sqrt(var_hr_diff / n) if n > 0 else 0.0
+    mean_roi_diff = acc["sum_roi_diff"] / n
+    var_roi_diff = (acc["sum_roi_diff_sq"] / n) - (mean_roi_diff * mean_roi_diff)
+    var_roi_diff = max(var_roi_diff, 0.0)
+    se_roi_diff = math.sqrt(var_roi_diff / n) if n > 0 else 0.0
+    return {
+        "n": n,
+        "roi": mean_roi,
+        "market_hr": mean_market_hr,
+        "real_hr": mean_real_hr,
+        "se": se_roi,
+        "se_hr": se_hr_diff,
+        "mean_hr_diff": mean_hr_diff,
+        "se_hr_vm": se_hr_diff,
+        "mean_roi_diff": mean_roi_diff,
+        "se_roi_vm": se_roi_diff,
+    }
 SEX_LABEL = {0: "牡", 1: "牝", 2: "セ", -1: "不明"}
 
 
@@ -148,7 +222,7 @@ def build_feature_tags(rec, num_order, runner_map, rr_map, jockey_ids):
     tags["distance"] = classify(rec["distance"], DISTANCE_BINS, lambda lo, hi: f"{lo}-{hi}")
     tags["n_runners"] = f"{rec['n_runners']}頭"
     tags["surface"] = {0: "ダート", 1: "芝", 2: "障害"}[rec["surface_id"]]
-    tags["venue"] = rec["venue_id"]
+    tags["venue"] = rec["venue"]
 
     for pos, num in enumerate(num_order, 1):
         prefix = f"win{pos}_"
@@ -275,13 +349,13 @@ def main():
 
     feature_data_loaded, processed_upto = load_checkpoint(ticket)
     if feature_data_loaded is not None:
-        feature_data = defaultdict(lambda: defaultdict(list))
+        feature_data = defaultdict(lambda: defaultdict(new_acc))
         for feat, bins in feature_data_loaded.items():
-            for label, samples in bins.items():
-                feature_data[feat][label] = samples
+            for label, acc in bins.items():
+                feature_data[feat][label] = acc
         start_idx = processed_upto
     else:
-        feature_data = defaultdict(lambda: defaultdict(list))
+        feature_data = defaultdict(lambda: defaultdict(new_acc))
         start_idx = 0
 
     n_races_used = 0
@@ -293,6 +367,9 @@ def main():
         if i < start_idx:
             continue
         rid = row[0]
+        parts_rid = rid.split("-")
+        if len(parts_rid) >= 3 and parts_rid[2] in EXCLUDED_TRACK_CODES:
+            continue
         try:
             p = json.loads(row[1])
         except Exception:
@@ -340,7 +417,7 @@ def main():
             "distance": p.get("distance") or 0,
             "surface_id": {"ダート":0,"芝":1,"障害":2}.get(p.get("surface") or "ダート", 0),
             "n_runners": len(runners),
-            "venue_id": parts[2] if len(parts) >= 3 else "",
+            "venue": TRACK_CD_TO_VENUE.get(parts[2] if len(parts) >= 3 else "", "不明"),
         }
         runner_map = {r0.get("horse_number"): r0 for r0 in runners}
         rr_map = {rr.get("horse_number"): rr for rr in result_runners}
@@ -379,7 +456,7 @@ def main():
             for feature, label in tags.items():
                 if label is None:
                     continue
-                feature_data[feature][label].append((market_prob, o, is_hit, payout, rho_race))
+                acc_add(feature_data[feature][label], market_prob, o, is_hit, payout, rho_race)
             n_samples += 1
 
         n_races_used += 1
@@ -390,29 +467,13 @@ def main():
 
     print(f"\n=== 集計: {n_races_used} レース, {n_samples} サンプル, 除外(50/1.0)={n_skip_bad} ===", flush=True)
 
-    def agg_stats(samples):
-        n = len(samples)
-        if n == 0:
-            return None
-        prob = np.array([s[0] for s in samples])
-        payout = np.array([s[3] for s in samples])
-        hit = np.array([s[2] for s in samples])
-        stake = n * STAKE_PER_BET
-        roi = float(payout.sum() / stake - 1.0)
-        market_hr = float(prob.mean())
-        real_hr = float(hit.mean())
-        profits = payout / 100.0 - 1.0
-        se = float(profits.std(ddof=1) / math.sqrt(n)) if n > 1 else 0.0
-        se_hr = math.sqrt(real_hr * (1 - real_hr) / n) if n > 0 else 0.0
-        return {"n": n, "roi": roi, "market_hr": market_hr, "real_hr": real_hr,
-                "se": se, "se_hr": se_hr}
-
-    feature_all = {}
-    for feature, bins in feature_data.items():
-        all_s = []
-        for label, samples in bins.items():
-            all_s.extend(samples)
-        feature_all[feature] = all_s
+    # 特徴ごとに B vs B^c 検定（累積値ベース）
+    def aggregate_bins(bins):
+        total = new_acc()
+        for label, acc in bins.items():
+            for k in total:
+                total[k] += acc[k]
+        return total
 
     total_bins = sum(len(b) for b in feature_data.values())
     z_adj = stats.norm.ppf(1 - 0.05 / (2 * total_bins)) if total_bins > 0 else 1.96
@@ -421,20 +482,15 @@ def main():
     results = {}
     for feature, bins in feature_data.items():
         feature_results = []
-        for label, samples in bins.items():
-            n_B = len(samples)
-            if n_B < 100:
+        total_acc = aggregate_bins(bins)
+        for label, acc in bins.items():
+            stats_B = acc_stats(acc)
+            if stats_B is None or stats_B["n"] < 100:
                 continue
-            stats_B = agg_stats(samples)
-            other = []
-            for l2, s2 in bins.items():
-                if l2 == label:
-                    continue
-                other.extend(s2)
-            n_C = len(other)
-            if n_C < 100:
+            other_acc = acc_sub(total_acc, acc)
+            stats_C = acc_stats(other_acc)
+            if stats_C is None or stats_C["n"] < 100:
                 continue
-            stats_C = agg_stats(other)
             roi_diff = stats_B["roi"] - stats_C["roi"]
             hr_diff = stats_B["real_hr"] - stats_C["real_hr"]
             se_roi = math.sqrt(stats_B["se"]**2 + stats_C["se"]**2)
@@ -444,24 +500,17 @@ def main():
             hr_ci_lo = hr_diff - z_adj * se_hr
             hr_ci_hi = hr_diff + z_adj * se_hr
 
-            prob_arr = np.array([s[0] for s in samples])
-            hit_arr = np.array([s[2] for s in samples]).astype(np.float64)
-            hr_diff_i = hit_arr - prob_arr
-            hr_vm_mean = float(hr_diff_i.mean())
-            hr_vm_se = float(hr_diff_i.std(ddof=1) / math.sqrt(n_B)) if n_B > 1 else 0.0
+            hr_vm_mean = stats_B["mean_hr_diff"]
+            hr_vm_se = stats_B["se_hr_vm"]
             hr_vm_ci_lo = hr_vm_mean - z_adj * hr_vm_se
             hr_vm_ci_hi = hr_vm_mean + z_adj * hr_vm_se
-
-            payout_arr = np.array([s[3] for s in samples]).astype(np.float64)
-            rho_arr = np.array([s[4] for s in samples]).astype(np.float64)
-            roi_vm_diff_i = (payout_arr / STAKE_PER_BET - 1.0) - (-rho_arr)
-            roi_vm_mean = float(roi_vm_diff_i.mean())
-            roi_vm_se = float(roi_vm_diff_i.std(ddof=1) / math.sqrt(n_B)) if n_B > 1 else 0.0
+            roi_vm_mean = stats_B["mean_roi_diff"]
+            roi_vm_se = stats_B["se_roi_vm"]
             roi_vm_ci_lo = roi_vm_mean - z_adj * roi_vm_se
             roi_vm_ci_hi = roi_vm_mean + z_adj * roi_vm_se
 
             feature_results.append({
-                "label": label, "n": n_B, "n_other": n_C,
+                "label": label, "n": stats_B["n"], "n_other": stats_C["n"],
                 "roi": stats_B["roi"], "roi_other": stats_C["roi"],
                 "roi_diff": roi_diff, "roi_ci_lo": roi_ci_lo, "roi_ci_hi": roi_ci_hi,
                 "roi_sig_up": roi_ci_lo > 0, "roi_sig_down": roi_ci_hi < 0,
@@ -477,6 +526,7 @@ def main():
                 "hr_vm_sig_up": hr_vm_ci_lo > 0, "hr_vm_sig_down": hr_vm_ci_hi < 0,
             })
         results[feature] = feature_results
+
 
     def sanitize(o):
         if isinstance(o, dict): return {k: sanitize(v) for k, v in o.items()}

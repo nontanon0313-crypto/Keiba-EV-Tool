@@ -437,6 +437,36 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     return html;
   }
 
+  function renderWeightHandicapTable(whData){
+    if (!whData || !whData.rows || !whData.rows.length) return "<p>該当データなし</p>";
+    var html = "<table class=\"ev-table\"><thead><tr>";
+    html += "<th>斤量</th>";
+    html += "<th>減量あり n</th><th>減量なし n</th>";
+    html += "<th>減量あり 実%</th><th>減量なし 実%</th>";
+    html += "<th>減量あり 的中率</th><th>減量なし 的中率</th>";
+    html += "</tr></thead><tbody>";
+    whData.rows.forEach(function(r){
+      function fmtOrDash(v, d, signed){
+        if (v == null) return "-";
+        if (signed) return fmtSignedPct(v, d);
+        return fmtPct(v, d);
+      }
+      var cls_roi_y = (r.roi_pct_yes == null) ? "" : KeibaTheme.evClass(r.roi_pct_yes / 100, 0);
+      var cls_roi_n = (r.roi_pct_no == null) ? "" : KeibaTheme.evClass(r.roi_pct_no / 100, 0);
+      html += "<tr>";
+      html += "<td>" + esc(r.weight_label) + "</td>";
+      html += "<td>" + r.n_yes + "</td>";
+      html += "<td>" + r.n_no + "</td>";
+      html += "<td class=\"" + cls_roi_y + "\">" + fmtOrDash(r.roi_pct_yes, 1, true) + "</td>";
+      html += "<td class=\"" + cls_roi_n + "\">" + fmtOrDash(r.roi_pct_no, 1, true) + "</td>";
+      html += "<td>" + fmtOrDash(r.hr_pct_yes, 2, false) + "</td>";
+      html += "<td>" + fmtOrDash(r.hr_pct_no, 2, false) + "</td>";
+      html += "</tr>";
+    });
+    html += "</tbody></table>";
+    return html;
+  }
+
   function renderFeatureGroup(features, currentKey){
     if (!features || !features.length) return "<p>該当データなし</p>";
     var tabsHtml = "<div class=\"subtabs\">";
@@ -470,6 +500,11 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     bodyHtml += renderFeatureTable(target.rows, "roi", currentFeatureFilter);
     bodyHtml += "<h4 class=\"feature-title\">的中率</h4>";
     bodyHtml += renderFeatureTable(target.rows, "hr", currentFeatureFilter);
+    // 斤量タブのときだけ、斤量×減量騎手の交差表を追加
+    if (target.feature === "weight" && analyticsFeaturesData && analyticsFeaturesData.weight_x_handicap) {
+      bodyHtml += "<h4 class=\"feature-title\">斤量 × 減量騎手</h4>";
+      bodyHtml += renderWeightHandicapTable(analyticsFeaturesData.weight_x_handicap);
+    }
     return tabsHtml + "<div>" + bodyHtml + "</div>";
   }
 

@@ -17,6 +17,7 @@ from backend.constants import (
     prob_bins as _prob_bins_const, odds_bins as _odds_bins_const,
     ev_bins as _ev_bins_const,
     PROB_THRESHOLDS, ODDS_THRESHOLDS, EV_THRESHOLDS,
+    EXCLUDED_TRACK_CODES,
 )
 from backend.app.services import race_store, odds_store
 from backend.app.services.prediction import predict_race
@@ -260,6 +261,9 @@ def build():
 
     for i, it in enumerate(races):
         rid = it["race_id"]
+        parts_rid = rid.split("-")
+        if len(parts_rid) >= 3 and parts_rid[2] in EXCLUDED_TRACK_CODES:
+            continue
         payload = it.get("payload") or {}
         finish = payload.get("finish_order") or []
         if len(finish) < 3:

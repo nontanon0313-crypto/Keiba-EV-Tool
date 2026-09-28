@@ -15,9 +15,14 @@ import libsql_client
 from scipy import stats
 
 from backend.constants import (
+    STAKE_PER_BET,
     AGE_BINS, WEIGHT_BINS, HW_CHG_BINS, DISTANCE_BINS, POP_BINS,
     N_RUNNERS_MIN, N_RUNNERS_MAX, ODDS_MISSING_LEGACY,
+    EXCLUDED_TRACK_CODES, TRACK_CD_TO_VENUE,
 )
+
+# 減量騎手の記号（NAR）
+HANDICAP_MARKS = ("☆", "△", "▲", "★", "◇")
 
 
 def build_dataset():
@@ -26,12 +31,8 @@ def build_dataset():
     http_url = url.replace("libsql://", "https://").replace("wss://", "https://")
     client = libsql_client.create_client_sync(url=http_url, auth_token=token)
 
-    venue_ids = {}
     r = client.execute("SELECT DISTINCT race_id FROM scraped_races")
-    for row in r.rows:
-        parts = row[0].split("-")
-        if len(parts) >= 3:
-            venue_ids[parts[2]] = len(venue_ids)
+    # 会場は TRACK_CD_TO_VENUE を使う（venue_ids は不要）
 
     r = client.execute("SELECT payload FROM scraped_races LIMIT 1000")
     jockey_counter = Counter()
@@ -54,6 +55,9 @@ def build_dataset():
     t0 = time.time()
     for i, row in enumerate(rows):
         rid = row[0]
+        parts_rid = rid.split("-")
+        if len(parts_rid) >= 3 and parts_rid[2] in EXCLUDED_TRACK_CODES:
+            continue
         try:
             p = json.loads(row[1])
         except Exception:
@@ -69,7 +73,7 @@ def build_dataset():
         surf = p.get("surface") or "ダート"
         surf_id = {"ダート": 0, "芝": 1, "障害": 2}.get(surf, 0)
         parts = rid.split("-")
-        venue_id = venue_ids.get(parts[2], -1)
+        venue_name = TRACK_CD_TO_VENUE.get(parts[2], "不明")
 
         win_payouts = {}
         for row2 in (payouts.get("単勝") or []):
@@ -124,7 +128,13 @@ def build_dataset():
             sex_id = -1
             age = 0.0
             jockey_id = len(jockey_ids)
+            is_handicap_jockey = 0
             if rr:
+                jname = (rr.get("jockey") or "")
+                for mark in HANDICAP_MARKS:
+                    if mark in jname:
+                        is_handicap_jockey = 1
+                        break
                 age_sex = rr.get("age_sex") or ""
                 if age_sex:
                     if age_sex[0] == "牡": sex_id = 0
@@ -155,9 +165,10 @@ def build_dataset():
                 "n_runners": float(n_runners),
                 "distance": float(distance),
                 "surface_id": float(surf_id),
-                "venue_id": float(venue_id),
+                "venue": venue_name,
                 "jockey_id": float(jockey_id),
                 "jockey_rank": -1,
+                "is_handicap_jockey": is_handicap_jockey,
                 "payout": float(payout),
             })
         if (i + 1) % 1000 == 0:
@@ -223,9 +234,9 @@ def main():
             bins.append(("distance", f"距離 {lo}-{hi}", lambda r, lo=lo, hi=hi: lo <= r["distance"] < hi))
         for sid, name in [(0,"ダート"),(1,"芝"),(2,"障害")]:
             bins.append(("surface_id", f"馬場 {name}", lambda r, sid=sid: r["surface_id"] == sid))
-        venue_set = set(int(r["venue_id"]) for r in records)
-        for vid in sorted(venue_set):
-            bins.append(("venue_id", f"会場 {vid}", lambda r, vid=vid: int(r["venue_id"]) == vid))
+        venue_set = set(r["venue"] for r in records)
+        for vname in sorted(venue_set):
+            bins.append(("venue", vname, lambda r, v=vname: r["venue"] == v))
         jk_set = set(int(r["jockey_id"]) for r in records)
         for jid in sorted(jk_set):
             bins.append(("jockey_id", f"騎手ID {jid}", lambda r, jid=jid: int(r["jockey_id"]) == jid))
@@ -237,6 +248,9 @@ def main():
             bins.append(("odds", name, lambda r, lo=lo, hi=hi: lo <= r["odds"] < hi))
         for rank, name in [(0,"騎手 上位"),(1,"騎手 中位"),(2,"騎手 下位")]:
             bins.append(("jockey_rank", name, lambda r, rank=rank: r["jockey_rank"] == rank))
+        # 減量騎手
+        bins.append(("handicap_jockey", "減量あり", lambda r: r.get("is_handicap_jockey", 0) == 1))
+        bins.append(("handicap_jockey", "減量なし", lambda r: r.get("is_handicap_jockey", 0) == 0))
         return bins
 
     all_bins = make_bins()
@@ -393,9 +407,10 @@ def main():
         ("n_runners", "頭数"),
         ("distance", "距離"),
         ("surface_id", "馬場"),
-        ("venue_id", "会場"),
+        ("venue", "会場"),
         ("jockey_id", "騎手"),
         ("jockey_rank", "騎手ランク"),
+        ("handicap_jockey", "減量騎手"),
     ]
 
     def to_pct(v):
@@ -464,6 +479,58 @@ def main():
             "max_roi_pct": max_row["roi_pct"] if max_row else None,
         }
 
+    # ============================================================
+    # 交差集計: 斤量 × 減量騎手
+    # ============================================================
+    def build_weight_handicap():
+        # (weight_label, is_handicap) -> 累積値
+        acc = {}
+        for rec in records:
+            w = rec.get("weight")
+            if not rec.get("has_weight") or w is None:
+                continue
+            wlabel = None
+            for lo, hi in WEIGHT_BINS:
+                if lo <= w < hi:
+                    wlabel = f"{lo}-{hi}"
+                    break
+            if wlabel is None:
+                continue
+            h = int(rec.get("is_handicap_jockey", 0))
+            key = (wlabel, h)
+            if key not in acc:
+                acc[key] = {"n": 0, "sum_payout": 0.0, "sum_hit": 0.0}
+            a = acc[key]
+            a["n"] += 1
+            a["sum_payout"] += rec["payout"]
+            a["sum_hit"] += 1 if rec["payout"] > 0 else 0
+        # 行を組み立て: 斤量ビンごとに yes/no を並べる
+        rows = []
+        for lo, hi in WEIGHT_BINS:
+            wlabel = f"{lo}-{hi}"
+            a_yes = acc.get((wlabel, 1), {"n": 0, "sum_payout": 0, "sum_hit": 0})
+            a_no = acc.get((wlabel, 0), {"n": 0, "sum_payout": 0, "sum_hit": 0})
+            def _roi(a):
+                if a["n"] == 0:
+                    return None
+                return a["sum_payout"] / (a["n"] * STAKE_PER_BET) * 100 - 100
+            def _hr(a):
+                if a["n"] == 0:
+                    return None
+                return a["sum_hit"] / a["n"] * 100
+            rows.append({
+                "weight_label": wlabel,
+                "n_yes": a_yes["n"],
+                "n_no": a_no["n"],
+                "roi_pct_yes": _roi(a_yes),
+                "roi_pct_no": _roi(a_no),
+                "hr_pct_yes": _hr(a_yes),
+                "hr_pct_no": _hr(a_no),
+            })
+        return {"label": "斤量×減量騎手", "rows": rows}
+
+    weight_handicap = build_weight_handicap()
+
     race_table_list = []
     for fk, flabel in RACE_TABLE_FEATURES:
         d = build_feature_rows(fk)
@@ -489,6 +556,7 @@ def main():
         "z_adj": z_adj,
         "race_table": race_table_list,
         "single": single_list,
+        "weight_x_handicap": weight_handicap,
         "generated_at": datetime.now().isoformat(),
     })
     with open("scratch/single_feature_result.json", "w", encoding="utf-8") as f:
