@@ -28,9 +28,12 @@ def main():
     rows = list(r.rows)
     print(f"全レース: {len(rows)}", flush=True)
 
-    # (venue, surface, dist_label, baba) → frame → {n, hits, sum_profit, sum_profit_sq}
+    # (venue, surface, dist_label, baba) → frame → 累積値
     cells = defaultdict(lambda: defaultdict(lambda: {
-        "n": 0, "hits": 0, "sum_profit": 0.0, "sum_profit_sq": 0.0,
+        "n": 0, "hits": 0,
+        "sum_profit": 0.0, "sum_profit_sq": 0.0,
+        "sum_market_prob": 0.0, "sum_rho": 0.0,
+        "sum_payout": 0.0,
     }))
 
     t0 = time.time()
@@ -79,6 +82,18 @@ def main():
                 break
         if dist_label is None:
             continue
+        # 単勝の Σ(1/odds) → レース排除率
+        inv_sum = 0.0
+        for r0 in runners:
+            o = r0.get("odds_win")
+            if o and o > 1 and o != ODDS_MISSING_LEGACY:
+                inv_sum += 1.0 / float(o)
+        if inv_sum <= 0:
+            n_skipped += 1
+            continue
+        rho_race = 1.0 - 1.0 / inv_sum
+        market_factor = 1.0 - rho_race
+
         winner = finish_order[0]
         cell_key = (venue, surface, dist_label, baba)
         for r0 in runners:
@@ -89,6 +104,7 @@ def main():
                 continue
             if odds == ODDS_MISSING_LEGACY or odds == 1.0:
                 continue
+            market_prob = market_factor / float(odds)
             is_hit = 1 if num == winner else 0
             payout = win_payouts.get(num, 0) if is_hit else 0
             profit = payout / float(STAKE_PER_BET) - 1.0
@@ -97,6 +113,9 @@ def main():
             acc["hits"] += is_hit
             acc["sum_profit"] += profit
             acc["sum_profit_sq"] += profit * profit
+            acc["sum_payout"] += payout
+            acc["sum_market_prob"] += market_prob
+            acc["sum_rho"] += rho_race
         n_used += 1
         if (idx + 1) % 500 == 0:
             print(f"  {idx+1}/{len(rows)} {time.time()-t0:.0f}s", flush=True)
@@ -133,6 +152,12 @@ def main():
             se_p = math.sqrt(p_hat * (1 - p_hat) / n) if n > 0 else 0.0
             frames_out.append({
                 "frame": f, "n": n,
+                "sum_profit": fd["sum_profit"],
+                "sum_profit_sq": fd["sum_profit_sq"],
+                "sum_hit": fd["hits"],
+                "sum_payout": fd["sum_payout"],
+                "sum_market_prob": fd["sum_market_prob"],
+                "sum_rho": fd["sum_rho"],
                 "roi_pct": roi_pct,
                 "roi_ci_lo": roi_ci_lo,
                 "roi_ci_hi": roi_ci_hi,

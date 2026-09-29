@@ -24,6 +24,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   var analyticsFrameData = null;
   var frameCondFilter = { venue: null, surface: null, distance_band: null, track_condition: null };
   var frameCondSelectedCell = null;
+  var frameTabFilter = { venue: "", surface: "", distance_band: "", track_condition: "" };
   var currentMultiTicket = null;
   var currentMultiFeature = null;
   var currentFeatureFilter = "all";
@@ -470,6 +471,161 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     return html;
   }
 
+  var FRAME_Z = 1.96;
+
+  function emptyAcc() {
+    return { n: 0, sum_profit: 0, sum_profit_sq: 0, sum_hit: 0,
+             sum_payout: 0, sum_market_prob: 0, sum_rho: 0 };
+  }
+
+  function frameRowStats(acc) {
+    if (!acc || acc.n === 0) return null;
+    var n = acc.n;
+    var mean_profit = acc.sum_profit / n;
+    var var_profit = acc.sum_profit_sq / n - mean_profit * mean_profit;
+    if (var_profit < 0) var_profit = 0;
+    var se_profit = Math.sqrt(var_profit / n);
+    var roi_pct = mean_profit * 100;
+    var roi_ci_lo = (mean_profit - FRAME_Z * se_profit) * 100;
+    var roi_ci_hi = (mean_profit + FRAME_Z * se_profit) * 100;
+    var p_hat = acc.sum_hit / n;
+    var se_p = Math.sqrt(p_hat * (1 - p_hat) / n);
+    var hr_pct = p_hat * 100;
+    var hr_ci_lo = (p_hat - FRAME_Z * se_p) * 100;
+    var hr_ci_hi = (p_hat + FRAME_Z * se_p) * 100;
+    return {
+      n: n,
+      roi_pct: roi_pct,
+      roi_sig_up: roi_ci_lo > 0,
+      roi_sig_down: roi_ci_hi < 0,
+      hr_pct: hr_pct,
+      hr_sig_up: hr_ci_lo > 0,
+      hr_sig_down: hr_ci_hi < 0,
+      market_hr_pct: (acc.sum_market_prob / n) * 100,
+      rho_pct: (acc.sum_rho / n) * 100
+    };
+  }
+
+  function aggregateFrameConditionRows() {
+    if (!analyticsFrameData) return null;
+    var cells = analyticsFrameData.cells || [];
+    var matched = cells.filter(function(c){
+      if (frameTabFilter.venue && c.venue !== frameTabFilter.venue) return false;
+      if (frameTabFilter.surface && c.surface !== frameTabFilter.surface) return false;
+      if (frameTabFilter.distance_band && c.distance_band !== frameTabFilter.distance_band) return false;
+      if (frameTabFilter.track_condition && c.track_condition !== frameTabFilter.track_condition) return false;
+      return true;
+    });
+    if (!matched.length) return null;
+    var perFrame = {};
+    for (var f = 1; f <= 8; f++) perFrame[f] = emptyAcc();
+    var total = emptyAcc();
+    matched.forEach(function(c){
+      c.frames.forEach(function(fr){
+        if (!fr.n || fr.n === 0) return;
+        var a = perFrame[fr.frame];
+        a.n += fr.n;
+        a.sum_profit += fr.sum_profit || 0;
+        a.sum_profit_sq += fr.sum_profit_sq || 0;
+        a.sum_hit += fr.sum_hit || 0;
+        a.sum_payout += fr.sum_payout || 0;
+        a.sum_market_prob += fr.sum_market_prob || 0;
+        a.sum_rho += fr.sum_rho || 0;
+        total.n += fr.n;
+        total.sum_profit += fr.sum_profit || 0;
+        total.sum_profit_sq += fr.sum_profit_sq || 0;
+        total.sum_hit += fr.sum_hit || 0;
+        total.sum_payout += fr.sum_payout || 0;
+        total.sum_market_prob += fr.sum_market_prob || 0;
+        total.sum_rho += fr.sum_rho || 0;
+      });
+    });
+    var rows = [];
+    for (var f = 1; f <= 8; f++) {
+      var A = frameRowStats(perFrame[f]);
+      var otherAcc = {
+        n: total.n - perFrame[f].n,
+        sum_profit: total.sum_profit - perFrame[f].sum_profit,
+        sum_profit_sq: total.sum_profit_sq - perFrame[f].sum_profit_sq,
+        sum_hit: total.sum_hit - perFrame[f].sum_hit,
+        sum_payout: total.sum_payout - perFrame[f].sum_payout,
+        sum_market_prob: total.sum_market_prob - perFrame[f].sum_market_prob,
+        sum_rho: total.sum_rho - perFrame[f].sum_rho
+      };
+      var O = frameRowStats(otherAcc);
+      rows.push({
+        label: "枠" + f,
+        n: A ? A.n : 0,
+        n_other: O ? O.n : total.n,
+        roi_pct: A ? A.roi_pct : null,
+        roi_other_pct: O ? O.roi_pct : null,
+        market_rho_pct: A ? A.rho_pct : null,
+        market_rho_other_pct: O ? O.rho_pct : null,
+        hit_rate_pct: A ? A.hr_pct : null,
+        hit_rate_other_pct: O ? O.hr_pct : null,
+        market_hit_rate_pct: A ? A.market_hr_pct : null,
+        market_hit_rate_other_pct: O ? O.market_hr_pct : null,
+        roi_sig_up: A ? A.roi_sig_up : false,
+        roi_sig_down: A ? A.roi_sig_down : false,
+        hr_sig_up: A ? A.hr_sig_up : false,
+        hr_sig_down: A ? A.hr_sig_down : false
+      });
+    }
+    return { rows: rows, matched_count: matched.length };
+  }
+
+  function renderFrameTabConditionFilter() {
+    if (!analyticsFrameData) {
+      fetchWithTimeout(API_BASE + "/analytics/frame_by_condition", 60000)
+        .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+        .then(function(d){ analyticsFrameData = d; renderView(); })
+        .catch(function(err){});
+      return "<p>条件データ読み込み中...</p>";
+    }
+    var cells = analyticsFrameData.cells || [];
+    var venues = {}, surfaces = {}, dists = {}, babas = {};
+    cells.forEach(function(c){
+      venues[c.venue] = 1;
+      surfaces[c.surface] = 1;
+      dists[c.distance_band] = 1;
+      babas[c.track_condition] = 1;
+    });
+    function opts(obj, current){
+      var keys = Object.keys(obj).sort();
+      var html = "<option value=\"\">すべて</option>";
+      keys.forEach(function(k){
+        var sel = (current === k) ? " selected" : "";
+        html += "<option value=\"" + esc(k) + "\"" + sel + ">" + esc(k) + "</option>";
+      });
+      return html;
+    }
+    var html = "<div class=\"frame-filters\">";
+    html += "<label>会場<select data-frame-tab-filter=\"venue\">" + opts(venues, frameTabFilter.venue) + "</select></label>";
+    html += "<label>芝/ダート<select data-frame-tab-filter=\"surface\">" + opts(surfaces, frameTabFilter.surface) + "</select></label>";
+    html += "<label>距離帯<select data-frame-tab-filter=\"distance_band\">" + opts(dists, frameTabFilter.distance_band) + "</select></label>";
+    html += "<label>馬場<select data-frame-tab-filter=\"track_condition\">" + opts(babas, frameTabFilter.track_condition) + "</select></label>";
+    html += "</div>";
+    return html;
+  }
+
+  function bindFrameTabConditionFilter() {
+    var sels = anaView.querySelectorAll("[data-frame-tab-filter]");
+    for (var i = 0; i < sels.length; i++) {
+      (function(sel){
+        sel.addEventListener("change", function(){
+          var key = sel.getAttribute("data-frame-tab-filter");
+          frameTabFilter[key] = sel.value || "";
+          renderView();
+        });
+      })(sels[i]);
+    }
+  }
+
+  function frameTabHasCondition() {
+    return frameTabFilter.venue || frameTabFilter.surface
+        || frameTabFilter.distance_band || frameTabFilter.track_condition;
+  }
+
   function renderFeatureGroup(features, currentKey){
     if (!features || !features.length) return "<p>該当データなし</p>";
     var tabsHtml = "<div class=\"subtabs\">";
@@ -499,10 +655,26 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
                 + " (" + fmtSignedPct(target.max_roi_pct, 1) + ")";
       bodyHtml += "</div>";
     }
+    // 枠番タブの場合、条件フィルタを表示
+    var isFrameTab = (target.feature === "frame");
+    var displayRows = target.rows;
+    if (isFrameTab) {
+      bodyHtml += renderFrameTabConditionFilter();
+      if (frameTabHasCondition()) {
+        var agg = aggregateFrameConditionRows();
+        if (agg) {
+          displayRows = agg.rows;
+          bodyHtml += "<div class=\"frame-count\">該当セル: " + agg.matched_count + " 件</div>";
+        } else {
+          bodyHtml += "<p>該当セルなし</p>";
+          return tabsHtml + "<div>" + bodyHtml + "</div>";
+        }
+      }
+    }
     bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
-    bodyHtml += renderFeatureTable(target.rows, "roi", currentFeatureFilter);
+    bodyHtml += renderFeatureTable(displayRows, "roi", currentFeatureFilter);
     bodyHtml += "<h4 class=\"feature-title\">的中率</h4>";
-    bodyHtml += renderFeatureTable(target.rows, "hr", currentFeatureFilter);
+    bodyHtml += renderFeatureTable(displayRows, "hr", currentFeatureFilter);
     // 斤量タブのときだけ、斤量×減量騎手の交差表を追加
     if (target.feature === "weight" && analyticsFeaturesData && analyticsFeaturesData.weight_x_handicap) {
       bodyHtml += "<h4 class=\"feature-title\">斤量 × 減量騎手</h4>";
@@ -552,6 +724,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
       anaView.innerHTML = html;
       bindFeatureFilterTabs();
       bindFeatureGroupTabs(features, function(k){ currentSingleFeature = k; });
+      bindFrameTabConditionFilter();
     });
   }
 
@@ -563,6 +736,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
       anaView.innerHTML = html;
       bindFeatureFilterTabs();
       bindFeatureGroupTabs(features, function(k){ currentRaceTableFeature = k; });
+      bindFrameTabConditionFilter();
     });
   }
 
