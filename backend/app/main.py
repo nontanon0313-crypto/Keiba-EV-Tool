@@ -15,6 +15,13 @@ app.include_router(storage.router)
 app.include_router(models.router)
 
 
+@app.on_event("shutdown")
+def on_shutdown():
+    """アプリ終了時に Turso クライアントを明示的にクローズする。"""
+    from backend.app.routers.analytics import close_client
+    close_client()
+
+
 @app.get("/")
 def root():
     return {"service": "Keiba-EV-Tool", "status": "ok"}
