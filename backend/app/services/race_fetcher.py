@@ -4,14 +4,36 @@ from backend.app.models.schemas import Race, Runner
 
 
 def get_races():
-    """Turso に保存された実レースを返す。なければ空リスト。
-    JRA (12桁数字) と NAR (nar-*) の両方を含む。"""
+    """本日かつ未完了のレースのみ返す。なければ空リスト。
+
+    予想ページは未来のレースのみを表示する。
+    - date == 今日 (JST)
+    - deadline_at > 現在時刻
+    - finish_order が空（結果未確定）
+    """
+    from datetime import datetime, timezone, timedelta
     from backend.app.services import race_store
 
-    items = race_store.list_races()
+    JST = timezone(timedelta(hours=9))
+    now = datetime.now(JST)
+    today_str = now.strftime("%Y-%m-%d")
+
+    # Turso側（または file側）で「本日 かつ 未完了」のみに絞る
+    items = race_store.list_today_open_races(today_str)
     out = []
     for it in items:
         p = it.get("payload") or {}
+        # 締切済みは除外
+        deadline_str = p.get("deadline_at")
+        if deadline_str:
+            try:
+                dl = datetime.fromisoformat(deadline_str)
+                if dl.tzinfo is None:
+                    dl = dl.replace(tzinfo=JST)
+                if dl <= now:
+                    continue
+            except (ValueError, TypeError):
+                pass
         runners = []
         for r in p.get("runners", []):
             try:

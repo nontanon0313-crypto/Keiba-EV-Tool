@@ -33,6 +33,19 @@ class _File:
         items.append({"race_id": race_id, "payload": payload, "scraped_at": datetime.now().isoformat()})
         FILE_PATH.write_text(json.dumps(items, ensure_ascii=False, indent=2), encoding="utf-8")
 
+    def list_today_open(self, today_str):
+        """本日かつ未完了のレースのみ返す（メモリ内でフィルタ）。"""
+        out = []
+        for it in self.load():
+            p = it.get("payload") or {}
+            if p.get("date") != today_str:
+                continue
+            fo = p.get("finish_order")
+            if fo:
+                continue
+            out.append(it)
+        return out
+
 
 class _Turso:
     name = "turso"
@@ -72,6 +85,24 @@ class _Turso:
             "ON CONFLICT (race_id) DO UPDATE SET payload=EXCLUDED.payload, scraped_at=EXCLUDED.scraped_at",
             [race_id, pj, datetime.now().isoformat()],
         )
+
+    def list_today_open(self, today_str):
+        """本日かつ未完了のレースのみ返す（SQL側でフィルタ）。"""
+        r = self.client.execute(
+            "SELECT race_id, payload, scraped_at FROM scraped_races "
+            "WHERE json_extract(payload, '$.date') = ? "
+            "AND (json_extract(payload, '$.finish_order') IS NULL "
+            "     OR json_extract(payload, '$.finish_order') = '[]')",
+            [today_str],
+        )
+        out = []
+        for row in r.rows:
+            try:
+                payload = json.loads(row[1])
+            except Exception:
+                payload = {}
+            out.append({"race_id": row[0], "payload": payload, "scraped_at": row[2]})
+        return out
 
 
 _backend = None
@@ -117,6 +148,11 @@ def get_race(race_id):
 
 def list_races():
     return _get().load()
+
+
+def list_today_open_races(today_str):
+    """本日かつ未完了のレースのみ返す。"""
+    return _get().list_today_open(today_str)
 
 
 def list_race_ids():
