@@ -248,7 +248,8 @@ def build():
     ticket_agg = defaultdict(lambda: {"count": 0, "hits": 0, "prob_sum": 0.0,
                                       "odds_sum": 0.0, "prob_odds_sum": 0.0,
                                       "sum_inv_odds": 0.0,
-                                      "stake": 0, "payout": 0})
+                                      "stake": 0, "payout": 0,
+                                      "sum_profit": 0.0, "sum_profit_sq": 0.0})
     RACE_COUNT = 0
 
     races = race_store.list_races()
@@ -324,6 +325,9 @@ def build():
                 ta["prob_odds_sum"] += prob * ro
                 ta["sum_inv_odds"] += 1.0 / ro
                 ta["stake"] += 100
+                profit = payout / STAKE_PER_BET - 1.0
+                ta["sum_profit"] += profit
+                ta["sum_profit_sq"] += profit * profit
                 if hit:
                     ta["payout"] += payout
 
@@ -453,16 +457,31 @@ def build():
         avg_inv = ta["sum_inv_odds"] / RACE_COUNT if RACE_COUNT else 0
         hpr = HITS_PER_RACE.get(t, 1)
         measured_deduction = (1 - hpr / avg_inv) * 100 if avg_inv > 0 else None
+        n = ta["count"]
+        mean_profit = ta["sum_profit"] / n
+        var_profit = ta["sum_profit_sq"] / n - mean_profit * mean_profit
+        var_profit = max(var_profit, 0.0)
+        se_profit = math.sqrt(var_profit / n) if n > 0 else 0.0
+        roi_ci_lo = (mean_profit - 1.96 * se_profit) * 100
+        roi_ci_hi = (mean_profit + 1.96 * se_profit) * 100
+        p_hat = ta["hits"] / n
+        se_p = math.sqrt(p_hat * (1 - p_hat) / n) if n > 0 else 0.0
+        hr_ci_lo = (p_hat - 1.96 * se_p) * 100
+        hr_ci_hi = (p_hat + 1.96 * se_p) * 100
         ticket_stats.append({
             "ticket": t,
             "label": _TICKET_LABEL.get(t, t),
-            "count": ta["count"],
+            "count": n,
             "hits": ta["hits"],
-            "expected_hit_rate_pct": (ta["prob_sum"] / ta["count"]) * 100,
-            "avg_odds": ta["odds_sum"] / ta["count"],
-            "actual_hit_rate_pct": (ta["hits"] / ta["count"]) * 100,
-            "expected_profit_pct": (ta["prob_odds_sum"] / ta["count"] - 1) * 100,
-            "actual_profit_pct": (ta["payout"] / ta["stake"] - 1) * 100 if ta["stake"] else 0.0,
+            "expected_hit_rate_pct": (ta["prob_sum"] / n) * 100,
+            "avg_odds": ta["odds_sum"] / n,
+            "actual_hit_rate_pct": p_hat * 100,
+            "actual_hit_rate_ci_lo_pct": hr_ci_lo,
+            "actual_hit_rate_ci_hi_pct": hr_ci_hi,
+            "expected_profit_pct": (ta["prob_odds_sum"] / n - 1) * 100,
+            "actual_profit_pct": mean_profit * 100,
+            "actual_profit_ci_lo_pct": roi_ci_lo,
+            "actual_profit_ci_hi_pct": roi_ci_hi,
             "measured_deduction_pct": measured_deduction,
             "theory_deduction_pct": THEORY_DEDUCTION_PCT.get(t),
         })

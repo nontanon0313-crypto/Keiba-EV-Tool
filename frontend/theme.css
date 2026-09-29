@@ -305,3 +305,11 @@ label.bulk-btn.inline{cursor:pointer;}
 #ana-view .ev-table.ev-table-8col2 th:nth-child(1) { width: 12%; }
 #ana-view .ev-table.ev-table-8col2 td:nth-child(2),
 #ana-view .ev-table.ev-table-8col2 th:nth-child(2) { width: 12%; }
+
+/* 13列テーブル（券種比較タブ）用の幅指定 */
+#ana-view .ev-table.ev-table-13col td,
+#ana-view .ev-table.ev-table-13col th { width: 7.5%; }
+#ana-view .ev-table.ev-table-13col td:nth-child(1),
+#ana-view .ev-table.ev-table-13col th:nth-child(1) { width: 8%; }
+#ana-view .ev-table.ev-table-13col td:nth-child(2),
+#ana-view .ev-table.ev-table-13col th:nth-child(2) { width: 8%; }

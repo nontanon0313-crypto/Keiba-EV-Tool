@@ -22,8 +22,6 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   var analyticsFeaturesData = null;
   var analyticsMultiData = null;
   var analyticsFrameData = null;
-  var frameCondFilter = { venue: null, surface: null, distance_band: null, track_condition: null };
-  var frameCondSelectedCell = null;
   var frameTabFilter = { venue: "", surface: "", distance_band: "", track_condition: "" };
   var currentMultiTicket = null;
   var currentMultiFeature = null;
@@ -369,20 +367,33 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     if (!analyticsData) return;
     var rows = analyticsData.ticket_stats || [];
     if (!rows.length) { anaView.textContent = "データなし"; return; }
-    var html = "<table class=\"ev-table ev-table-9col\"><thead><tr><th>券種</th><th>件数</th><th>予想的中率</th><th>オッズ平均</th><th>想定利益%</th><th>実的中率</th><th>実利益%</th><th>実測控除率%</th><th>理論控除率%</th></tr></thead><tbody>";
+    var html = "<table class=\"ev-table ev-table-13col\"><thead><tr>";
+    html += "<th>券種</th><th>件数</th><th>予想的中率</th><th>オッズ平均</th><th>想定利益%</th>";
+    html += "<th>実的中率</th><th>CI下限</th><th>CI上限</th>";
+    html += "<th>実利益%</th><th>CI下限</th><th>CI上限</th>";
+    html += "<th>実測控除率%</th><th>理論控除率%</th>";
+    html += "</tr></thead><tbody>";
     rows.forEach(function(r){
       var cls = KeibaTheme.evClass(r.expected_profit_pct / 100, EV_THRESHOLD);
       var ehr = r.expected_hit_rate_pct == null ? "-" : fmtPct(r.expected_hit_rate_pct, 2);
       var ahr = r.actual_hit_rate_pct == null ? "-" : fmtPct(r.actual_hit_rate_pct, 2);
+      var hr_ci_lo = r.actual_hit_rate_ci_lo_pct == null ? "-" : fmtPct(r.actual_hit_rate_ci_lo_pct, 2);
+      var hr_ci_hi = r.actual_hit_rate_ci_hi_pct == null ? "-" : fmtPct(r.actual_hit_rate_ci_hi_pct, 2);
       var ep = r.expected_profit_pct == null ? "-" : fmtSignedPct(r.expected_profit_pct, 1);
       var ap = r.actual_profit_pct == null ? "-" : fmtSignedPct(r.actual_profit_pct, 1);
+      var roi_ci_lo = r.actual_profit_ci_lo_pct == null ? "-" : fmtSignedPct(r.actual_profit_ci_lo_pct, 1);
+      var roi_ci_hi = r.actual_profit_ci_hi_pct == null ? "-" : fmtSignedPct(r.actual_profit_ci_hi_pct, 1);
       html += "<tr class=\"" + cls + "\"><td>" + esc(r.label) + "</td>"
             + "<td>" + r.count + "</td>"
             + "<td>" + ehr + "</td>"
             + "<td>" + (r.avg_odds == null ? "-" : fmtNum(r.avg_odds, 1)) + "</td>"
             + "<td>" + ep + "</td>"
             + "<td>" + ahr + "</td>"
+            + "<td>" + hr_ci_lo + "</td>"
+            + "<td>" + hr_ci_hi + "</td>"
             + "<td>" + ap + "</td>"
+            + "<td>" + roi_ci_lo + "</td>"
+            + "<td>" + roi_ci_hi + "</td>"
             + "<td>" + (r.measured_deduction_pct == null ? "-" : fmtPct(r.measured_deduction_pct, 1)) + "</td>"
             + "<td>" + (r.theory_deduction_pct == null ? "-" : fmtPct(r.theory_deduction_pct, 1)) + "</td></tr>";
     });
@@ -952,149 +963,6 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     }
   }
 
-  function renderFrameCondFilters(cells){
-    // 利用可能な値を抽出
-    var venues = {}, surfaces = {}, dists = {}, babas = {};
-    cells.forEach(function(c){
-      venues[c.venue] = 1;
-      surfaces[c.surface] = 1;
-      dists[c.distance_band] = 1;
-      babas[c.track_condition] = 1;
-    });
-    function opts(obj, current){
-      var keys = Object.keys(obj).sort();
-      var html = "<option value=\"\">すべて</option>";
-      keys.forEach(function(k){
-        var sel = (current === k) ? " selected" : "";
-        html += "<option value=\"" + esc(k) + "\"" + sel + ">" + esc(k) + "</option>";
-      });
-      return html;
-    }
-    var html = "<div class=\"frame-filters\">";
-    html += "<label>会場<select data-frame-filter=\"venue\">" + opts(venues, frameCondFilter.venue) + "</select></label>";
-    html += "<label>芝/ダート<select data-frame-filter=\"surface\">" + opts(surfaces, frameCondFilter.surface) + "</select></label>";
-    html += "<label>距離帯<select data-frame-filter=\"distance_band\">" + opts(dists, frameCondFilter.distance_band) + "</select></label>";
-    html += "<label>馬場<select data-frame-filter=\"track_condition\">" + opts(babas, frameCondFilter.track_condition) + "</select></label>";
-    html += "</div>";
-    return html;
-  }
-
-  function filterCells(cells){
-    return cells.filter(function(c){
-      if (frameCondFilter.venue && c.venue !== frameCondFilter.venue) return false;
-      if (frameCondFilter.surface && c.surface !== frameCondFilter.surface) return false;
-      if (frameCondFilter.distance_band && c.distance_band !== frameCondFilter.distance_band) return false;
-      if (frameCondFilter.track_condition && c.track_condition !== frameCondFilter.track_condition) return false;
-      return true;
-    });
-  }
-
-  function renderFrameCondList(cells){
-    if (!cells.length) return "<p>該当セルなし</p>";
-    cells = cells.slice().sort(function(a, b){ return b.total_n - a.total_n; });
-    var html = "<table class=\"ev-table\"><thead><tr>";
-    html += "<th>会場</th><th>馬場</th><th>距離</th><th>馬場状態</th><th>n</th>";
-    html += "</tr></thead><tbody>";
-    cells.forEach(function(c, i){
-      html += "<tr data-frame-cell-idx=\"" + i + "\" style=\"cursor:pointer;\">";
-      html += "<td>" + esc(c.venue) + "</td>";
-      html += "<td>" + esc(c.surface) + "</td>";
-      html += "<td>" + esc(c.distance_band) + "</td>";
-      html += "<td>" + esc(c.track_condition) + "</td>";
-      html += "<td>" + c.total_n + "</td>";
-      html += "</tr>";
-    });
-    html += "</tbody></table>";
-    return html;
-  }
-
-  function renderFrameCondDetail(cell){
-    if (!cell) return "";
-    var html = "<div class=\"frame-detail-title\">";
-    html += esc(cell.venue) + " / " + esc(cell.surface) + " / " + esc(cell.distance_band) + " / " + esc(cell.track_condition);
-    html += "（n=" + cell.total_n + "）</div>";
-    html += "<h4 class=\"feature-title\">枠番別</h4>";
-    html += "<table class=\"ev-table ev-table-6col\"><thead><tr>";
-    html += "<th>枠</th><th>n</th><th>実利益%</th><th>95%CI</th><th>的中率</th><th>95%CI</th>";
-    html += "</tr></thead><tbody>";
-    cell.frames.forEach(function(f){
-      if (f.n === 0) {
-        html += "<tr><td>" + f.frame + "</td><td>0</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>";
-        return;
-      }
-      var cls_roi = KeibaTheme.evClass(f.roi_pct / 100, 0);
-      html += "<tr>";
-      html += "<td>" + f.frame + "</td>";
-      html += "<td>" + f.n + "</td>";
-      html += "<td class=\"" + cls_roi + "\">" + fmtSignedPct(f.roi_pct, 1) + "</td>";
-      html += "<td>" + fmtSignedPct(f.roi_ci_lo, 1) + " 〜 " + fmtSignedPct(f.roi_ci_hi, 1) + "</td>";
-      html += "<td>" + fmtPct(f.hr_pct, 2) + "</td>";
-      html += "<td>" + fmtPct(f.hr_ci_lo, 2) + " 〜 " + fmtPct(f.hr_ci_hi, 2) + "</td>";
-      html += "</tr>";
-    });
-    html += "</tbody></table>";
-    html += "<button class=\"bulk-btn\" id=\"frame-cond-back\" type=\"button\">← 一覧に戻る</button>";
-    return html;
-  }
-
-  function renderFrameCondView(){
-    if (!analyticsFrameData) {
-      anaView.textContent = "読み込み中...";
-      fetchWithTimeout(API_BASE + "/analytics/frame_by_condition", 60000)
-        .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
-        .then(function(d){ analyticsFrameData = d; renderFrameCondView(); })
-        .catch(function(err){ anaView.textContent = "取得失敗: " + err.message; });
-      return;
-    }
-    var cells = analyticsFrameData.cells || [];
-    var html = renderFrameCondFilters(cells);
-    if (frameCondSelectedCell) {
-      html += renderFrameCondDetail(frameCondSelectedCell);
-    } else {
-      var filtered = filterCells(cells);
-      html += "<div class=\"frame-count\">該当セル: " + filtered.length + " 件</div>";
-      html += renderFrameCondList(filtered);
-    }
-    anaView.innerHTML = html;
-    bindFrameCondFilters(cells);
-    if (frameCondSelectedCell) {
-      var backBtn = document.getElementById("frame-cond-back");
-      if (backBtn) backBtn.addEventListener("click", function(){
-        frameCondSelectedCell = null;
-        renderFrameCondView();
-      });
-    } else {
-      bindFrameCondCellSelect(filtered);
-    }
-  }
-
-  function bindFrameCondFilters(cells){
-    var selects = anaView.querySelectorAll("[data-frame-filter]");
-    for (var i = 0; i < selects.length; i++) {
-      (function(sel){
-        sel.addEventListener("change", function(){
-          var key = sel.getAttribute("data-frame-filter");
-          frameCondFilter[key] = sel.value || null;
-          frameCondSelectedCell = null;
-          renderFrameCondView();
-        });
-      })(selects[i]);
-    }
-  }
-
-  function bindFrameCondCellSelect(cells){
-    var rows = anaView.querySelectorAll("[data-frame-cell-idx]");
-    for (var i = 0; i < rows.length; i++) {
-      (function(tr){
-        tr.addEventListener("click", function(){
-          var idx = parseInt(tr.getAttribute("data-frame-cell-idx"), 10);
-          frameCondSelectedCell = cells[idx];
-          renderFrameCondView();
-        });
-      })(rows[i]);
-    }
-  }
-
   function renderView(){
     if (currentView === "features") {
       renderRaceTable();
@@ -1106,10 +974,6 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     }
     if (currentView === "multi") {
       renderMultiView();
-      return;
-    }
-    if (currentView === "frame_cond") {
-      renderFrameCondView();
       return;
     }
     if (!analyticsData) return;
