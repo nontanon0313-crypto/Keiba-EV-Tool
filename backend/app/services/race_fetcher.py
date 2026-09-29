@@ -11,7 +11,7 @@ def get_races():
     - deadline_at > 現在時刻
     - finish_order が空（結果未確定）
     """
-    from datetime import datetime, timezone, timedelta
+    from datetime import timezone, timedelta
     from backend.app.services import race_store
 
     JST = timezone(timedelta(hours=9))
