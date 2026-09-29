@@ -295,6 +295,17 @@ def main():
         hr_ci_lo = hr_diff - z_adj * se_hr_diff
         hr_ci_hi = hr_diff + z_adj * se_hr_diff
 
+        # 実値そのものの95%CI (記述用、z=1.96)
+        z_std = 1.96
+        roi_b_ci_lo = mean_B - z_std * se_B
+        roi_b_ci_hi = mean_B + z_std * se_B
+        hr_b_ci_lo = hr_B - z_std * se_h_B
+        hr_b_ci_hi = hr_B + z_std * se_h_B
+        roi_c_ci_lo = mean_C - z_std * se_C
+        roi_c_ci_hi = mean_C + z_std * se_C
+        hr_c_ci_lo = hr_C - z_std * se_h_C
+        hr_c_ci_hi = hr_C + z_std * se_h_C
+
         # 平均オッズ・平均払戻
         avg_odds_B = float(odds_arr[mask].mean())
         avg_odds_C = float(odds_arr[~mask].mean())
@@ -339,6 +350,14 @@ def main():
             "roi_ci_hi": float(roi_ci_hi),
             "roi_sig_up": roi_ci_lo > 0,
             "roi_sig_down": roi_ci_hi < 0,
+            "roi_b_ci_lo": float(roi_b_ci_lo),
+            "roi_b_ci_hi": float(roi_b_ci_hi),
+            "hr_b_ci_lo": float(hr_b_ci_lo),
+            "hr_b_ci_hi": float(hr_b_ci_hi),
+            "roi_c_ci_lo": float(roi_c_ci_lo),
+            "roi_c_ci_hi": float(roi_c_ci_hi),
+            "hr_c_ci_lo": float(hr_c_ci_lo),
+            "hr_c_ci_hi": float(hr_c_ci_hi),
             "hit_rate": hr_B,
             "hit_rate_other": hr_C,
             "hr_diff": hr_diff,
@@ -432,6 +451,10 @@ def main():
                 "roi_diff_pct": to_pct(r["roi_diff"]),
                 "roi_ci_lo_pct": to_pct(r["roi_ci_lo"]),
                 "roi_ci_hi_pct": to_pct(r["roi_ci_hi"]),
+                "roi_b_ci_lo_pct": to_pct(r["roi_b_ci_lo"]),
+                "roi_b_ci_hi_pct": to_pct(r["roi_b_ci_hi"]),
+                "roi_c_ci_lo_pct": to_pct(r["roi_c_ci_lo"]),
+                "roi_c_ci_hi_pct": to_pct(r["roi_c_ci_hi"]),
                 "roi_sig_up": r["roi_sig_up"],
                 "roi_sig_down": r["roi_sig_down"],
                 "hit_rate_pct": to_pct(r["hit_rate"]),
@@ -439,6 +462,10 @@ def main():
                 "hr_diff_pct": to_pct(r["hr_diff"]),
                 "hr_ci_lo_pct": to_pct(r["hr_ci_lo"]),
                 "hr_ci_hi_pct": to_pct(r["hr_ci_hi"]),
+                "hr_b_ci_lo_pct": to_pct(r["hr_b_ci_lo"]),
+                "hr_b_ci_hi_pct": to_pct(r["hr_b_ci_hi"]),
+                "hr_c_ci_lo_pct": to_pct(r["hr_c_ci_lo"]),
+                "hr_c_ci_hi_pct": to_pct(r["hr_c_ci_hi"]),
                 "hr_sig_up": r["hr_sig_up"],
                 "hr_sig_down": r["hr_sig_down"],
                 "market_hit_rate_pct": to_pct(r["market_hit_rate"]),

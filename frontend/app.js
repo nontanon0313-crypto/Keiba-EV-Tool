@@ -276,18 +276,38 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
 
   function tableRows(rows, label){
     if (!rows || !rows.length) return "<p>該当データなし</p>";
-    var html = "<table class=\"ev-table\"><thead><tr><th>" + label + "</th><th>件数</th><th>予想的中率</th><th>オッズ平均</th><th>想定利益%</th><th>実的中率</th><th>実利益%</th></tr></thead><tbody>";
+    var html = "<table class=\"ev-table ev-table-11col\"><thead><tr>";
+    html += "<th>" + label + "</th><th>件数</th><th>予想的中率</th><th>オッズ平均</th><th>想定利益%</th>";
+    html += "<th>実的中率</th><th>CI下限</th><th>CI上限</th>";
+    html += "<th>実利益%</th><th>CI下限</th><th>CI上限</th>";
+    html += "</tr></thead><tbody>";
     rows.forEach(function(r){
       var cls = KeibaTheme.evClass(r.expected_profit_pct / 100, EV_THRESHOLD);
-      var actual = r.actual_hit_rate_pct == null ? "-" : fmtPct(r.actual_hit_rate_pct, 1);
+      var actual = r.actual_hit_rate_pct == null ? "-" : fmtPct(r.actual_hit_rate_pct, 2);
       var ap = r.actual_profit_pct == null ? "-" : fmtSignedPct(r.actual_profit_pct, 1);
       var ep = r.expected_profit_pct == null ? "-" : fmtSignedPct(r.expected_profit_pct, 1);
-      var ehr = r.expected_hit_rate_pct == null ? "-" : fmtPct(r.expected_hit_rate_pct, 1);
+      var ehr = r.expected_hit_rate_pct == null ? "-" : fmtPct(r.expected_hit_rate_pct, 2);
+      var hr_ci_lo = r.actual_hit_rate_ci_lo_pct == null ? "-" : fmtPct(r.actual_hit_rate_ci_lo_pct, 2);
+      var hr_ci_hi = r.actual_hit_rate_ci_hi_pct == null ? "-" : fmtPct(r.actual_hit_rate_ci_hi_pct, 2);
+      var roi_ci_lo = r.actual_profit_ci_lo_pct == null ? "-" : fmtSignedPct(r.actual_profit_ci_lo_pct, 1);
+      var roi_ci_hi = r.actual_profit_ci_hi_pct == null ? "-" : fmtSignedPct(r.actual_profit_ci_hi_pct, 1);
       var ratio = "";
       if (window._anaTotalCount && window._anaTotalCount > 0) {
         ratio = " (" + (r.count / window._anaTotalCount * 100).toFixed(1) + "%)";
       }
-      html += "<tr class=\"" + cls + "\"><td>" + esc(r.range) + "</td><td>" + r.count + ratio + "</td><td>" + ehr + "</td><td>" + fmtNum(r.avg_odds, 1) + "</td><td>" + ep + "</td><td>" + actual + "</td><td>" + ap + "</td></tr>";
+      html += "<tr class=\"" + cls + "\">";
+      html += "<td>" + esc(r.range) + "</td>";
+      html += "<td>" + r.count + ratio + "</td>";
+      html += "<td>" + ehr + "</td>";
+      html += "<td>" + fmtNum(r.avg_odds, 1) + "</td>";
+      html += "<td>" + ep + "</td>";
+      html += "<td>" + actual + "</td>";
+      html += "<td>" + hr_ci_lo + "</td>";
+      html += "<td>" + hr_ci_hi + "</td>";
+      html += "<td>" + ap + "</td>";
+      html += "<td>" + roi_ci_lo + "</td>";
+      html += "<td>" + roi_ci_hi + "</td>";
+      html += "</tr>";
     });
     html += "</tbody></table>";
     return html;
@@ -308,18 +328,38 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   function renderCumTable(rows, label){
     if (!rows || !rows.length) return "<p>該当データなし</p>";
     var html = "<h4 class=\"feature-title\">" + label + " (累積)</h4>";
-    html += "<table class=\"ev-table\"><thead><tr><th>範囲</th><th>件数</th><th>予想的中率</th><th>オッズ平均</th><th>想定利益%</th><th>実的中率</th><th>実利益%</th></tr></thead><tbody>";
+    html += "<table class=\"ev-table ev-table-11col\"><thead><tr>";
+    html += "<th>範囲</th><th>件数</th><th>予想的中率</th><th>オッズ平均</th><th>想定利益%</th>";
+    html += "<th>実的中率</th><th>CI下限</th><th>CI上限</th>";
+    html += "<th>実利益%</th><th>CI下限</th><th>CI上限</th>";
+    html += "</tr></thead><tbody>";
     rows.forEach(function(r){
       var cls = KeibaTheme.evClass(r.expected_profit_pct / 100, EV_THRESHOLD);
-      var actual = r.actual_hit_rate_pct == null ? "-" : fmtPct(r.actual_hit_rate_pct, 1);
+      var actual = r.actual_hit_rate_pct == null ? "-" : fmtPct(r.actual_hit_rate_pct, 2);
       var ap = r.actual_profit_pct == null ? "-" : fmtSignedPct(r.actual_profit_pct, 1);
       var ep = r.expected_profit_pct == null ? "-" : fmtSignedPct(r.expected_profit_pct, 1);
-      var ehr = r.expected_hit_rate_pct == null ? "-" : fmtPct(r.expected_hit_rate_pct, 1);
+      var ehr = r.expected_hit_rate_pct == null ? "-" : fmtPct(r.expected_hit_rate_pct, 2);
+      var hr_ci_lo = r.actual_hit_rate_ci_lo_pct == null ? "-" : fmtPct(r.actual_hit_rate_ci_lo_pct, 2);
+      var hr_ci_hi = r.actual_hit_rate_ci_hi_pct == null ? "-" : fmtPct(r.actual_hit_rate_ci_hi_pct, 2);
+      var roi_ci_lo = r.actual_profit_ci_lo_pct == null ? "-" : fmtSignedPct(r.actual_profit_ci_lo_pct, 1);
+      var roi_ci_hi = r.actual_profit_ci_hi_pct == null ? "-" : fmtSignedPct(r.actual_profit_ci_hi_pct, 1);
       var ratio2 = "";
       if (window._anaTotalCount && window._anaTotalCount > 0) {
         ratio2 = " (" + (r.count / window._anaTotalCount * 100).toFixed(1) + "%)";
       }
-      html += "<tr class=\"" + cls + "\"><td>" + esc(r.range) + "</td><td>" + r.count + ratio2 + "</td><td>" + ehr + "</td><td>" + fmtNum(r.avg_odds, 1) + "</td><td>" + ep + "</td><td>" + actual + "</td><td>" + ap + "</td></tr>";
+      html += "<tr class=\"" + cls + "\">";
+      html += "<td>" + esc(r.range) + "</td>";
+      html += "<td>" + r.count + ratio2 + "</td>";
+      html += "<td>" + ehr + "</td>";
+      html += "<td>" + fmtNum(r.avg_odds, 1) + "</td>";
+      html += "<td>" + ep + "</td>";
+      html += "<td>" + actual + "</td>";
+      html += "<td>" + hr_ci_lo + "</td>";
+      html += "<td>" + hr_ci_hi + "</td>";
+      html += "<td>" + ap + "</td>";
+      html += "<td>" + roi_ci_lo + "</td>";
+      html += "<td>" + roi_ci_hi + "</td>";
+      html += "</tr>";
     });
     html += "</tbody></table>";
     return html;
@@ -366,17 +406,17 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
 
   function renderFeatureTable(rows, mode, filter){
     if (!rows || !rows.length) return "<p>該当データなし</p>";
-    // 列数: filter="all" は 9列、それ以外は 6列（有意列を追加）
-    var colCls = (filter === "all") ? " ev-table-feat-9col" : " ev-table-6col";
+    // 列数: all=13列、on/off=8列
+    var colCls = (filter === "all") ? " ev-table-feat-13col" : " ev-table-8col2";
     var html = "<table class=\"ev-table" + colCls + "\"><thead><tr>";
     html += "<th>ビン</th><th>件数</th>";
     if (mode === "roi") {
-      if (filter === "all" || filter === "on") html += "<th>適用 実%</th><th>適用 市場%</th><th>適用 差</th>";
-      if (filter === "all" || filter === "off") html += "<th>適用外 実%</th><th>適用外 市場%</th><th>適用外 差</th>";
+      if (filter === "all" || filter === "on") html += "<th>適用 実%</th><th>CI下限</th><th>CI上限</th><th>適用 市場%</th><th>適用 差</th>";
+      if (filter === "all" || filter === "off") html += "<th>適用外 実%</th><th>CI下限</th><th>CI上限</th><th>適用外 市場%</th><th>適用外 差</th>";
       html += "<th>有意</th>";
     } else {
-      if (filter === "all" || filter === "on") html += "<th>適用 実的中率</th><th>適用 市場的中率</th><th>適用 差</th>";
-      if (filter === "all" || filter === "off") html += "<th>適用外 実的中率</th><th>適用外 市場的中率</th><th>適用外 差</th>";
+      if (filter === "all" || filter === "on") html += "<th>適用 実的中率</th><th>CI下限</th><th>CI上限</th><th>適用 市場的中率</th><th>適用 差</th>";
+      if (filter === "all" || filter === "off") html += "<th>適用外 実的中率</th><th>CI下限</th><th>CI上限</th><th>適用外 市場的中率</th><th>適用外 差</th>";
       html += "<th>有意</th>";
     }
     html += "</tr></thead><tbody>";
@@ -403,11 +443,15 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
         var cls_diff_off = KeibaTheme.evClass(diff_off / 100, 0);
         if (filter === "all" || filter === "on") {
           html += "<td class=\"" + cls_real_on + "\">" + fmtSignedPct(real_on, 1) + "</td>";
+          html += "<td>" + (r.roi_b_ci_lo_pct == null ? "-" : fmtSignedPct(r.roi_b_ci_lo_pct, 1)) + "</td>";
+          html += "<td>" + (r.roi_b_ci_hi_pct == null ? "-" : fmtSignedPct(r.roi_b_ci_hi_pct, 1)) + "</td>";
           html += "<td>" + fmtSignedPct(market_on, 1) + "</td>";
           html += "<td class=\"" + cls_diff_on + "\">" + fmtSignedPct(diff_on, 1) + "</td>";
         }
         if (filter === "all" || filter === "off") {
           html += "<td class=\"" + cls_real_off + "\">" + fmtSignedPct(real_off, 1) + "</td>";
+          html += "<td>" + (r.roi_c_ci_lo_pct == null ? "-" : fmtSignedPct(r.roi_c_ci_lo_pct, 1)) + "</td>";
+          html += "<td>" + (r.roi_c_ci_hi_pct == null ? "-" : fmtSignedPct(r.roi_c_ci_hi_pct, 1)) + "</td>";
           html += "<td>" + fmtSignedPct(market_off, 1) + "</td>";
           html += "<td class=\"" + cls_diff_off + "\">" + fmtSignedPct(diff_off, 1) + "</td>";
         }
@@ -424,11 +468,15 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
         var hcls_off = KeibaTheme.evClass(hr_diff_off / 100, 0);
         if (filter === "all" || filter === "on") {
           html += "<td>" + fmtPct(hr_real_on, 2) + "</td>";
+          html += "<td>" + (r.hr_b_ci_lo_pct == null ? "-" : fmtPct(r.hr_b_ci_lo_pct, 2)) + "</td>";
+          html += "<td>" + (r.hr_b_ci_hi_pct == null ? "-" : fmtPct(r.hr_b_ci_hi_pct, 2)) + "</td>";
           html += "<td>" + fmtPct(hr_mkt_on, 2) + "</td>";
           html += "<td class=\"" + hcls_on + "\">" + fmtSignedPct(hr_diff_on, 2) + "</td>";
         }
         if (filter === "all" || filter === "off") {
           html += "<td>" + fmtPct(hr_real_off, 2) + "</td>";
+          html += "<td>" + (r.hr_c_ci_lo_pct == null ? "-" : fmtPct(r.hr_c_ci_lo_pct, 2)) + "</td>";
+          html += "<td>" + (r.hr_c_ci_hi_pct == null ? "-" : fmtPct(r.hr_c_ci_hi_pct, 2)) + "</td>";
           html += "<td>" + fmtPct(hr_mkt_off, 2) + "</td>";
           html += "<td class=\"" + hcls_off + "\">" + fmtSignedPct(hr_diff_off, 2) + "</td>";
         }

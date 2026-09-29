@@ -7,6 +7,7 @@
 """
 import os
 import json
+import math
 import time
 from pathlib import Path
 from datetime import datetime
@@ -112,6 +113,8 @@ class Agg:
         self.sum_odds = 0.0
         self.sum_prob_odds = 0.0
         self.sum_payout_yen = 0.0
+        self.sum_profit = 0.0
+        self.sum_profit_sq = 0.0
 
     def add(self, prob, odds, hit, payout_yen=0):
         self.n += 1
@@ -119,6 +122,9 @@ class Agg:
         self.sum_prob += prob
         self.sum_odds += odds
         self.sum_prob_odds += prob * odds
+        profit = payout_yen / STAKE_PER_BET - 1.0
+        self.sum_profit += profit
+        self.sum_profit_sq += profit * profit
         if hit:
             self.sum_payout_yen += payout_yen
 
@@ -126,6 +132,16 @@ class Agg:
         n = self.n
         if n == 0:
             return None
+        mean_profit = self.sum_profit / n
+        var_profit = self.sum_profit_sq / n - mean_profit * mean_profit
+        var_profit = max(var_profit, 0.0)
+        se_profit = math.sqrt(var_profit / n) if n > 0 else 0.0
+        roi_ci_lo_pct = (mean_profit - 1.96 * se_profit) * 100
+        roi_ci_hi_pct = (mean_profit + 1.96 * se_profit) * 100
+        p_hat = self.hits / n
+        se_p = math.sqrt(p_hat * (1 - p_hat) / n) if n > 0 else 0.0
+        hr_ci_lo_pct = (p_hat - 1.96 * se_p) * 100
+        hr_ci_hi_pct = (p_hat + 1.96 * se_p) * 100
         return {
             "range": label,
             "count": n,
@@ -135,8 +151,12 @@ class Agg:
             "expected_profit_pct": (self.sum_prob_odds / n - 1) * 100,
             "actual_hits": self.hits,
             "actual_attempts": n,
-            "actual_hit_rate_pct": (self.hits / n) * 100,
-            "actual_profit_pct": (self.sum_payout_yen / (n * STAKE_PER_BET) - 1) * 100,
+            "actual_hit_rate_pct": p_hat * 100,
+            "actual_hit_rate_ci_lo_pct": hr_ci_lo_pct,
+            "actual_hit_rate_ci_hi_pct": hr_ci_hi_pct,
+            "actual_profit_pct": mean_profit * 100,
+            "actual_profit_ci_lo_pct": roi_ci_lo_pct,
+            "actual_profit_ci_hi_pct": roi_ci_hi_pct,
         }
 
 
