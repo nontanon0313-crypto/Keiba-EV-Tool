@@ -17,9 +17,9 @@ app.include_router(models.router)
 
 @app.on_event("shutdown")
 def on_shutdown():
-    """アプリ終了時に Turso クライアントを明示的にクローズする。"""
-    from backend.app.routers.analytics import close_client
-    close_client()
+    """アプリ終了時に共有 Turso クライアントを1回だけクローズする。"""
+    from backend.app.services import turso_client
+    turso_client.close_client()
 
 
 @app.get("/")

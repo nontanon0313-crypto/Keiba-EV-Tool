@@ -151,11 +151,12 @@ class PostgresStorage:
 class TursoStorage:
     name = "turso"
 
-    def __init__(self, url, token):
-        import libsql_client
-        # libsql:// -> https:// に変換 (WebSocketではなくHTTP接続を使う)
-        http_url = url.replace("libsql://", "https://").replace("wss://", "https://")
-        self.client = libsql_client.create_client_sync(url=http_url, auth_token=token)
+    def __init__(self):
+        from backend.app.services import turso_client
+        client, err = turso_client.get_client()
+        if client is None:
+            raise RuntimeError("turso_client: " + str(err))
+        self.client = client
         self._ensure_schema()
 
     def _ensure_schema(self):
@@ -180,10 +181,8 @@ class TursoStorage:
         """)
 
     def close(self):
-        try:
-            self.client.close()
-        except Exception:
-            pass
+        # 共有クライアントは閉じない
+        pass
 
     def load_all(self):
         r = self.client.execute("SELECT id, race_id, combo, amount, odds, prob, ev, ticket_type, payout, model_version, created_at FROM bets ORDER BY id")
@@ -233,7 +232,7 @@ def get_storage():
     if mode == "turso":
         try:
             u, t = turso_creds()
-            _storage = TursoStorage(u, t)
+            _storage = TursoStorage()
             print("[storage] backend=turso")
             return _storage
         except Exception as e:
@@ -244,13 +243,9 @@ def get_storage():
 
 
 def close_storage():
+    """_storage の参照を切るだけ。共有クライアントは閉じない。"""
     global _storage
-    if _storage is not None and hasattr(_storage, "close"):
-        try:
-            _storage.close()
-        except Exception:
-            pass
     _storage = None
 
 
-atexit.register(close_storage)
+# atexit は使わない（main.py の shutdown で一括クリーンアップする）

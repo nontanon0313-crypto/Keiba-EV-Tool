@@ -11,45 +11,22 @@ router = APIRouter(prefix="/analytics")
 
 LOCAL_CACHE = Path("analytics_cache.json")
 
-# === Turso クライアントのシングルトン ===
-# リクエストごとに create_client_sync すると aiohttp セッションが
-# GCまで残り、メモリリークの原因になる。モジュール全体で共有する。
-_client = None
+# 共有 Turso クライアントを使用（backend/app/services/turso_client.py）
+# 全ストアで1つのクライアントを共有することで、aiohttp セッションの
+# 多重作成によるメモリリークを防ぐ。
+from backend.app.services import turso_client
 
 
 def _get_client():
-    """Turso クライアントを返す。初回のみ作成、以降は使い回す。
+    """共有 Turso クライアントを返す。
     Returns: (client, error_message)
     """
-    global _client
-    if _client is not None:
-        return _client, None
-    url = os.getenv("TURSO_URL")
-    token = os.getenv("TURSO_TOKEN")
-    if not url or not token:
-        return None, "TURSO_URL/TURSO_TOKEN not set"
-    try:
-        import libsql_client
-    except ImportError:
-        return None, "libsql_client not installed"
-    http_url = url.replace("libsql://", "https://").replace("wss://", "https://")
-    try:
-        _client = libsql_client.create_client_sync(url=http_url, auth_token=token)
-        return _client, None
-    except Exception as e:
-        _client = None
-        return None, str(e)
+    return turso_client.get_client()
 
 
 def close_client():
-    """アプリ終了時に呼ぶ。"""
-    global _client
-    if _client is not None:
-        try:
-            _client.close()
-        except Exception:
-            pass
-        _client = None
+    """後方互換のため残す。実際は turso_client.close_client を呼ぶ。"""
+    turso_client.close_client()
 
 
 def _load_from_turso():

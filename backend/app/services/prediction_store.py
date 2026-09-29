@@ -37,10 +37,12 @@ class _File:
 class _Turso:
     name = "turso"
 
-    def __init__(self, url, token):
-        import libsql_client
-        http_url = url.replace("libsql://", "https://").replace("wss://", "https://")
-        self.client = libsql_client.create_client_sync(url=http_url, auth_token=token)
+    def __init__(self):
+        from backend.app.services import turso_client
+        client, err = turso_client.get_client()
+        if client is None:
+            raise RuntimeError("turso_client: " + str(err))
+        self.client = client
         self.client.execute(
             "CREATE TABLE IF NOT EXISTS predictions ("
             "id INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -52,6 +54,8 @@ class _Turso:
         )
 
     def close(self):
+        # 共有クライアントは閉じない
+        return
         try:
             self.client.close()
         except Exception:
@@ -87,7 +91,7 @@ def _get():
     u, t = _turso_creds()
     if u and t:
         try:
-            _backend = _Turso(u, t)
+            _backend = _Turso()
             print("[pred_store] backend=turso")
             return _backend
         except Exception as e:
@@ -98,16 +102,12 @@ def _get():
 
 
 def close_prediction_store():
+    """_backend の参照を切るだけ。共有クライアントは閉じない。"""
     global _backend
-    if _backend is not None and hasattr(_backend, "close"):
-        try:
-            _backend.close()
-        except Exception:
-            pass
     _backend = None
 
 
-atexit.register(close_prediction_store)
+# atexit は使わない（main.py の shutdown で一括クリーンアップする）
 
 
 def save_prediction(race_id, model_version, payload):
