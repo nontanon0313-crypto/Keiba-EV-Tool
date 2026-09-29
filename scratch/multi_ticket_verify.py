@@ -104,6 +104,8 @@ def acc_stats(acc):
     var_hr_diff = (acc["sum_hr_diff_sq"] / n) - (mean_hr_diff * mean_hr_diff)
     var_hr_diff = max(var_hr_diff, 0.0)
     se_hr_diff = math.sqrt(var_hr_diff / n) if n > 0 else 0.0
+    # 実的中率そのもののSE (二項分布近似)
+    se_real_hr = math.sqrt(mean_real_hr * (1 - mean_real_hr) / n) if n > 0 else 0.0
     mean_roi_diff = acc["sum_roi_diff"] / n
     var_roi_diff = (acc["sum_roi_diff_sq"] / n) - (mean_roi_diff * mean_roi_diff)
     var_roi_diff = max(var_roi_diff, 0.0)
@@ -119,6 +121,7 @@ def acc_stats(acc):
         "se_hr_vm": se_hr_diff,
         "mean_roi_diff": mean_roi_diff,
         "se_roi_vm": se_roi_diff,
+        "se_real_hr": se_real_hr,
     }
 SEX_LABEL = {0: "牡", 1: "牝", 2: "セ", -1: "不明"}
 
@@ -347,6 +350,9 @@ def main():
     race_rows = list(r.rows)
     print(f"races: {len(race_rows)}", flush=True)
 
+    # オッズは500件ずつのチャンクで取得（メモリ抑制 + N+1回避）
+    from backend.app.services import odds_store
+
     feature_data_loaded, processed_upto = load_checkpoint(ticket)
     if feature_data_loaded is not None:
         feature_data = defaultdict(lambda: defaultdict(new_acc))
@@ -363,9 +369,22 @@ def main():
     n_skip_bad = 0
 
     t0 = time.time()
+    CHUNK_SIZE = 500
+    odds_batch = {}
+    current_chunk = -1
+
     for i, row in enumerate(race_rows):
         if i < start_idx:
             continue
+        # 500件ごとに新しいチャンクのオッズを取得
+        chunk_idx = i // CHUNK_SIZE
+        if chunk_idx != current_chunk:
+            current_chunk = chunk_idx
+            chunk_start = chunk_idx * CHUNK_SIZE
+            chunk_end = min(chunk_start + CHUNK_SIZE, len(race_rows))
+            chunk_rids = [r[0] for r in race_rows[chunk_start:chunk_end]]
+            odds_batch = odds_store.get_odds_batch(chunk_rids)
+            print(f"  [odds chunk] {chunk_start}-{chunk_end} loaded={len(odds_batch)}", flush=True)
         rid = row[0]
         parts_rid = rid.split("-")
         if len(parts_rid) >= 3 and parts_rid[2] in EXCLUDED_TRACK_CODES:
@@ -386,13 +405,8 @@ def main():
             n_skip_bad += 1
             continue
 
-        r2 = client.execute("SELECT payload FROM scraped_odds WHERE race_id=?", [rid])
-        orows = list(r2.rows)
-        if not orows:
-            continue
-        try:
-            odds_payload = json.loads(orows[0][0])
-        except Exception:
+        odds_payload = odds_batch.get(rid)
+        if not odds_payload:
             continue
         odds_map = odds_payload.get(ticket) or {}
         if not odds_map:
@@ -509,12 +523,27 @@ def main():
             roi_vm_ci_lo = roi_vm_mean - z_adj * roi_vm_se
             roi_vm_ci_hi = roi_vm_mean + z_adj * roi_vm_se
 
+            # 実値そのものの95%CI (z=1.96、B と B^c)
+            z_std = 1.96
+            roi_b_ci_lo = (stats_B["roi"] - z_std * stats_B["se"]) * 100
+            roi_b_ci_hi = (stats_B["roi"] + z_std * stats_B["se"]) * 100
+            roi_c_ci_lo = (stats_C["roi"] - z_std * stats_C["se"]) * 100
+            roi_c_ci_hi = (stats_C["roi"] + z_std * stats_C["se"]) * 100
+            hr_b_ci_lo = (stats_B["real_hr"] - z_std * stats_B["se_real_hr"]) * 100
+            hr_b_ci_hi = (stats_B["real_hr"] + z_std * stats_B["se_real_hr"]) * 100
+            hr_c_ci_lo = (stats_C["real_hr"] - z_std * stats_C["se_real_hr"]) * 100
+            hr_c_ci_hi = (stats_C["real_hr"] + z_std * stats_C["se_real_hr"]) * 100
+
             feature_results.append({
                 "label": label, "n": stats_B["n"], "n_other": stats_C["n"],
                 "roi": stats_B["roi"], "roi_other": stats_C["roi"],
+                "roi_b_ci_lo": float(roi_b_ci_lo), "roi_b_ci_hi": float(roi_b_ci_hi),
+                "roi_c_ci_lo": float(roi_c_ci_lo), "roi_c_ci_hi": float(roi_c_ci_hi),
                 "roi_diff": roi_diff, "roi_ci_lo": roi_ci_lo, "roi_ci_hi": roi_ci_hi,
                 "roi_sig_up": roi_ci_lo > 0, "roi_sig_down": roi_ci_hi < 0,
                 "real_hr": stats_B["real_hr"], "real_hr_other": stats_C["real_hr"],
+                "hr_b_ci_lo": float(hr_b_ci_lo), "hr_b_ci_hi": float(hr_b_ci_hi),
+                "hr_c_ci_lo": float(hr_c_ci_lo), "hr_c_ci_hi": float(hr_c_ci_hi),
                 "market_hr": stats_B["market_hr"], "market_hr_other": stats_C["market_hr"],
                 "hr_diff": hr_diff, "hr_ci_lo": hr_ci_lo, "hr_ci_hi": hr_ci_hi,
                 "hr_sig_up": hr_ci_lo > 0, "hr_sig_down": hr_ci_hi < 0,
