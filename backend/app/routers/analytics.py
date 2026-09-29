@@ -143,3 +143,33 @@ def get_multi():
         except Exception:
             continue
     return {"tickets": out}
+
+@router.get("/frame_by_condition")
+def get_frame_by_condition():
+    """枠番×会場×芝ダート×距離帯×馬場状態 の集計結果を返す。"""
+    url = os.getenv("TURSO_URL")
+    token = os.getenv("TURSO_TOKEN")
+    if not url or not token:
+        raise HTTPException(503, "TURSO_URL/TURSO_TOKEN not set")
+    try:
+        import libsql_client
+    except ImportError:
+        raise HTTPException(503, "libsql_client not installed")
+    http_url = url.replace("libsql://", "https://").replace("wss://", "https://")
+    try:
+        client = libsql_client.create_client_sync(url=http_url, auth_token=token)
+        r = client.execute("SELECT payload, updated_at FROM analytics_frame_cache WHERE id=1")
+        rows = list(r.rows)
+        try:
+            client.close()
+        except Exception:
+            pass
+        if not rows:
+            raise HTTPException(503, "no frame cache row")
+        payload = json.loads(rows[0][0])
+        payload["_updated_at"] = rows[0][1]
+        return payload
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(503, "frame cache load failed: " + str(e))
