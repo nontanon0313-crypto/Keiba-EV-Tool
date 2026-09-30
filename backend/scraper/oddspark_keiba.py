@@ -177,6 +177,17 @@ def _parse_runner_row(cells, prev_frame, prev_num):
         return None, prev_frame, prev_num
 
     horse_name = _extract_horse_name(name_cell)
+    lineage_nb = ""
+    a_link = name_cell.find("a", href=re.compile(r"lineageNb="))
+    if a_link:
+        m2 = re.search(r"lineageNb=(\d+)", a_link.get("href", ""))
+        if m2:
+            lineage_nb = m2.group(1)
+    age_sex = ""
+    full_txt = name_cell.get_text(" ", strip=True)
+    m3 = re.search(r"[牡牝セ]\s*\d+", full_txt)
+    if m3:
+        age_sex = re.sub(r"\s+", "", m3.group(0))
     jockey, weight = _extract_jockey_weight(jw_cell)
 
     odds_txt = odds_cell.get_text(" ", strip=True)
@@ -197,6 +208,8 @@ def _parse_runner_row(cells, prev_frame, prev_num):
         "horse_weight": horse_weight,
         "odds_win": odds_win,
         "popularity": popularity,
+        "lineage_nb": lineage_nb,
+        "age_sex": age_sex,
         "status": "出走",
     }, frame, num
 

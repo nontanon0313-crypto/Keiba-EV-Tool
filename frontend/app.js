@@ -1510,17 +1510,55 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     }
     return h;
   }
-  function loadHorse(){
-    var idEl = $("horse-id");
+  function renderHorseSearchResult(items){
+    if (!items || !items.length) return "<p>該当馬なし</p>";
+    var h = "<h4 class=\"feature-title\">検索結果 " + items.length + "件</h4>";
+    h += "<table class=\"ev-table\"><thead><tr><th>馬名</th><th>性齢</th><th>所属</th><th></th></tr></thead><tbody>";
+    items.forEach(function(x){
+      h += "<tr>";
+      h += "<td>" + esc(x.name) + "</td>";
+      h += "<td>" + esc(x.age_sex || "") + "</td>";
+      h += "<td>" + esc(x.affiliation || "") + "</td>";
+      h += "<td><button class=\"bet-btn\" data-horse-load=\"" + esc(x.lineage_nb) + "\" type=\"button\">詳細</button></td>";
+      h += "</tr>";
+    });
+    h += "</tbody></table>";
+    return h;
+  }
+  function loadHorseDetail(lineageNb){
     var view = $("horse-view");
-    if (!idEl || !view) return;
-    var id = (idEl.value || "").trim();
-    if (!id) { view.innerHTML = "<p>馬IDを入力してください</p>"; return; }
+    if (!view) return;
     view.innerHTML = "<p>読み込み中...</p>";
-    fetchWithTimeout(API_BASE + "/horses/" + encodeURIComponent(id), 30000)
+    fetchWithTimeout(API_BASE + "/horses/" + encodeURIComponent(lineageNb), 30000)
       .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
       .then(function(d){ view.innerHTML = renderHorseView(d); })
       .catch(function(err){ view.innerHTML = "<p>取得失敗: " + esc(err.message) + "</p>"; });
+  }
+  function loadHorse(){
+    var idEl = $("horse-id");
+    var res = $("horse-search-result");
+    var view = $("horse-view");
+    if (!idEl || !res) return;
+    var q = (idEl.value || "").trim();
+    if (!q) { res.innerHTML = "<p>馬名 or 馬IDを入力してください</p>"; return; }
+    if (view) view.innerHTML = "";
+    res.innerHTML = "<p>検索中...</p>";
+    fetchWithTimeout(API_BASE + "/horses/search?q=" + encodeURIComponent(q) + "&limit=50", 20000)
+      .then(function(r){ if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function(d){
+        var items = (d && d.items) || [];
+        res.innerHTML = renderHorseSearchResult(items);
+        var btns = res.querySelectorAll("[data-horse-load]");
+        for (var i = 0; i < btns.length; i++) {
+          (function(b){
+            b.addEventListener("click", function(){
+              loadHorseDetail(b.getAttribute("data-horse-load"));
+            });
+          })(btns[i]);
+        }
+        if (items.length === 1) loadHorseDetail(items[0].lineage_nb);
+      })
+      .catch(function(err){ res.innerHTML = "<p>検索失敗: " + esc(err.message) + "</p>"; });
   }
   (function(){
     var btn = $("horse-load");

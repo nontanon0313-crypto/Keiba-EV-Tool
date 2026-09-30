@@ -135,7 +135,7 @@ def _build_payload(date, track_cd, sponsor_cd, race_nb, shutuba, detail):
         runners.append({
             "horse_number": r.get("horse_number", 0),
             "frame_number": r.get("frame_number", 0),
-            "horse_id": "", "horse_name": r.get("horse_name", ""),
+            "horse_id": r.get("lineage_nb", "") or "", "horse_name": r.get("horse_name", ""), "age_sex": r.get("age_sex", ""),
             "jockey": r.get("jockey", ""), "trainer": "",
             "weight": 55.0,
             "horse_weight": r.get("horse_weight"),
