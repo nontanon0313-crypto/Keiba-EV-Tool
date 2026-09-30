@@ -1,27 +1,5 @@
 
-function __diagWidth(){
-  try{
-    var vw = document.documentElement.clientWidth;
-    var b = document.body;
-    var winX = window.scrollX || window.pageXOffset || 0;
-    function info(sel){
-      var el = document.querySelector(sel);
-      if(!el) return sel + ': none';
-      var r = el.getBoundingClientRect();
-      return sel + ': L' + Math.round(r.left) + ' R' + Math.round(r.right) + ' W' + Math.round(r.width) + ' SW' + el.scrollWidth;
-    }
-    var lines = [];
-    lines.push('vw=' + vw + ' bodySW=' + b.scrollWidth + ' docSW=' + document.documentElement.scrollWidth + ' winX=' + winX);
-    lines.push(info('header'));
-    lines.push(info('nav.tabs'));
-    lines.push(info('main'));
-    lines.push(info('#tab-analytics'));
-    lines.push(info('#ana-view-tabs'));
-    lines.push(info('#ana-view'));
-    lines.push(info('.ev-table-decomp'));
-    return lines.join(' | ');
-  }catch(e){ return 'diag err ' + e.message; }
-}
+
 const API_BASE = "https://keiba-ev-tool.onrender.com";
 const TIMEOUT_MS = 60000;
 const EV_THRESHOLD = 0.12;
@@ -806,7 +784,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
 function renderFrameDecompositionTable(title, rows) {
   if (!rows || !rows.length) return "";
   var h = "<h4 class=\"feature-title\">" + title + "</h4>";
-  h += "<table class=\"ev-table-decomp\"><thead><tr>";
+  h += "<div class=\"decomp-scroll\"><table class=\"ev-table-decomp\"><thead><tr>";
   h += "<th>条件</th><th>n</th>";
   for (var f = 1; f <= 8; f++) h += "<th>" + f + "</th>";
   h += "<th>内diff</th><th>外diff</th><th>内外差</th><th>判定</th>";
@@ -826,14 +804,14 @@ function renderFrameDecompositionTable(title, rows) {
     var vCls = r.verdict === "外有利" ? "ev-mid" : (r.verdict === "内有利" ? "ev-neg" : "");
     h += "<td class=\"" + vCls + "\">" + r.verdict + "</td></tr>";
   });
-  h += "</tbody></table>";
+  h += "</tbody></table></div>";
   return h;
 }
 function renderFrameTabConditionFilter() {
     if (!analyticsFrameData) {
       fetchWithTimeout(API_BASE + "/analytics/frame_by_condition", 60000)
         .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
-        .then(function(d){ analyticsFrameData = d; try{var _dbg=document.getElementById("__dbg"); if(_dbg){_dbg.textContent=__diagWidth();}}catch(e){} renderView(); })
+        .then(function(d){ analyticsFrameData = d; renderView(); })
         .catch(function(err){});
       return "<p>条件データ読み込み中...</p>";
     }
