@@ -7,3 +7,4 @@ pydantic-settings
 libsql-client
 pg8000
 aiohttp
+beautifulsoup4
