@@ -1,3 +1,27 @@
+
+function __diagWidth(){
+  try{
+    var vw = document.documentElement.clientWidth;
+    var b = document.body;
+    var winX = window.scrollX || window.pageXOffset || 0;
+    function info(sel){
+      var el = document.querySelector(sel);
+      if(!el) return sel + ': none';
+      var r = el.getBoundingClientRect();
+      return sel + ': L' + Math.round(r.left) + ' R' + Math.round(r.right) + ' W' + Math.round(r.width) + ' SW' + el.scrollWidth;
+    }
+    var lines = [];
+    lines.push('vw=' + vw + ' bodySW=' + b.scrollWidth + ' docSW=' + document.documentElement.scrollWidth + ' winX=' + winX);
+    lines.push(info('header'));
+    lines.push(info('nav.tabs'));
+    lines.push(info('main'));
+    lines.push(info('#tab-analytics'));
+    lines.push(info('#ana-view-tabs'));
+    lines.push(info('#ana-view'));
+    lines.push(info('.ev-table-decomp'));
+    return lines.join(' | ');
+  }catch(e){ return 'diag err ' + e.message; }
+}
 const API_BASE = "https://keiba-ev-tool.onrender.com";
 const TIMEOUT_MS = 60000;
 const EV_THRESHOLD = 0.12;
@@ -809,7 +833,7 @@ function renderFrameTabConditionFilter() {
     if (!analyticsFrameData) {
       fetchWithTimeout(API_BASE + "/analytics/frame_by_condition", 60000)
         .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
-        .then(function(d){ analyticsFrameData = d; renderView(); })
+        .then(function(d){ analyticsFrameData = d; try{var _dbg=document.getElementById("__dbg"); if(_dbg){_dbg.textContent=__diagWidth();}}catch(e){} renderView(); })
         .catch(function(err){});
       return "<p>条件データ読み込み中...</p>";
     }
