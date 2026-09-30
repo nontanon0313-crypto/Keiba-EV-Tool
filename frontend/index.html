@@ -88,6 +88,15 @@
 </div>
 <button id="horse-load" class="bulk-btn" type="button">検索</button>
 <div id="horse-search-result"></div>
+<div class="subtabs" id="horse-view-tabs" hidden>
+<button class="subtab active" data-hv="basic" type="button">基本</button>
+<button class="subtab" data-hv="history" type="button">走歴</button>
+<button class="subtab" data-hv="distance" type="button">距離別</button>
+<button class="subtab" data-hv="surface_cond" type="button">馬場別</button>
+<button class="subtab" data-hv="venue" type="button">会場別</button>
+<button class="subtab" data-hv="style" type="button">脚質</button>
+<button class="subtab" data-hv="recent" type="button">近走</button>
+</div>
 <div id="horse-view"></div>
 </section>
 </main>
@@ -110,6 +119,6 @@
 </div>
 </div>
 <script src="./ev-theme.js"></script>
-<script src="./app.js?v=64"></script>
+<script src="./app.js?v=65"></script>
 </body>
 </html>

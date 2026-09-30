@@ -1471,20 +1471,72 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
 
   list.textContent = "読み込み中... (サーバー起動待ちの場合があります)";
   fetchWithTimeout(API_BASE + "/races", TIMEOUT_MS).then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); }).then(function(data){ var races = Array.isArray(data) ? data : (data.races || data.items || []); renderList(races); }).catch(function(err){ list.textContent = "API取得失敗: " + err.message + " — 再読み込みしてください"; });
-  function renderHorseView(d){
-    if (!d) return "<p>データなし</p>";
-    var h = "";
-    h += "<h3 class=\"feature-title\">基本</h3>";
-    h += "<table class=\"ev-table\"><tbody>";
+  var horseData = null;
+  var horseViewTab = "basic";
+
+  function histRow(hist, row){
+    var o = {};
+    var hh = hist.header || [];
+    for (var i = 0; i < hh.length && i < row.length; i++) o[hh[i]] = row[i];
+    return o;
+  }
+  function histCell(o, key1, key2){
+    return o[key1] != null ? o[key1] : (key2 && o[key2] != null ? o[key2] : "");
+  }
+  function horseAggBy(hist, keyFn){
+    var buckets = {};
+    (hist.rows || []).forEach(function(row){
+      var o = histRow(hist, row);
+      var k = keyFn(o);
+      if (k == null || k === "") return;
+      if (!buckets[k]) buckets[k] = {n:0,w:0,p:0,s:0,u:0,fs:0};
+      var b = buckets[k];
+      var f = parseInt(o["着順"]) || 0;
+      if (!f) return;
+      b.n++; b.fs += f;
+      if (f === 1) b.w++; else if (f === 2) b.p++; else if (f === 3) b.s++; else b.u++;
+    });
+    var rows = [];
+    Object.keys(buckets).forEach(function(k){
+      var b = buckets[k];
+      if (!b.n) return;
+      rows.push({
+        label: k, n: b.n, w: b.w, p: b.p, s: b.s, u: b.u,
+        win_pct: (b.w/b.n*100).toFixed(1),
+        place_pct: ((b.w+b.p)/b.n*100).toFixed(1),
+        show_pct: ((b.w+b.p+b.s)/b.n*100).toFixed(1),
+        avg_finish: (b.fs/b.n).toFixed(1)
+      });
+    });
+    return rows;
+  }
+  function renderHorseAggTable(rows, sortNumeric){
+    if (!rows.length) return "<p>該当データなし</p>";
+    if (sortNumeric) rows.sort(function(a,b){ return (parseFloat(a.label)||0) - (parseFloat(b.label)||0); });
+    else rows.sort(function(a,b){ return b.n - a.n; });
+    var h = "<table class=\\"ev-table\\"><thead><tr>";
+    h += "<th>種別</th><th>出走</th><th>1着</th><th>2着</th><th>3着</th><th>着外</th>";
+    h += "<th>勝率</th><th>連対率</th><th>3連対率</th><th>平均着順</th>";
+    h += "</tr></thead><tbody>";
+    rows.forEach(function(r){
+      h += "<tr><td>" + esc(r.label) + "</td><td>" + r.n + "</td><td>" + r.w + "</td><td>" + r.p + "</td><td>" + r.s + "</td><td>" + r.u + "</td>";
+      h += "<td>" + r.win_pct + "%</td><td>" + r.place_pct + "%</td><td>" + r.show_pct + "%</td><td>" + r.avg_finish + "</td></tr>";
+    });
+    h += "</tbody></table>";
+    return h;
+  }
+  function renderHorseBasic(d){
+    var h = "<h3 class=\\"feature-title\\">基本</h3>";
+    h += "<table class=\\"ev-table\\"><tbody>";
     var basics = d.basic || {};
     Object.keys(basics).forEach(function(k){
       h += "<tr><td>" + esc(k) + "</td><td>" + esc(basics[k]) + "</td></tr>";
     });
     h += "</tbody></table>";
     if (d.summaries && d.summaries.length) {
-      h += "<h3 class=\"feature-title\">成績サマリ</h3>";
+      h += "<h3 class=\\"feature-title\\">成績サマリ</h3>";
       d.summaries.forEach(function(blk){
-        h += "<table class=\"ev-table\"><thead><tr>";
+        h += "<table class=\\"ev-table\\"><thead><tr>";
         (blk.header||[]).forEach(function(x){ h += "<th>" + esc(x) + "</th>"; });
         h += "</tr></thead><tbody>";
         (blk.rows||[]).forEach(function(row){
@@ -1495,36 +1547,123 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
         h += "</tbody></table>";
       });
     }
-    var hist = d.history;
-    if (hist && hist.rows && hist.rows.length) {
-      h += "<h3 class=\"feature-title\">走歴</h3>";
-      h += "<div class=\"decomp-scroll\"><table class=\"ev-table-decomp\"><thead><tr>";
-      (hist.header||[]).forEach(function(x){ h += "<th>" + esc(x) + "</th>"; });
-      h += "</tr></thead><tbody>";
-      hist.rows.forEach(function(row){
-        h += "<tr>";
-        row.forEach(function(x){ h += "<td>" + esc(x) + "</td>"; });
-        h += "</tr>";
-      });
-      h += "</tbody></table></div>";
-    }
     return h;
   }
-  function renderHorseSearchResult(items){
-    if (!items || !items.length) return "<p>該当馬なし</p>";
-    var h = "<h4 class=\"feature-title\">検索結果 " + items.length + "件</h4>";
-    h += "<table class=\"ev-table\"><thead><tr><th>馬名</th><th>性齢</th><th>所属</th><th></th></tr></thead><tbody>";
-    items.forEach(function(x){
+  function renderHorseHistory(d){
+    var hist = d.history;
+    if (!hist || !hist.rows || !hist.rows.length) return "<p>走歴なし</p>";
+    var h = "<h3 class=\\"feature-title\\">走歴</h3>";
+    h += "<div class=\\"decomp-scroll\\"><table class=\\"ev-table-decomp\\"><thead><tr>";
+    (hist.header||[]).forEach(function(x){ h += "<th>" + esc(x) + "</th>"; });
+    h += "</tr></thead><tbody>";
+    hist.rows.forEach(function(row){
       h += "<tr>";
-      h += "<td>" + esc(x.name) + "</td>";
-      h += "<td>" + esc(x.age_sex || "") + "</td>";
-      h += "<td>" + esc(x.affiliation || "") + "</td>";
-      h += "<td><button class=\"bet-btn\" data-horse-load=\"" + esc(x.lineage_nb) + "\" type=\"button\">詳細</button></td>";
+      row.forEach(function(x){ h += "<td>" + esc(x) + "</td>"; });
       h += "</tr>";
     });
+    h += "</tbody></table></div>";
+    return h;
+  }
+  function renderHorseDistance(d){
+    var hist = d.history;
+    if (!hist) return "<p>走歴なし</p>";
+    var rows = horseAggBy(hist, function(o){
+      var v = o["距離"] || "";
+      var m = v.match(/(\d+)/);
+      return m ? m[1] : "";
+    });
+    return "<h3 class=\\"feature-title\\">距離別</h3>" + renderHorseAggTable(rows, true);
+  }
+  function renderHorseSurfaceCond(d){
+    var hist = d.history;
+    if (!hist) return "<p>走歴なし</p>";
+    var rows = horseAggBy(hist, function(o){
+      var v = o["馬場(天候)"] || "";
+      var m = v.match(/^(良|稍重|重|不良)/);
+      return m ? m[1] : v.slice(0,2);
+    });
+    return "<h3 class=\\"feature-title\\">馬場別</h3>" + renderHorseAggTable(rows, false);
+  }
+  function renderHorseVenue(d){
+    var hist = d.history;
+    if (!hist) return "<p>走歴なし</p>";
+    var rows = horseAggBy(hist, function(o){ return o["競馬場"] || ""; });
+    return "<h3 class=\\"feature-title\\">会場別</h3>" + renderHorseAggTable(rows, false);
+  }
+  function renderHorseStyle(d){
+    var hist = d.history;
+    if (!hist || !hist.rows || !hist.rows.length) return "<p>走歴なし</p>";
+    var ratios = [];
+    hist.rows.forEach(function(row){
+      var o = histRow(hist, row);
+      var corner = histCell(o, "通過順位", "通過\u200b順位");
+      var n = parseInt(o["頭数"]) || 0;
+      var m = (corner||"").match(/^(\d+)/);
+      if (m && n) ratios.push(parseInt(m[1]) / n);
+    });
+    if (!ratios.length) return "<p>脚質データなし</p>";
+    var avg = ratios.reduce(function(a,b){ return a+b; }, 0) / ratios.length;
+    var style = avg < 0.2 ? "逃げ" : avg < 0.4 ? "先行" : avg < 0.7 ? "差し" : "追込";
+    var h = "<h3 class=\\"feature-title\\">脚質</h3>";
+    h += "<table class=\\"ev-table\\"><tbody>";
+    h += "<tr><td>平均先行度</td><td>" + avg.toFixed(3) + "</td></tr>";
+    h += "<tr><td>判定</td><td>" + style + "</td></tr>";
+    h += "<tr><td>サンプル数</td><td>" + ratios.length + "</td></tr>";
     h += "</tbody></table>";
     return h;
   }
+  function renderHorseRecent(d){
+    var hist = d.history;
+    if (!hist || !hist.rows || !hist.rows.length) return "<p>走歴なし</p>";
+    var h = "<h3 class=\\"feature-title\\">近走（直近5走）</h3>";
+    h += "<div class=\\"decomp-scroll\\"><table class=\\"ev-table-decomp\\"><thead><tr>";
+    h += "<th>年月日</th><th>会場</th><th>距離</th><th>馬場</th><th>人気</th><th>着順</th><th>上3F</th><th>通過</th>";
+    h += "</tr></thead><tbody>";
+    hist.rows.slice(0, 5).forEach(function(row){
+      var o = histRow(hist, row);
+      h += "<tr>";
+      h += "<td>" + esc(o["年月日"] || "") + "</td>";
+      h += "<td>" + esc(o["競馬場"] || "") + "</td>";
+      h += "<td>" + esc(o["距離"] || "") + "</td>";
+      h += "<td>" + esc((o["馬場(天候)"] || "").slice(0,2)) + "</td>";
+      h += "<td>" + esc(o["人気"] || "") + "</td>";
+      h += "<td>" + esc(o["着順"] || "") + "</td>";
+      h += "<td>" + esc(o["上3F"] || "") + "</td>";
+      h += "<td>" + esc(histCell(o, "通過順位", "通過\u200b順位")) + "</td>";
+      h += "</tr>";
+    });
+    h += "</tbody></table></div>";
+    return h;
+  }
+  function renderHorseTab(tab){
+    var d = horseData;
+    if (!d) return "<p>データなし</p>";
+    if (tab === "basic") return renderHorseBasic(d);
+    if (tab === "history") return renderHorseHistory(d);
+    if (tab === "distance") return renderHorseDistance(d);
+    if (tab === "surface_cond") return renderHorseSurfaceCond(d);
+    if (tab === "venue") return renderHorseVenue(d);
+    if (tab === "style") return renderHorseStyle(d);
+    if (tab === "recent") return renderHorseRecent(d);
+    return "<p>不明なタブ</p>";
+  }
+  function syncHorseSubtabs(){
+    var tabsEl = document.getElementById("horse-view-tabs");
+    if (!tabsEl) return;
+    var btns = tabsEl.querySelectorAll("[data-hv]");
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].classList.toggle("active", btns[i].getAttribute("data-hv") === horseViewTab);
+    }
+  }
+  function renderHorseView(d){
+    if (!d) return "<p>データなし</p>";
+    horseData = d;
+    var tabsEl = document.getElementById("horse-view-tabs");
+    if (tabsEl) tabsEl.hidden = false;
+    syncHorseSubtabs();
+    return renderHorseTab(horseViewTab);
+  }
+
   function loadHorseDetail(lineageNb){
     var view = $("horse-view");
     if (!view) return;
@@ -1567,3 +1706,15 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     if (idEl) idEl.addEventListener("keydown", function(e){ if (e.key === "Enter") loadHorse(); });
   })();
 })();
+  (function(){
+    var tabsEl = document.getElementById("horse-view-tabs");
+    if (!tabsEl) return;
+    tabsEl.addEventListener("click", function(e){
+      var b = e.target.closest("[data-hv]");
+      if (!b) return;
+      horseViewTab = b.getAttribute("data-hv");
+      syncHorseSubtabs();
+      var view = document.getElementById("horse-view");
+      if (view && horseData) view.innerHTML = renderHorseTab(horseViewTab);
+    });
+  })();
