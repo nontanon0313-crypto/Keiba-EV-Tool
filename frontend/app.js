@@ -782,7 +782,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
 function renderFrameDecompositionTable(title, rows) {
   if (!rows || !rows.length) return "";
   var h = "<h4 class=\"feature-title\">" + title + "</h4>";
-  h += "<table class=\"ev-table ev-table-decomp\"><thead><tr>";
+  h += "<table class=\"ev-table-decomp\"><thead><tr>";
   h += "<th>条件</th><th>n</th>";
   for (var f = 1; f <= 8; f++) h += "<th>" + f + "</th>";
   h += "<th>内diff</th><th>外diff</th><th>内外差</th><th>判定</th>";

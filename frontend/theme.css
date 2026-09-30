@@ -332,6 +332,7 @@ label.bulk-btn.inline{cursor:pointer;}
 
 /* 枠番分解表 (v51) */
 .ev-table-decomp{width:100%;border-collapse:collapse;font-size:10px;table-layout:auto;}
-.ev-table-decomp th,.ev-table-decomp td{padding:3px 2px;border-bottom:1px solid rgba(212,175,55,0.15);text-align:right;white-space:nowrap;}
+.ev-table-decomp th,.ev-table-decomp td{padding:2px 3px;border-bottom:1px solid rgba(212,175,55,0.15);text-align:right;white-space:nowrap;line-height:1.15;}
 .ev-table-decomp th{color:var(--keiba-gold);font-weight:600;font-size:9.5px;vertical-align:bottom;}
-.ev-table-decomp td:first-child,.ev-table-decomp th:first-child{text-align:left;padding-left:4px;}
+.ev-table-decomp td:first-child,.ev-table-decomp th:first-child{text-align:left;padding-left:2px;}
+.ev-table-decomp td{vertical-align:top;}
