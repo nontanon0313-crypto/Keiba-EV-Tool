@@ -723,7 +723,89 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     return { rows: rows, matched_count: matched.length };
   }
 
-  function renderFrameTabConditionFilter() {
+  function aggByDimension(dimKey, minN) {
+  if (!analyticsFrameData) return null;
+  var cells = analyticsFrameData.cells || [];
+  var otherKeys = ["venue","surface","distance_band","track_condition"].filter(function(k){ return k !== dimKey; });
+  var buckets = {};
+  cells.forEach(function(c){
+    for (var i = 0; i < otherKeys.length; i++) {
+      var k = otherKeys[i];
+      if (frameTabFilter[k] && c[k] !== frameTabFilter[k]) return;
+    }
+    var v = c[dimKey];
+    if (!buckets[v]) {
+      buckets[v] = { total: emptyAcc(), perFrame: {} };
+      for (var f = 1; f <= 8; f++) buckets[v].perFrame[f] = emptyAcc();
+    }
+    var b = buckets[v];
+    c.frames.forEach(function(fr){
+      if (!fr.n || fr.n === 0) return;
+      var a = b.perFrame[fr.frame];
+      a.n += fr.n; a.sum_profit += fr.sum_profit || 0; a.sum_profit_sq += fr.sum_profit_sq || 0;
+      a.sum_hit += fr.sum_hit || 0; a.sum_payout += fr.sum_payout || 0;
+      a.sum_market_prob += fr.sum_market_prob || 0; a.sum_rho += fr.sum_rho || 0;
+      b.total.n += fr.n; b.total.sum_profit += fr.sum_profit || 0; b.total.sum_profit_sq += fr.sum_profit_sq || 0;
+      b.total.sum_hit += fr.sum_hit || 0; b.total.sum_payout += fr.sum_payout || 0;
+      b.total.sum_market_prob += fr.sum_market_prob || 0; b.total.sum_rho += fr.sum_rho || 0;
+    });
+  });
+  var rows = [];
+  Object.keys(buckets).forEach(function(v){
+    var b = buckets[v];
+    if (b.total.n < minN) return;
+    var frs = [];
+    for (var f = 1; f <= 8; f++) {
+      var A = frameRowStats(b.perFrame[f]);
+      frs.push({ frame: f, n: A ? A.n : 0, hr_pct: A ? A.hr_pct : null, market_hr_pct: A ? A.market_hr_pct : null, roi_pct: A ? A.roi_pct : null });
+    }
+    var inAcc = emptyAcc(), outAcc = emptyAcc();
+    [1,2,3].forEach(function(f){ var a = b.perFrame[f]; inAcc.n += a.n; inAcc.sum_profit += a.sum_profit; inAcc.sum_profit_sq += a.sum_profit_sq; inAcc.sum_hit += a.sum_hit; inAcc.sum_market_prob += a.sum_market_prob; });
+    [6,7,8].forEach(function(f){ var a = b.perFrame[f]; outAcc.n += a.n; outAcc.sum_profit += a.sum_profit; outAcc.sum_profit_sq += a.sum_profit_sq; outAcc.sum_hit += a.sum_hit; outAcc.sum_market_prob += a.sum_market_prob; });
+    var inStats = frameRowStats(inAcc), outStats = frameRowStats(outAcc);
+    var inDiff = inStats ? (inStats.hr_pct - inStats.market_hr_pct) : null;
+    var outDiff = outStats ? (outStats.hr_pct - outStats.market_hr_pct) : null;
+    var diffGap = (inDiff != null && outDiff != null) ? (outDiff - inDiff) : null;
+    function diffSe(st) { if (!st || !st.n) return null; var p = st.hr_pct/100; return Math.sqrt(p*(1-p)/st.n) * 100; }
+    var seIn = diffSe(inStats), seOut = diffSe(outStats);
+    var gapSe = (seIn != null && seOut != null) ? Math.sqrt(seIn*seIn + seOut*seOut) : null;
+    var gapLo = (diffGap != null && gapSe != null) ? (diffGap - 1.96*gapSe) : null;
+    var gapHi = (diffGap != null && gapSe != null) ? (diffGap + 1.96*gapSe) : null;
+    var verdict = "中立";
+    if (gapLo != null && gapLo > 0) verdict = "外有利";
+    else if (gapHi != null && gapHi < 0) verdict = "内有利";
+    rows.push({ label: v, n_total: b.total.n, frames: frs, in_diff: inDiff, out_diff: outDiff, diff_gap: diffGap, verdict: verdict });
+  });
+  rows.sort(function(a,b){ return b.n_total - a.n_total; });
+  return rows;
+}
+function renderFrameDecompositionTable(title, rows) {
+  if (!rows || !rows.length) return "";
+  var h = "<h4 class=\"feature-title\">" + title + "</h4>";
+  h += "<div class=\"table-scroll\"><table class=\"feature-table\"><thead><tr>";
+  h += "<th>条件</th><th>n</th>";
+  for (var f = 1; f <= 8; f++) h += "<th>枠" + f + "</th>";
+  h += "<th>内diff</th><th>外diff</th><th>内外差</th><th>判定</th>";
+  h += "</tr></thead><tbody>";
+  rows.forEach(function(r){
+    h += "<tr><td>" + esc(r.label) + "</td><td>" + r.n_total + "</td>";
+    r.frames.forEach(function(cell){
+      if (cell.hr_pct == null) { h += "<td>-</td>"; return; }
+      var d = cell.hr_pct - cell.market_hr_pct;
+      var dCls = d > 0.5 ? "cell-pos" : (d < -0.5 ? "cell-neg" : "");
+      var roi = (cell.roi_pct != null) ? cell.roi_pct : 0;
+      var rCls = roi > 0 ? "cell-pos" : (roi < -20 ? "cell-neg" : "");
+      h += "<td class=\"" + dCls + "\">" + (d>=0?"+":"") + d.toFixed(1) + "<br><span class=\"" + rCls + "\">" + (roi>=0?"+":"") + roi.toFixed(1) + "</span></td>";
+    });
+    function fD(x){ return (x == null) ? "-" : ((x>=0?"+":"") + x.toFixed(2)); }
+    h += "<td>" + fD(r.in_diff) + "</td><td>" + fD(r.out_diff) + "</td><td>" + fD(r.diff_gap) + "</td>";
+    var vCls = r.verdict === "外有利" ? "cell-pos" : (r.verdict === "内有利" ? "cell-neg" : "");
+    h += "<td class=\"" + vCls + "\">" + r.verdict + "</td></tr>";
+  });
+  h += "</tbody></table></div>";
+  return h;
+}
+function renderFrameTabConditionFilter() {
     if (!analyticsFrameData) {
       fetchWithTimeout(API_BASE + "/analytics/frame_by_condition", 60000)
         .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
@@ -820,7 +902,20 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
         }
       }
     }
-    bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
+      if (isFrameTab) {
+    var dims = [
+      { key: "venue", label: "会場別（枠番 実−市場 / ROI）", min: 1000 },
+      { key: "surface", label: "芝/ダート別（枠番 実−市場 / ROI）", min: 500 },
+      { key: "distance_band", label: "距離帯別（枠番 実−市場 / ROI）", min: 500 },
+      { key: "track_condition", label: "馬場別（枠番 実−市場 / ROI）", min: 500 }
+    ];
+    dims.forEach(function(d){
+      if (frameTabFilter[d.key]) return;
+      var drows = aggByDimension(d.key, d.min);
+      bodyHtml += renderFrameDecompositionTable(d.label, drows);
+    });
+  }
+bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     bodyHtml += renderFeatureTable(displayRows, "roi", currentFeatureFilter);
     bodyHtml += "<h4 class=\"feature-title\">的中率</h4>";
     bodyHtml += renderFeatureTable(displayRows, "hr", currentFeatureFilter);
