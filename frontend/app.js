@@ -1705,7 +1705,6 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     var idEl = $("horse-id");
     if (idEl) idEl.addEventListener("keydown", function(e){ if (e.key === "Enter") loadHorse(); });
   })();
-})();
   (function(){
     var tabsEl = document.getElementById("horse-view-tabs");
     if (!tabsEl) return;
@@ -1718,3 +1717,4 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
       if (view && horseData) view.innerHTML = renderHorseTab(horseViewTab);
     });
   })();
+})();
