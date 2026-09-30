@@ -1,18 +1,23 @@
-"""既存 scraped_races の ent1 を再取得して馬マスタを構築する。
+"""既存 scraped_races の ent1 を再取得して:
+  A) 馬マスタ horses を構築
+  B) scraped_races.runners に lineage_nb / age_sex を書き戻す
+
+同じ ent1 取得で両方行うため、二度手間を避ける。
 
 使い方:
     python3 -m backend.scripts.build_horse_master
-    python3 -m backend.scripts.build_horse_master 100    # 先頭100レースだけ(テスト)
+    python3 -m backend.scripts.build_horse_master 100
 """
 import os
 import sys
+import json
 import asyncio
 import time
+import re
 from datetime import datetime
 
 import httpx
 from bs4 import BeautifulSoup
-import re
 
 from backend.app.services import horse_store
 
@@ -56,8 +61,16 @@ async def _fetch_ent1(client, sem, date, track_cd, sponsor_cd, race_nb):
     for row in table.find_all("tr"):
         cells = row.find_all(["td", "th"])
         if len(cells) >= 16:
+            try:
+                num = int(cells[2].get_text(strip=True))
+            except (ValueError, IndexError):
+                continue
             name_cell = cells[5]
         elif len(cells) >= 12:
+            try:
+                num = int(cells[0].get_text(strip=True))
+            except (ValueError, IndexError):
+                continue
             name_cell = cells[3]
         else:
             continue
@@ -74,7 +87,7 @@ async def _fetch_ent1(client, sem, date, track_cd, sponsor_cd, race_nb):
         full_txt = name_cell.get_text(" ", strip=True)
         m2 = re.search(r"[牡牝セ]\s*\d+", full_txt)
         age_sex = re.sub(r"\s+", "", m2.group(0)) if m2 else ""
-        out.append({"lineage_nb": ln, "name": nm, "age_sex": age_sex, "affiliation": ""})
+        out.append({"horse_number": num, "lineage_nb": ln, "name": nm, "age_sex": age_sex})
     return out
 
 
@@ -88,13 +101,12 @@ async def main_async(limit=None):
     h = url.replace("libsql://", "https://").replace("wss://", "https://")
     c = libsql_client.create_client_sync(url=h, auth_token=token)
     try:
-        r = c.execute("SELECT payload FROM scraped_races ORDER BY race_id")
+        r = c.execute("SELECT race_id, payload FROM scraped_races ORDER BY race_id")
         races = []
         for row in r.rows:
-            import json
             try:
-                d = json.loads(row[0]) if isinstance(row[0], str) else row[0]
-                races.append((d.get("date"), d.get("track_cd"), d.get("sponsor_cd"), d.get("race_nb")))
+                d = json.loads(row[1]) if isinstance(row[1], str) else row[1]
+                races.append({"race_id": row[0], "payload": d})
             except Exception:
                 continue
     finally:
@@ -104,46 +116,88 @@ async def main_async(limit=None):
             pass
     if limit:
         races = races[:int(limit)]
-    _log("races to fetch: " + str(len(races)))
+    _log("races to process: " + str(len(races)))
 
     sem = asyncio.Semaphore(CONCURRENCY)
+    seen_horses = set()
+    horse_buf = []
     total_horses = 0
-    seen = set()
-    buf = []
+    updated_races = 0
+    t0 = time.time()
+
     async with httpx.AsyncClient(headers=HEADERS) as client:
         tasks = []
-        for (date, tc, sc, rn) in races:
+        for race in races:
+            d = race["payload"]
+            date = str(d.get("date", "")).replace("-", "")
             if not date:
                 continue
-            d = str(date).replace("-", "")
-            tasks.append(_fetch_ent1(client, sem, d, tc, sc, rn))
-        t0 = time.time()
+            tasks.append((race, _fetch_ent1(client, sem, date, d.get("track_cd"), d.get("sponsor_cd"), d.get("race_nb"))))
         done = 0
-        for coro in asyncio.as_completed(tasks):
+        for (race, coro) in tasks:
             horses = await coro
             done += 1
-            for hh in horses:
-                if hh["lineage_nb"] in seen:
+            if not horses:
+                continue
+            by_num = {hh["horse_number"]: hh for hh in horses}
+            runners = race["payload"].get("runners") or []
+            changed = False
+            for run in runners:
+                num = run.get("horse_number")
+                hh = by_num.get(num)
+                if not hh:
                     continue
-                seen.add(hh["lineage_nb"])
-                buf.append(hh)
-                total_horses += 1
-            if len(buf) >= 200:
-                horse_store.upsert_many(buf)
-                buf = []
-            if done % 200 == 0:
+                if run.get("horse_id") != hh["lineage_nb"] or run.get("age_sex") != hh["age_sex"]:
+                    run["horse_id"] = hh["lineage_nb"]
+                    run["age_sex"] = hh["age_sex"]
+                    changed = True
+                if hh["lineage_nb"] not in seen_horses:
+                    seen_horses.add(hh["lineage_nb"])
+                    horse_buf.append({"lineage_nb": hh["lineage_nb"], "name": hh["name"], "age_sex": hh["age_sex"], "affiliation": ""})
+                    total_horses += 1
+            if changed:
+                race["payload"]["runners"] = runners
+                race["_dirty"] = True
+                updated_races += 1
+            if len(horse_buf) >= 200:
+                horse_store.upsert_many(horse_buf)
+                horse_buf = []
+            # 進捗
+            if done % 100 == 0:
                 rate = done / max(1, time.time() - t0)
                 _log("done=" + str(done) + "/" + str(len(tasks))
                      + " horses=" + str(total_horses)
+                     + " updated_races=" + str(updated_races)
                      + " rate=" + str(round(rate, 2)) + "/s")
-        if buf:
-            horse_store.upsert_many(buf)
-    _log("DONE total horses=" + str(total_horses))
+        if horse_buf:
+            horse_store.upsert_many(horse_buf)
+
+        # scraped_races を書き戻し
+        dirty = [r for r in races if r.get("_dirty")]
+        _log("writing back " + str(len(dirty)) + " races")
+        c2 = libsql_client.create_client_sync(url=h, auth_token=token)
+        try:
+            for i, race in enumerate(dirty, 1):
+                payload = dict(race["payload"])
+                payload.pop("_dirty", None)
+                pj = json.dumps(payload, ensure_ascii=False)
+                try:
+                    c2.execute("UPDATE scraped_races SET payload=? WHERE race_id=?", [pj, race["race_id"]])
+                except Exception as e:
+                    _log("update fail " + race["race_id"] + ": " + str(e))
+                if i % 200 == 0:
+                    _log("written " + str(i) + "/" + str(len(dirty)))
+        finally:
+            try:
+                c2.close()
+            except Exception:
+                pass
+    _log("DONE horses=" + str(total_horses) + " updated_races=" + str(updated_races))
     _log("master count=" + str(horse_store.count()))
 
 
 if __name__ == "__main__":
-    lim = sys.argv[1] if len(sys.argv) > 1 else None
+    lim = sys.argv[1] if len(sys.argv) > 1 and sys.argv[1].isdigit() else None
     asyncio.run(main_async(lim))
 import os as _o
 _o._exit(0)
