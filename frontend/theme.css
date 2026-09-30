@@ -329,3 +329,9 @@ label.bulk-btn.inline{cursor:pointer;}
 #ana-view .ev-table.ev-table-13col2 th:nth-child(1) { width: 8%; }
 #ana-view .ev-table.ev-table-13col2 td:nth-child(2),
 #ana-view .ev-table.ev-table-13col2 th:nth-child(2) { width: 8%; }
+
+/* 枠番分解表 (v51) */
+.ev-table-decomp{width:100%;border-collapse:collapse;font-size:10px;table-layout:auto;}
+.ev-table-decomp th,.ev-table-decomp td{padding:3px 2px;border-bottom:1px solid rgba(212,175,55,0.15);text-align:right;white-space:nowrap;}
+.ev-table-decomp th{color:var(--keiba-gold);font-weight:600;font-size:9.5px;vertical-align:bottom;}
+.ev-table-decomp td:first-child,.ev-table-decomp th:first-child{text-align:left;padding-left:4px;}

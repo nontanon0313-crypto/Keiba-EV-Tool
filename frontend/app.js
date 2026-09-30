@@ -782,9 +782,9 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
 function renderFrameDecompositionTable(title, rows) {
   if (!rows || !rows.length) return "";
   var h = "<h4 class=\"feature-title\">" + title + "</h4>";
-  h += "<div class=\"table-scroll\"><table class=\"feature-table\"><thead><tr>";
+  h += "<table class=\"ev-table ev-table-decomp\"><thead><tr>";
   h += "<th>条件</th><th>n</th>";
-  for (var f = 1; f <= 8; f++) h += "<th>枠" + f + "</th>";
+  for (var f = 1; f <= 8; f++) h += "<th>" + f + "</th>";
   h += "<th>内diff</th><th>外diff</th><th>内外差</th><th>判定</th>";
   h += "</tr></thead><tbody>";
   rows.forEach(function(r){
@@ -792,17 +792,17 @@ function renderFrameDecompositionTable(title, rows) {
     r.frames.forEach(function(cell){
       if (cell.hr_pct == null) { h += "<td>-</td>"; return; }
       var d = cell.hr_pct - cell.market_hr_pct;
-      var dCls = d > 0.5 ? "cell-pos" : (d < -0.5 ? "cell-neg" : "");
+      var dCls = d > 0.5 ? "ev-mid" : (d < -0.5 ? "ev-neg" : "");
       var roi = (cell.roi_pct != null) ? cell.roi_pct : 0;
-      var rCls = roi > 0 ? "cell-pos" : (roi < -20 ? "cell-neg" : "");
+      var rCls = roi > 0 ? "ev-mid" : (roi < -20 ? "ev-neg" : "");
       h += "<td class=\"" + dCls + "\">" + (d>=0?"+":"") + d.toFixed(1) + "<br><span class=\"" + rCls + "\">" + (roi>=0?"+":"") + roi.toFixed(1) + "</span></td>";
     });
     function fD(x){ return (x == null) ? "-" : ((x>=0?"+":"") + x.toFixed(2)); }
     h += "<td>" + fD(r.in_diff) + "</td><td>" + fD(r.out_diff) + "</td><td>" + fD(r.diff_gap) + "</td>";
-    var vCls = r.verdict === "外有利" ? "cell-pos" : (r.verdict === "内有利" ? "cell-neg" : "");
+    var vCls = r.verdict === "外有利" ? "ev-mid" : (r.verdict === "内有利" ? "ev-neg" : "");
     h += "<td class=\"" + vCls + "\">" + r.verdict + "</td></tr>";
   });
-  h += "</tbody></table></div>";
+  h += "</tbody></table>";
   return h;
 }
 function renderFrameTabConditionFilter() {
