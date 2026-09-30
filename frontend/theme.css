@@ -321,3 +321,11 @@ label.bulk-btn.inline{cursor:pointer;}
 #ana-view .ev-table.ev-table-12col th:nth-child(1) { width: 8%; }
 #ana-view .ev-table.ev-table-12col td:nth-child(2),
 #ana-view .ev-table.ev-table-12col th:nth-child(2) { width: 8%; }
+
+/* 13列テーブル（期待値/確率/オッズタブ: 市場列追加版） */
+#ana-view .ev-table.ev-table-13col2 td,
+#ana-view .ev-table.ev-table-13col2 th { width: 7.5%; }
+#ana-view .ev-table.ev-table-13col2 td:nth-child(1),
+#ana-view .ev-table.ev-table-13col2 th:nth-child(1) { width: 8%; }
+#ana-view .ev-table.ev-table-13col2 td:nth-child(2),
+#ana-view .ev-table.ev-table-13col2 th:nth-child(2) { width: 8%; }

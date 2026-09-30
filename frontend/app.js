@@ -274,13 +274,12 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
 
   function tableRows(rows, label){
     if (!rows || !rows.length) return "<p>該当データなし</p>";
-    var html = "<table class=\"ev-table ev-table-11col\"><thead><tr>";
+    var html = "<table class=\"ev-table ev-table-13col2\"><thead><tr>";
     html += "<th>" + label + "</th><th>件数</th><th>予想的中率</th><th>オッズ平均</th><th>想定利益%</th>";
-    html += "<th>実的中率</th><th>CI下限</th><th>CI上限</th>";
-    html += "<th>実利益%</th><th>CI下限</th><th>CI上限</th>";
+    html += "<th>実的中率</th><th>CI下限</th><th>CI上限</th><th>市場的中率</th>";
+    html += "<th>実利益%</th><th>CI下限</th><th>CI上限</th><th>市場利益%</th>";
     html += "</tr></thead><tbody>";
     rows.forEach(function(r){
-      var cls = KeibaTheme.evClass(r.expected_profit_pct / 100, EV_THRESHOLD);
       var actual = r.actual_hit_rate_pct == null ? "-" : fmtPct(r.actual_hit_rate_pct, 2);
       var ap = r.actual_profit_pct == null ? "-" : fmtSignedPct(r.actual_profit_pct, 1);
       var ep = r.expected_profit_pct == null ? "-" : fmtSignedPct(r.expected_profit_pct, 1);
@@ -289,22 +288,37 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
       var hr_ci_hi = r.actual_hit_rate_ci_hi_pct == null ? "-" : fmtPct(r.actual_hit_rate_ci_hi_pct, 2);
       var roi_ci_lo = r.actual_profit_ci_lo_pct == null ? "-" : fmtSignedPct(r.actual_profit_ci_lo_pct, 1);
       var roi_ci_hi = r.actual_profit_ci_hi_pct == null ? "-" : fmtSignedPct(r.actual_profit_ci_hi_pct, 1);
+      var mhr = r.market_hit_rate_pct == null ? "-" : fmtPct(r.market_hit_rate_pct, 2);
+      var mp = r.market_profit_pct == null ? "-" : fmtSignedPct(r.market_profit_pct, 1);
+      // 色付け: 実 vs 市場
+      var hr_cls = "";
+      if (r.actual_hit_rate_pct != null && r.market_hit_rate_pct != null) {
+        if (r.actual_hit_rate_pct > r.market_hit_rate_pct) hr_cls = "ev-mid";
+        else if (r.actual_hit_rate_pct < r.market_hit_rate_pct) hr_cls = "ev-neg";
+      }
+      var roi_cls = "";
+      if (r.actual_profit_pct != null && r.market_profit_pct != null) {
+        if (r.actual_profit_pct > r.market_profit_pct) roi_cls = "ev-mid";
+        else if (r.actual_profit_pct < r.market_profit_pct) roi_cls = "ev-neg";
+      }
       var ratio = "";
       if (window._anaTotalCount && window._anaTotalCount > 0) {
         ratio = " (" + (r.count / window._anaTotalCount * 100).toFixed(1) + "%)";
       }
-      html += "<tr class=\"" + cls + "\">";
+      html += "<tr>";
       html += "<td>" + esc(r.range) + "</td>";
       html += "<td>" + r.count + ratio + "</td>";
       html += "<td>" + ehr + "</td>";
       html += "<td>" + fmtNum(r.avg_odds, 1) + "</td>";
       html += "<td>" + ep + "</td>";
-      html += "<td>" + actual + "</td>";
+      html += "<td class=\"" + hr_cls + "\">" + actual + "</td>";
       html += "<td>" + hr_ci_lo + "</td>";
       html += "<td>" + hr_ci_hi + "</td>";
-      html += "<td>" + ap + "</td>";
+      html += "<td>" + mhr + "</td>";
+      html += "<td class=\"" + roi_cls + "\">" + ap + "</td>";
       html += "<td>" + roi_ci_lo + "</td>";
       html += "<td>" + roi_ci_hi + "</td>";
+      html += "<td>" + mp + "</td>";
       html += "</tr>";
     });
     html += "</tbody></table>";
@@ -326,13 +340,12 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   function renderCumTable(rows, label){
     if (!rows || !rows.length) return "<p>該当データなし</p>";
     var html = "<h4 class=\"feature-title\">" + label + " (累積)</h4>";
-    html += "<table class=\"ev-table ev-table-11col\"><thead><tr>";
+    html += "<table class=\"ev-table ev-table-13col2\"><thead><tr>";
     html += "<th>範囲</th><th>件数</th><th>予想的中率</th><th>オッズ平均</th><th>想定利益%</th>";
-    html += "<th>実的中率</th><th>CI下限</th><th>CI上限</th>";
-    html += "<th>実利益%</th><th>CI下限</th><th>CI上限</th>";
+    html += "<th>実的中率</th><th>CI下限</th><th>CI上限</th><th>市場的中率</th>";
+    html += "<th>実利益%</th><th>CI下限</th><th>CI上限</th><th>市場利益%</th>";
     html += "</tr></thead><tbody>";
     rows.forEach(function(r){
-      var cls = KeibaTheme.evClass(r.expected_profit_pct / 100, EV_THRESHOLD);
       var actual = r.actual_hit_rate_pct == null ? "-" : fmtPct(r.actual_hit_rate_pct, 2);
       var ap = r.actual_profit_pct == null ? "-" : fmtSignedPct(r.actual_profit_pct, 1);
       var ep = r.expected_profit_pct == null ? "-" : fmtSignedPct(r.expected_profit_pct, 1);
@@ -341,22 +354,36 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
       var hr_ci_hi = r.actual_hit_rate_ci_hi_pct == null ? "-" : fmtPct(r.actual_hit_rate_ci_hi_pct, 2);
       var roi_ci_lo = r.actual_profit_ci_lo_pct == null ? "-" : fmtSignedPct(r.actual_profit_ci_lo_pct, 1);
       var roi_ci_hi = r.actual_profit_ci_hi_pct == null ? "-" : fmtSignedPct(r.actual_profit_ci_hi_pct, 1);
+      var mhr = r.market_hit_rate_pct == null ? "-" : fmtPct(r.market_hit_rate_pct, 2);
+      var mp = r.market_profit_pct == null ? "-" : fmtSignedPct(r.market_profit_pct, 1);
+      var hr_cls = "";
+      if (r.actual_hit_rate_pct != null && r.market_hit_rate_pct != null) {
+        if (r.actual_hit_rate_pct > r.market_hit_rate_pct) hr_cls = "ev-mid";
+        else if (r.actual_hit_rate_pct < r.market_hit_rate_pct) hr_cls = "ev-neg";
+      }
+      var roi_cls = "";
+      if (r.actual_profit_pct != null && r.market_profit_pct != null) {
+        if (r.actual_profit_pct > r.market_profit_pct) roi_cls = "ev-mid";
+        else if (r.actual_profit_pct < r.market_profit_pct) roi_cls = "ev-neg";
+      }
       var ratio2 = "";
       if (window._anaTotalCount && window._anaTotalCount > 0) {
         ratio2 = " (" + (r.count / window._anaTotalCount * 100).toFixed(1) + "%)";
       }
-      html += "<tr class=\"" + cls + "\">";
+      html += "<tr>";
       html += "<td>" + esc(r.range) + "</td>";
       html += "<td>" + r.count + ratio2 + "</td>";
       html += "<td>" + ehr + "</td>";
       html += "<td>" + fmtNum(r.avg_odds, 1) + "</td>";
       html += "<td>" + ep + "</td>";
-      html += "<td>" + actual + "</td>";
+      html += "<td class=\"" + hr_cls + "\">" + actual + "</td>";
       html += "<td>" + hr_ci_lo + "</td>";
       html += "<td>" + hr_ci_hi + "</td>";
-      html += "<td>" + ap + "</td>";
+      html += "<td>" + mhr + "</td>";
+      html += "<td class=\"" + roi_cls + "\">" + ap + "</td>";
       html += "<td>" + roi_ci_lo + "</td>";
       html += "<td>" + roi_ci_hi + "</td>";
+      html += "<td>" + mp + "</td>";
       html += "</tr>";
     });
     html += "</tbody></table>";
@@ -371,10 +398,9 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     html += "<th>券種</th><th>件数</th><th>予想的中率</th><th>オッズ平均</th><th>想定利益%</th>";
     html += "<th>実的中率</th><th>CI下限</th><th>CI上限</th>";
     html += "<th>実利益%</th><th>CI下限</th><th>CI上限</th>";
-    html += "<th>実測控除率%</th><th>理論控除率%</th>";
+    html += "<th>市場利益%</th><th>理論控除率%</th>";
     html += "</tr></thead><tbody>";
     rows.forEach(function(r){
-      var cls = KeibaTheme.evClass(r.expected_profit_pct / 100, EV_THRESHOLD);
       var ehr = r.expected_hit_rate_pct == null ? "-" : fmtPct(r.expected_hit_rate_pct, 2);
       var ahr = r.actual_hit_rate_pct == null ? "-" : fmtPct(r.actual_hit_rate_pct, 2);
       var hr_ci_lo = r.actual_hit_rate_ci_lo_pct == null ? "-" : fmtPct(r.actual_hit_rate_ci_lo_pct, 2);
@@ -383,7 +409,15 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
       var ap = r.actual_profit_pct == null ? "-" : fmtSignedPct(r.actual_profit_pct, 1);
       var roi_ci_lo = r.actual_profit_ci_lo_pct == null ? "-" : fmtSignedPct(r.actual_profit_ci_lo_pct, 1);
       var roi_ci_hi = r.actual_profit_ci_hi_pct == null ? "-" : fmtSignedPct(r.actual_profit_ci_hi_pct, 1);
-      html += "<tr class=\"" + cls + "\"><td>" + esc(r.label) + "</td>"
+      // 市場利益% = -(実測控除率%)
+      var market_profit_pct = (r.measured_deduction_pct == null) ? null : -r.measured_deduction_pct;
+      // 実利益%セルの色: 実 > 市場 → 緑、実 < 市場 → 赤
+      var ap_cls = "";
+      if (r.actual_profit_pct != null && market_profit_pct != null) {
+        if (r.actual_profit_pct > market_profit_pct) ap_cls = "ev-mid";
+        else if (r.actual_profit_pct < market_profit_pct) ap_cls = "ev-neg";
+      }
+      html += "<tr><td>" + esc(r.label) + "</td>"
             + "<td>" + r.count + "</td>"
             + "<td>" + ehr + "</td>"
             + "<td>" + (r.avg_odds == null ? "-" : fmtNum(r.avg_odds, 1)) + "</td>"
@@ -391,10 +425,10 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
             + "<td>" + ahr + "</td>"
             + "<td>" + hr_ci_lo + "</td>"
             + "<td>" + hr_ci_hi + "</td>"
-            + "<td>" + ap + "</td>"
+            + "<td class=\"" + ap_cls + "\">" + ap + "</td>"
             + "<td>" + roi_ci_lo + "</td>"
             + "<td>" + roi_ci_hi + "</td>"
-            + "<td>" + (r.measured_deduction_pct == null ? "-" : fmtPct(r.measured_deduction_pct, 1)) + "</td>"
+            + "<td>" + (market_profit_pct == null ? "-" : fmtSignedPct(market_profit_pct, 1)) + "</td>"
             + "<td>" + (r.theory_deduction_pct == null ? "-" : fmtPct(r.theory_deduction_pct, 1)) + "</td></tr>";
     });
     html += "</tbody></table>";
@@ -448,19 +482,38 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
         var real_off = r.roi_other_pct;
         var market_off = -(r.market_rho_other_pct || 0);
         var diff_off = real_off - market_off;
-        var cls_real_on = KeibaTheme.evClass(real_on / 100, 0);
-        var cls_real_off = KeibaTheme.evClass(real_off / 100, 0);
+        // 色付け: 適用/適用外の比較 または 実 vs 市場
+        var on_cls = "";
+        var off_cls = "";
+        if (filter === "all") {
+          if (real_on != null && real_off != null) {
+            if (real_on > real_off) on_cls = "ev-mid";
+            else if (real_on < real_off) on_cls = "ev-neg";
+            if (real_off > real_on) off_cls = "ev-mid";
+            else if (real_off < real_on) off_cls = "ev-neg";
+          }
+        } else if (filter === "on") {
+          if (real_on != null && market_on != null) {
+            if (real_on > market_on) on_cls = "ev-mid";
+            else if (real_on < market_on) on_cls = "ev-neg";
+          }
+        } else if (filter === "off") {
+          if (real_off != null && market_off != null) {
+            if (real_off > market_off) off_cls = "ev-mid";
+            else if (real_off < market_off) off_cls = "ev-neg";
+          }
+        }
         var cls_diff_on = KeibaTheme.evClass(diff_on / 100, 0);
         var cls_diff_off = KeibaTheme.evClass(diff_off / 100, 0);
         if (filter === "all" || filter === "on") {
-          html += "<td class=\"" + cls_real_on + "\">" + fmtSignedPct(real_on, 1) + "</td>";
+          html += "<td class=\"" + on_cls + "\">" + fmtSignedPct(real_on, 1) + "</td>";
           html += "<td>" + (r.roi_b_ci_lo_pct == null ? "-" : fmtSignedPct(r.roi_b_ci_lo_pct, 1)) + "</td>";
           html += "<td>" + (r.roi_b_ci_hi_pct == null ? "-" : fmtSignedPct(r.roi_b_ci_hi_pct, 1)) + "</td>";
           html += "<td>" + fmtSignedPct(market_on, 1) + "</td>";
           html += "<td class=\"" + cls_diff_on + "\">" + fmtSignedPct(diff_on, 1) + "</td>";
         }
         if (filter === "all" || filter === "off") {
-          html += "<td class=\"" + cls_real_off + "\">" + fmtSignedPct(real_off, 1) + "</td>";
+          html += "<td class=\"" + off_cls + "\">" + fmtSignedPct(real_off, 1) + "</td>";
           html += "<td>" + (r.roi_c_ci_lo_pct == null ? "-" : fmtSignedPct(r.roi_c_ci_lo_pct, 1)) + "</td>";
           html += "<td>" + (r.roi_c_ci_hi_pct == null ? "-" : fmtSignedPct(r.roi_c_ci_hi_pct, 1)) + "</td>";
           html += "<td>" + fmtSignedPct(market_off, 1) + "</td>";
@@ -475,17 +528,37 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
         var hr_real_off = r.hit_rate_other_pct;
         var hr_mkt_off = r.market_hit_rate_other_pct;
         var hr_diff_off = hr_real_off - hr_mkt_off;
+        var hon_cls = "";
+        var hoff_cls = "";
+        if (filter === "all") {
+          if (hr_real_on != null && hr_real_off != null) {
+            if (hr_real_on > hr_real_off) hon_cls = "ev-mid";
+            else if (hr_real_on < hr_real_off) hon_cls = "ev-neg";
+            if (hr_real_off > hr_real_on) hoff_cls = "ev-mid";
+            else if (hr_real_off < hr_real_on) hoff_cls = "ev-neg";
+          }
+        } else if (filter === "on") {
+          if (hr_real_on != null && hr_mkt_on != null) {
+            if (hr_real_on > hr_mkt_on) hon_cls = "ev-mid";
+            else if (hr_real_on < hr_mkt_on) hon_cls = "ev-neg";
+          }
+        } else if (filter === "off") {
+          if (hr_real_off != null && hr_mkt_off != null) {
+            if (hr_real_off > hr_mkt_off) hoff_cls = "ev-mid";
+            else if (hr_real_off < hr_mkt_off) hoff_cls = "ev-neg";
+          }
+        }
         var hcls_on = KeibaTheme.evClass(hr_diff_on / 100, 0);
         var hcls_off = KeibaTheme.evClass(hr_diff_off / 100, 0);
         if (filter === "all" || filter === "on") {
-          html += "<td>" + fmtPct(hr_real_on, 2) + "</td>";
+          html += "<td class=\"" + hon_cls + "\">" + fmtPct(hr_real_on, 2) + "</td>";
           html += "<td>" + (r.hr_b_ci_lo_pct == null ? "-" : fmtPct(r.hr_b_ci_lo_pct, 2)) + "</td>";
           html += "<td>" + (r.hr_b_ci_hi_pct == null ? "-" : fmtPct(r.hr_b_ci_hi_pct, 2)) + "</td>";
           html += "<td>" + fmtPct(hr_mkt_on, 2) + "</td>";
           html += "<td class=\"" + hcls_on + "\">" + fmtSignedPct(hr_diff_on, 2) + "</td>";
         }
         if (filter === "all" || filter === "off") {
-          html += "<td>" + fmtPct(hr_real_off, 2) + "</td>";
+          html += "<td class=\"" + hoff_cls + "\">" + fmtPct(hr_real_off, 2) + "</td>";
           html += "<td>" + (r.hr_c_ci_lo_pct == null ? "-" : fmtPct(r.hr_c_ci_lo_pct, 2)) + "</td>";
           html += "<td>" + (r.hr_c_ci_hi_pct == null ? "-" : fmtPct(r.hr_c_ci_hi_pct, 2)) + "</td>";
           html += "<td>" + fmtPct(hr_mkt_off, 2) + "</td>";
@@ -514,8 +587,13 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
         if (signed) return fmtSignedPct(v, d);
         return fmtPct(v, d);
       }
-      var cls_roi_y = (r.roi_pct_yes == null) ? "" : KeibaTheme.evClass(r.roi_pct_yes / 100, 0);
-      var cls_roi_n = (r.roi_pct_no == null) ? "" : KeibaTheme.evClass(r.roi_pct_no / 100, 0);
+      // 色付け: 大きい方だけ緑（マイナス方向の色付けはしない）
+      var cls_roi_y = "";
+      var cls_roi_n = "";
+      if (r.roi_pct_yes != null && r.roi_pct_no != null) {
+        if (r.roi_pct_yes > r.roi_pct_no) cls_roi_y = "ev-mid";
+        else if (r.roi_pct_no > r.roi_pct_yes) cls_roi_n = "ev-mid";
+      }
       html += "<tr>";
       html += "<td>" + esc(r.weight_label) + "</td>";
       html += "<td>" + r.n_yes + "</td>";
@@ -843,6 +921,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
       var roi_diff_pct = r.roi_diff * 100;
       var hr_diff_pct = r.hr_diff * 100;
       var cls = KeibaTheme.evClass(roi_diff_pct / 100, 0);
+      var hcls = KeibaTheme.evClass(hr_diff_pct / 100, 0);
       var roi_b_lo = r.roi_b_ci_lo == null ? "-" : fmtSignedPct(r.roi_b_ci_lo, 1);
       var roi_b_hi = r.roi_b_ci_hi == null ? "-" : fmtSignedPct(r.roi_b_ci_hi, 1);
       var roi_c_lo = r.roi_c_ci_lo == null ? "-" : fmtSignedPct(r.roi_c_ci_lo, 1);
@@ -862,7 +941,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
       html += "<td>" + fmtPct(r.real_hr * 100, 2) + "</td>";
       html += "<td>" + hr_b_lo + "</td>";
       html += "<td>" + hr_b_hi + "</td>";
-      html += "<td>" + fmtSignedPct(hr_diff_pct, 2) + "</td>";
+      html += "<td class=\"" + hcls + "\">" + fmtSignedPct(hr_diff_pct, 2) + "</td>";
       html += "</tr>";
     });
     html += "</tbody></table>";

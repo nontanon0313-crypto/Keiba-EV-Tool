@@ -115,8 +115,10 @@ class Agg:
         self.sum_payout_yen = 0.0
         self.sum_profit = 0.0
         self.sum_profit_sq = 0.0
+        self.sum_market_prob = 0.0
+        self.sum_rho = 0.0
 
-    def add(self, prob, odds, hit, payout_yen=0):
+    def add(self, prob, odds, hit, payout_yen=0, market_prob=None, rho_race=None):
         self.n += 1
         self.hits += hit
         self.sum_prob += prob
@@ -125,6 +127,10 @@ class Agg:
         profit = payout_yen / STAKE_PER_BET - 1.0
         self.sum_profit += profit
         self.sum_profit_sq += profit * profit
+        if market_prob is not None:
+            self.sum_market_prob += market_prob
+        if rho_race is not None:
+            self.sum_rho += rho_race
         if hit:
             self.sum_payout_yen += payout_yen
 
@@ -157,6 +163,8 @@ class Agg:
             "actual_profit_pct": mean_profit * 100,
             "actual_profit_ci_lo_pct": roi_ci_lo_pct,
             "actual_profit_ci_hi_pct": roi_ci_hi_pct,
+            "market_hit_rate_pct": (self.sum_market_prob / n) * 100,
+            "market_profit_pct": -(self.sum_rho / n) * 100,
         }
 
 
@@ -258,27 +266,29 @@ def build():
     odds_map = odds_store.get_odds_batch(rids)
     print("[build] odds fetched:", len(odds_map), flush=True)
 
-    def add_to_scope(scope, prob, odds, hit, payout_yen):
-        scope["total"].add(prob, odds, hit, payout_yen)
+    def add_to_scope(scope, prob, odds, hit, payout_yen, market_prob, rho_race):
+        mp = market_prob
+        rr = rho_race
+        scope["total"].add(prob, odds, hit, payout_yen, mp, rr)
         for j, (lo, hi) in enumerate(pb):
             if lo <= prob < hi:
-                scope["prob_bins"][j].add(prob, odds, hit, payout_yen); break
+                scope["prob_bins"][j].add(prob, odds, hit, payout_yen, mp, rr); break
         for j, (lo, hi) in enumerate(ob):
             if lo <= odds < hi:
-                scope["odds_bins"][j].add(prob, odds, hit, payout_yen); break
+                scope["odds_bins"][j].add(prob, odds, hit, payout_yen, mp, rr); break
         ev = prob * odds - 1.0
         for j, (lo, hi) in enumerate(eb):
             if lo <= ev < hi:
-                scope["ev_bins"][j].add(prob, odds, hit, payout_yen); break
+                scope["ev_bins"][j].add(prob, odds, hit, payout_yen, mp, rr); break
         for j, th in enumerate(prob_th):
             if prob >= th:
-                scope["prob_cum"][j].add(prob, odds, hit, payout_yen)
+                scope["prob_cum"][j].add(prob, odds, hit, payout_yen, mp, rr)
         for j, th in enumerate(odds_th):
             if odds >= th:
-                scope["odds_cum"][j].add(prob, odds, hit, payout_yen)
+                scope["odds_cum"][j].add(prob, odds, hit, payout_yen, mp, rr)
         for j, th in enumerate(ev_th):
             if ev >= th:
-                scope["ev_cum"][j].add(prob, odds, hit, payout_yen)
+                scope["ev_cum"][j].add(prob, odds, hit, payout_yen, mp, rr)
 
     for i, it in enumerate(races):
         rid = it["race_id"]
@@ -303,18 +313,35 @@ def build():
         RACE_COUNT += 1
 
         for t in tickets:
+            # パス1: 候補リストを作成 + Σ(1/odds) を計算
+            cand_list = []
             for combo, prob in _candidates(pred, t):
                 if prob <= 0:
                     continue
                 ro = real_odds(odds_p, t, combo)
                 if not ro or ro <= 1:
                     continue
+                cand_list.append((combo, prob, ro))
+            if not cand_list:
+                continue
+            inv_sum = 0.0
+            for _, _, ro in cand_list:
+                inv_sum += 1.0 / ro
+            if inv_sum <= 0:
+                continue
+            hpr = HITS_PER_RACE.get(t, 1)
+            rho_race = 1.0 - hpr / inv_sum
+            market_factor = 1.0 - rho_race
+
+            # パス2: 各買い目を集計
+            for combo, prob, ro in cand_list:
+                market_prob = market_factor / ro
                 hit = hit_check(t, combo, finish)
                 ticket_jp = _TICKET_LABEL.get(t, t)
                 payout = payout_yen(payouts_dict, ticket_jp, combo) or 0
 
                 # 全組み合わせ
-                add_to_scope(scopes_data["all_combos"], prob, ro, hit, payout)
+                add_to_scope(scopes_data["all_combos"], prob, ro, hit, payout, market_prob, rho_race)
 
                 # 券種別
                 ta = ticket_agg[t]
@@ -335,11 +362,11 @@ def build():
                 ev = prob * ro - 1.0
                 passes_filter = (ro >= settings.MIXED_ODDS_MIN) and (ev >= settings.MIXED_EV_MIN) and (t in settings.MIXED_TICKETS)
                 if passes_filter:
-                    add_to_scope(scopes_data["all"], prob, ro, hit, payout)
+                    add_to_scope(scopes_data["all"], prob, ro, hit, payout, market_prob, rho_race)
                     if (t, combo) in plan_set:
-                        add_to_scope(scopes_data["plan"], prob, ro, hit, payout)
+                        add_to_scope(scopes_data["plan"], prob, ro, hit, payout, market_prob, rho_race)
                     else:
-                        add_to_scope(scopes_data["non_plan"], prob, ro, hit, payout)
+                        add_to_scope(scopes_data["non_plan"], prob, ro, hit, payout, market_prob, rho_race)
 
                 # features（all_combos のみ。メモリ節約のため）
                 parts = combo.split("-")
