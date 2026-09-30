@@ -1471,8 +1471,6 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
 
   list.textContent = "読み込み中... (サーバー起動待ちの場合があります)";
   fetchWithTimeout(API_BASE + "/races", TIMEOUT_MS).then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); }).then(function(data){ var races = Array.isArray(data) ? data : (data.races || data.items || []); renderList(races); }).catch(function(err){ list.textContent = "API取得失敗: " + err.message + " — 再読み込みしてください"; });
-})();
-
   function renderHorseView(d){
     if (!d) return "<p>データなし</p>";
     var h = "";
@@ -1530,4 +1528,4 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     var idEl = $("horse-id");
     if (idEl) idEl.addEventListener("keydown", function(e){ if (e.key === "Enter") loadHorse(); });
   })();
-
+})();
