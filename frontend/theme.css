@@ -338,3 +338,9 @@ label.bulk-btn.inline{cursor:pointer;}
 .ev-table-decomp th{color:var(--keiba-gold);font-weight:600;font-size:9.5px;vertical-align:bottom;}
 .ev-table-decomp td:first-child,.ev-table-decomp th:first-child{text-align:left;padding-left:2px;}
 .ev-table-decomp td{vertical-align:top;}
+
+/* 横はみ出し防止 (v54) */
+html,body{overflow-x:hidden;max-width:100%;}
+main{max-width:100%;overflow-x:hidden;}
+#ana-view{min-width:0;width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+#ana-view > *{max-width:100%;}
