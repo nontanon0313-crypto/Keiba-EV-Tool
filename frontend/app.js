@@ -1664,6 +1664,21 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     return renderHorseTab(horseViewTab);
   }
 
+  function renderHorseSearchResult(items){
+    if (!items || !items.length) return "<p>該当馬なし</p>";
+    var h = "<h4 class=\"feature-title\">検索結果 " + items.length + "件</h4>";
+    h += "<table class=\"ev-table\"><thead><tr><th>馬名</th><th>性齢</th><th>所属</th><th></th></tr></thead><tbody>";
+    items.forEach(function(x){
+      h += "<tr>";
+      h += "<td>" + esc(x.name) + "</td>";
+      h += "<td>" + esc(x.age_sex || "") + "</td>";
+      h += "<td>" + esc(x.affiliation || "") + "</td>";
+      h += "<td><button class=\"bet-btn\" data-horse-load=\"" + esc(x.lineage_nb) + "\" type=\"button\">詳細</button></td>";
+      h += "</tr>";
+    });
+    h += "</tbody></table>";
+    return h;
+  }
   function loadHorseDetail(lineageNb){
     var view = $("horse-view");
     if (!view) return;
