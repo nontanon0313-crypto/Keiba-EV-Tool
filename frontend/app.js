@@ -1514,7 +1514,7 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     if (!rows.length) return "<p>該当データなし</p>";
     if (sortNumeric) rows.sort(function(a,b){ return (parseFloat(a.label)||0) - (parseFloat(b.label)||0); });
     else rows.sort(function(a,b){ return b.n - a.n; });
-    var h = "<table class=\\"ev-table\\"><thead><tr>";
+    var h = "<table class=\"ev-table\"><thead><tr>";
     h += "<th>種別</th><th>出走</th><th>1着</th><th>2着</th><th>3着</th><th>着外</th>";
     h += "<th>勝率</th><th>連対率</th><th>3連対率</th><th>平均着順</th>";
     h += "</tr></thead><tbody>";
@@ -1526,17 +1526,17 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     return h;
   }
   function renderHorseBasic(d){
-    var h = "<h3 class=\\"feature-title\\">基本</h3>";
-    h += "<table class=\\"ev-table\\"><tbody>";
+    var h = "<h3 class=\"feature-title\">基本</h3>";
+    h += "<table class=\"ev-table\"><tbody>";
     var basics = d.basic || {};
     Object.keys(basics).forEach(function(k){
       h += "<tr><td>" + esc(k) + "</td><td>" + esc(basics[k]) + "</td></tr>";
     });
     h += "</tbody></table>";
     if (d.summaries && d.summaries.length) {
-      h += "<h3 class=\\"feature-title\\">成績サマリ</h3>";
+      h += "<h3 class=\"feature-title\">成績サマリ</h3>";
       d.summaries.forEach(function(blk){
-        h += "<table class=\\"ev-table\\"><thead><tr>";
+        h += "<table class=\"ev-table\"><thead><tr>";
         (blk.header||[]).forEach(function(x){ h += "<th>" + esc(x) + "</th>"; });
         h += "</tr></thead><tbody>";
         (blk.rows||[]).forEach(function(row){
@@ -1552,8 +1552,8 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
   function renderHorseHistory(d){
     var hist = d.history;
     if (!hist || !hist.rows || !hist.rows.length) return "<p>走歴なし</p>";
-    var h = "<h3 class=\\"feature-title\\">走歴</h3>";
-    h += "<div class=\\"decomp-scroll\\"><table class=\\"ev-table-decomp\\"><thead><tr>";
+    var h = "<h3 class=\"feature-title\">走歴</h3>";
+    h += "<div class=\"decomp-scroll\"><table class=\"ev-table-decomp\"><thead><tr>";
     (hist.header||[]).forEach(function(x){ h += "<th>" + esc(x) + "</th>"; });
     h += "</tr></thead><tbody>";
     hist.rows.forEach(function(row){
@@ -1572,7 +1572,7 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
       var m = v.match(/(\d+)/);
       return m ? m[1] : "";
     });
-    return "<h3 class=\\"feature-title\\">距離別</h3>" + renderHorseAggTable(rows, true);
+    return "<h3 class=\"feature-title\">距離別</h3>" + renderHorseAggTable(rows, true);
   }
   function renderHorseSurfaceCond(d){
     var hist = d.history;
@@ -1582,13 +1582,13 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
       var m = v.match(/^(良|稍重|重|不良)/);
       return m ? m[1] : v.slice(0,2);
     });
-    return "<h3 class=\\"feature-title\\">馬場別</h3>" + renderHorseAggTable(rows, false);
+    return "<h3 class=\"feature-title\">馬場別</h3>" + renderHorseAggTable(rows, false);
   }
   function renderHorseVenue(d){
     var hist = d.history;
     if (!hist) return "<p>走歴なし</p>";
     var rows = horseAggBy(hist, function(o){ return o["競馬場"] || ""; });
-    return "<h3 class=\\"feature-title\\">会場別</h3>" + renderHorseAggTable(rows, false);
+    return "<h3 class=\"feature-title\">会場別</h3>" + renderHorseAggTable(rows, false);
   }
   function renderHorseStyle(d){
     var hist = d.history;
@@ -1604,8 +1604,8 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     if (!ratios.length) return "<p>脚質データなし</p>";
     var avg = ratios.reduce(function(a,b){ return a+b; }, 0) / ratios.length;
     var style = avg < 0.2 ? "逃げ" : avg < 0.4 ? "先行" : avg < 0.7 ? "差し" : "追込";
-    var h = "<h3 class=\\"feature-title\\">脚質</h3>";
-    h += "<table class=\\"ev-table\\"><tbody>";
+    var h = "<h3 class=\"feature-title\">脚質</h3>";
+    h += "<table class=\"ev-table\"><tbody>";
     h += "<tr><td>平均先行度</td><td>" + avg.toFixed(3) + "</td></tr>";
     h += "<tr><td>判定</td><td>" + style + "</td></tr>";
     h += "<tr><td>サンプル数</td><td>" + ratios.length + "</td></tr>";
@@ -1615,8 +1615,8 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
   function renderHorseRecent(d){
     var hist = d.history;
     if (!hist || !hist.rows || !hist.rows.length) return "<p>走歴なし</p>";
-    var h = "<h3 class=\\"feature-title\\">近走（直近5走）</h3>";
-    h += "<div class=\\"decomp-scroll\\"><table class=\\"ev-table-decomp\\"><thead><tr>";
+    var h = "<h3 class=\"feature-title\">近走（直近5走）</h3>";
+    h += "<div class=\"decomp-scroll\"><table class=\"ev-table-decomp\"><thead><tr>";
     h += "<th>年月日</th><th>会場</th><th>距離</th><th>馬場</th><th>人気</th><th>着順</th><th>上3F</th><th>通過</th>";
     h += "</tr></thead><tbody>";
     hist.rows.slice(0, 5).forEach(function(row){
