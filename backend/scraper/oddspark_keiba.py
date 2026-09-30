@@ -861,6 +861,33 @@ def get_payout(payouts_raw, ticket, combo):
             pass
     return m.get(combo)
 
+
+def _parse_pedigree(soup):
+    """tb71 血統テーブルを {sire, sire_sire, sire_dam, dam, dam_sire, dam_dam} で返す。"""
+    import re as _re
+    t = soup.select_one("table.tb71")
+    if not t:
+        return {}
+    rows = t.find_all("tr")
+    # 行構造: [血統], [父|父父], [父母], [母|母父], [母母]
+    cells_per_row = []
+    for tr in rows:
+        cells = tr.find_all(["td", "th"])
+        txts = [_re.sub(r"[\s\u200b\u3000]+", "", c.get_text(" ", strip=True)) for c in cells]
+        cells_per_row.append(txts)
+    out = {}
+    # 2列目に値がある行を父/母の第1行とみなす
+    # 標準: row1=ヘッダ, row2=[父,父父], row3=[父母], row4=[母,母父], row5=[母母]
+    data = [r for r in cells_per_row if r and r[0] != "血統"]
+    if len(data) >= 4:
+        out["sire"] = data[0][0] if len(data[0]) >= 1 else ""
+        out["sire_sire"] = data[0][1] if len(data[0]) >= 2 else ""
+        out["sire_dam"] = data[1][0] if len(data[1]) >= 1 else ""
+        out["dam"] = data[2][0] if len(data[2]) >= 1 else ""
+        out["dam_sire"] = data[2][1] if len(data[2]) >= 2 else ""
+        out["dam_dam"] = data[3][0] if len(data[3]) >= 1 else ""
+    return out
+
 def fetch_horse_detail(lineage_nb):
     """馬詳細ページを取得してパース。
     lineageNb: HorseDetail.do のパラメータ (馬固有ID)。
@@ -918,5 +945,6 @@ def fetch_horse_detail(lineage_nb):
                     history["rows"].append(cells)
             break
     out["history"] = history
+    out["pedigree"] = _parse_pedigree(soup)
     return out
 

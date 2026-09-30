@@ -1635,6 +1635,20 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     h += "</tbody></table></div>";
     return h;
   }
+  function renderHorsePedigree(d){
+    var pg = d.pedigree || {};
+    if (!pg.sire && !pg.dam) return "<p>血統データなし</p>";
+    var h = "<h3 class=\"feature-title\">血統</h3>";
+    h += "<table class=\"ev-table\"><tbody>";
+    h += "<tr><td>父</td><td>" + esc(pg.sire || "") + "</td></tr>";
+    h += "<tr><td>父父</td><td>" + esc(pg.sire_sire || "") + "</td></tr>";
+    h += "<tr><td>父母</td><td>" + esc(pg.sire_dam || "") + "</td></tr>";
+    h += "<tr><td>母</td><td>" + esc(pg.dam || "") + "</td></tr>";
+    h += "<tr><td>母父</td><td>" + esc(pg.dam_sire || "") + "</td></tr>";
+    h += "<tr><td>母母</td><td>" + esc(pg.dam_dam || "") + "</td></tr>";
+    h += "</tbody></table>";
+    return h;
+  }
   function renderHorseTab(tab){
     var d = horseData;
     if (!d) return "<p>データなし</p>";
@@ -1645,6 +1659,7 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     if (tab === "venue") return renderHorseVenue(d);
     if (tab === "style") return renderHorseStyle(d);
     if (tab === "recent") return renderHorseRecent(d);
+    if (tab === "pedigree") return renderHorsePedigree(d);
     return "<p>不明なタブ</p>";
   }
   function syncHorseSubtabs(){
