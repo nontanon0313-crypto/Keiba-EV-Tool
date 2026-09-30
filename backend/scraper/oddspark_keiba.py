@@ -847,3 +847,63 @@ def get_payout(payouts_raw, ticket, combo):
         except ValueError:
             pass
     return m.get(combo)
+
+def fetch_horse_detail(lineage_nb):
+    """馬詳細ページを取得してパース。
+    lineageNb: HorseDetail.do のパラメータ (馬固有ID)。
+    """
+    import re as _re
+    url = f"{BASE}/keiba/HorseDetail.do?lineageNb={lineage_nb}"
+    with httpx.Client(headers=HEADERS, timeout=20, follow_redirects=True) as c:
+        r = c.get(url)
+        r.raise_for_status()
+        html = r.text
+    soup = BeautifulSoup(html, "html.parser")
+    def norm(x):
+        return _re.sub(r"\s+", "", x or "")
+    out = {"lineage_nb": str(lineage_nb), "url": url}
+    t = soup.find("title")
+    if t:
+        out["title"] = t.get_text(strip=True)
+    # 基本情報 (tb72)
+    basic = {}
+    bt = soup.select_one("table.tb72")
+    if bt:
+        for tr in bt.find_all("tr"):
+            cells = [c.get_text(" ", strip=True) for c in tr.find_all(["td", "th"])]
+            if len(cells) >= 2:
+                basic[norm(cells[0])] = cells[1]
+    out["basic"] = basic
+    # 成績サマリ (tb70 stripe, 種別ヘッダあり)
+    summaries = []
+    for st in soup.select("table.tb70.stripe"):
+        rows = st.find_all("tr")
+        if not rows:
+            continue
+        header = [norm(c.get_text(" ", strip=True)) for c in rows[0].find_all(["td", "th"])]
+        if "種別" not in header:
+            continue
+        block = {"header": header, "rows": []}
+        for tr in rows[1:]:
+            cells = [c.get_text(" ", strip=True) for c in tr.find_all(["td", "th"])]
+            if len(cells) >= len(header):
+                block["rows"].append(cells)
+        summaries.append(block)
+    out["summaries"] = summaries
+    # 走歴 (年月日 + 着順 ヘッダ)
+    history = None
+    for ht in soup.find_all("table"):
+        rows = ht.find_all("tr")
+        if len(rows) < 3:
+            continue
+        header = [norm(c.get_text(" ", strip=True)) for c in rows[0].find_all(["td", "th"])]
+        if "年月日" in header and "着順" in header:
+            history = {"header": header, "rows": []}
+            for tr in rows[1:]:
+                cells = [c.get_text(" ", strip=True) for c in tr.find_all(["td", "th"])]
+                if len(cells) >= len(header):
+                    history["rows"].append(cells)
+            break
+    out["history"] = history
+    return out
+
