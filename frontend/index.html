@@ -18,6 +18,7 @@
 <button class="tab active" data-tab="predict" type="button">予想</button>
 <button class="tab" data-tab="analytics" type="button">検証</button>
 <button class="tab" data-tab="bets" type="button">収益</button>
+<button class="tab" data-tab="horse" type="button">馬</button>
 <button id="settings-btn" class="gear-tab" type="button" aria-label="詳細設定">詳細設定</button>
 </nav>
 </header>
@@ -80,6 +81,14 @@
 </div>
 <div id="bets-list">読み込み中...</div>
 </section>
+<section id="tab-horse" hidden>
+<h2>馬</h2>
+<div class="filters">
+<label>馬ID (lineageNb)<input id="horse-id" type="text" placeholder="例: 2019100959"></label>
+</div>
+<button id="horse-load" class="bulk-btn" type="button">取得</button>
+<div id="horse-view"></div>
+</section>
 </main>
 <div id="settings-modal" class="modal" hidden>
 <div class="modal-content">
@@ -100,6 +109,6 @@
 </div>
 </div>
 <script src="./ev-theme.js"></script>
-<script src="./app.js?v=61"></script>
+<script src="./app.js?v=62"></script>
 </body>
 </html>

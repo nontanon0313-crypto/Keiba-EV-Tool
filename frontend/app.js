@@ -14,7 +14,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   var $ = function(id){ return document.getElementById(id); };
   var list = $("race-list"), detail = $("detail"), detailTitle = $("detail-title"), detailBody = $("detail-body");
   var backBtn = $("back-btn"), racesSection = $("races");
-  var tabPredict = $("tab-predict"), tabAnalytics = $("tab-analytics"), tabBets = $("tab-bets");
+  var tabPredict = $("tab-predict"), tabAnalytics = $("tab-analytics"), tabBets = $("tab-bets"), tabHorse = $("tab-horse");
   var fMinProb = $("f-minprob"), fMinOdds = $("f-minodds"), fCollateral = $("f-collateral"), fMaxInv = $("f-maxinv"), fBetUnit = $("f-betunit"), fBetMode = $("f-betmode");
   var anaSummary = $("ana-summary"), anaView = $("ana-view");
   var anaViewTabs = $("ana-view-tabs");
@@ -1397,6 +1397,7 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     tabPredict.hidden = name !== "predict";
     tabAnalytics.hidden = name !== "analytics";
     tabBets.hidden = name !== "bets";
+    if (tabHorse) tabHorse.hidden = name !== "horse";
     window.scrollTo(0, 0);
     if (name === "analytics") loadAnalytics();
     if (name === "bets") loadBets();
@@ -1471,3 +1472,62 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
   list.textContent = "読み込み中... (サーバー起動待ちの場合があります)";
   fetchWithTimeout(API_BASE + "/races", TIMEOUT_MS).then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); }).then(function(data){ var races = Array.isArray(data) ? data : (data.races || data.items || []); renderList(races); }).catch(function(err){ list.textContent = "API取得失敗: " + err.message + " — 再読み込みしてください"; });
 })();
+
+  function renderHorseView(d){
+    if (!d) return "<p>データなし</p>";
+    var h = "";
+    h += "<h3 class=\"feature-title\">基本</h3>";
+    h += "<table class=\"ev-table\"><tbody>";
+    var basics = d.basic || {};
+    Object.keys(basics).forEach(function(k){
+      h += "<tr><td>" + esc(k) + "</td><td>" + esc(basics[k]) + "</td></tr>";
+    });
+    h += "</tbody></table>";
+    if (d.summaries && d.summaries.length) {
+      h += "<h3 class=\"feature-title\">成績サマリ</h3>";
+      d.summaries.forEach(function(blk){
+        h += "<table class=\"ev-table\"><thead><tr>";
+        (blk.header||[]).forEach(function(x){ h += "<th>" + esc(x) + "</th>"; });
+        h += "</tr></thead><tbody>";
+        (blk.rows||[]).forEach(function(row){
+          h += "<tr>";
+          row.forEach(function(x){ h += "<td>" + esc(x) + "</td>"; });
+          h += "</tr>";
+        });
+        h += "</tbody></table>";
+      });
+    }
+    var hist = d.history;
+    if (hist && hist.rows && hist.rows.length) {
+      h += "<h3 class=\"feature-title\">走歴</h3>";
+      h += "<div class=\"decomp-scroll\"><table class=\"ev-table-decomp\"><thead><tr>";
+      (hist.header||[]).forEach(function(x){ h += "<th>" + esc(x) + "</th>"; });
+      h += "</tr></thead><tbody>";
+      hist.rows.forEach(function(row){
+        h += "<tr>";
+        row.forEach(function(x){ h += "<td>" + esc(x) + "</td>"; });
+        h += "</tr>";
+      });
+      h += "</tbody></table></div>";
+    }
+    return h;
+  }
+  function loadHorse(){
+    var idEl = $("horse-id");
+    var view = $("horse-view");
+    if (!idEl || !view) return;
+    var id = (idEl.value || "").trim();
+    if (!id) { view.innerHTML = "<p>馬IDを入力してください</p>"; return; }
+    view.innerHTML = "<p>読み込み中...</p>";
+    fetchWithTimeout(API_BASE + "/horses/" + encodeURIComponent(id), 30000)
+      .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+      .then(function(d){ view.innerHTML = renderHorseView(d); })
+      .catch(function(err){ view.innerHTML = "<p>取得失敗: " + esc(err.message) + "</p>"; });
+  }
+  (function(){
+    var btn = $("horse-load");
+    if (btn) btn.addEventListener("click", loadHorse);
+    var idEl = $("horse-id");
+    if (idEl) idEl.addEventListener("keydown", function(e){ if (e.key === "Enter") loadHorse(); });
+  })();
+
