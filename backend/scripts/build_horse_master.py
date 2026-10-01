@@ -134,8 +134,8 @@ async def main_async(limit=None):
                 continue
             tasks.append((race, _fetch_ent1(client, sem, date, d.get("track_cd"), d.get("sponsor_cd"), d.get("race_nb"))))
         done = 0
-        for (race, coro) in tasks:
-            horses = await coro
+        coros = [t[1] for t in tasks]
+        for horses, (race, _) in zip(await asyncio.gather(*coros), tasks):
             done += 1
             if not horses:
                 continue
