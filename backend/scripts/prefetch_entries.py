@@ -16,12 +16,8 @@ import httpx
 from bs4 import BeautifulSoup
 
 from backend.app.services import entry_store
-from backend.scraper.oddspark_keiba import (
-    fetch_race_list_async,
-    fetch_one_day_races_async,
-    fetch_one_day_detail,
-    fetch_shutuba,
-)
+from backend.scraper.oddspark_keiba import fetch_one_day_detail, fetch_shutuba
+from backend.scripts.bulk_fetch_nar import fetch_race_list_async, fetch_one_day_races_async
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Mobile Safari/537.36",
