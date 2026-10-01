@@ -168,10 +168,31 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     arr.forEach(function(h){
       var frame = h.frame_number || h.waku || 0, num = h.horse_number || h.num || 0;
       var waku = KeibaTheme.wakuClass(frame || num);
-      html += "<tr><td><span class=\"" + waku + "\">" + frame + "</span></td><td>" + num + "</td><td>" + esc(h.horse_name || "") + "</td><td>" + esc(h.jockey || "") + "</td><td>" + (h.weight || h.wEight || "") + "</td><td>" + (h.odds_win || h["勝ちオッズ"] || "") + "</td><td>" + (h["人気"] || h.popularity || "") + "</td></tr>";
+      var ln = h.lineage_nb || h.horse_id || "";
+      var nameHtml = "";
+      if (ln) {
+        nameHtml = "<a class=\"horse-link\" href=\"#\" data-horse-link=\"" + esc(ln) + "\">" + esc(h.horse_name || "") + "</a>";
+      } else {
+        nameHtml = esc(h.horse_name || "");
+      }
+      html += "<tr><td><span class=\"" + waku + "\">" + frame + "</span></td><td>" + num + "</td><td>" + nameHtml + "</td><td>" + esc(h.jockey || "") + "</td><td>" + (h.weight || h.wEight || "") + "</td><td>" + (h.odds_win || h["勝ちオッズ"] || "") + "</td><td>" + (h["人気"] || h.popularity || "") + "</td></tr>";
     });
     html += "</tbody></table>";
     wrap.innerHTML = html;
+    var links = wrap.querySelectorAll("[data-horse-link]");
+    for (var i = 0; i < links.length; i++) {
+      links[i].addEventListener("click", function(e){
+        e.preventDefault();
+        var ln = this.getAttribute("data-horse-link");
+        if (ln) openHorseByLineage(ln);
+      });
+    }
+  }
+  function openHorseByLineage(lineageNb){
+    switchTab("horse");
+    var idEl = $("horse-id");
+    if (idEl) idEl.value = lineageNb;
+    loadHorse();
   }
 
   function bindSortBar(){
