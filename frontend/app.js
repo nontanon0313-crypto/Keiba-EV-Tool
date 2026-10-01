@@ -1470,7 +1470,7 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
   } catch (e) {}
 
   list.textContent = "読み込み中... (サーバー起動待ちの場合があります)";
-  fetchWithTimeout(API_BASE + "/races", TIMEOUT_MS).then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); }).then(function(data){ var races = Array.isArray(data) ? data : (data.races || data.items || []); renderList(races); }).catch(function(err){ list.textContent = "API取得失敗: " + err.message + " — 再読み込みしてください"; });
+  fetchWithTimeout(API_BASE + "/races/today", TIMEOUT_MS).then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); }).then(function(data){ var races = Array.isArray(data) ? data : (data.races || data.items || []); renderList(races); }).catch(function(err){ list.textContent = "API取得失敗: " + err.message + " — 再読み込みしてください"; });
   var horseData = null;
   var horseViewTab = "basic";
 

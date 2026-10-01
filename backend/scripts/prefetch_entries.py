@@ -19,6 +19,7 @@ from backend.app.services import entry_store
 from backend.scraper.oddspark_keiba import (
     fetch_race_list_async,
     fetch_one_day_races_async,
+    fetch_one_day_detail,
     fetch_shutuba,
 )
 
@@ -167,8 +168,14 @@ async def main_async(days_ahead=7, force=False):
                     race_nbs = await fetch_one_day_races_async(client, d, tc, sc)
                 except Exception:
                     continue
+                details = {}
+                try:
+                    details_list = await asyncio.to_thread(fetch_one_day_detail, tc, sc, d)
+                    details = {x["race_nb"]: x for x in details_list}
+                except Exception:
+                    details = {}
                 for rn in race_nbs or []:
-                    tasks.append((d, tc, sc, rn))
+                    tasks.append((d, tc, sc, rn, details.get(rn, {})))
         _log("races to prefetch: " + str(len(tasks)))
         sem = asyncio.Semaphore(CONCURRENCY)
         done = 0
@@ -176,7 +183,7 @@ async def main_async(days_ahead=7, force=False):
         skip = 0
         fail = 0
         t0 = time.time()
-        for (d, tc, sc, rn) in tasks:
+        for (d, tc, sc, rn, detail) in tasks:
             rid = "nar-" + d + "-" + str(tc) + "-" + str(rn)
             if not force:
                 cached, _ = entry_store.get(rid)
@@ -186,6 +193,9 @@ async def main_async(days_ahead=7, force=False):
             payload = await _fetch_ent1(client, sem, d, tc, sc, rn)
             done += 1
             if payload and payload.get("runners"):
+                payload["start_hhmm"] = (detail or {}).get("start_hhmm")
+                payload["distance"] = (detail or {}).get("distance", 0)
+                payload["surface"] = (detail or {}).get("surface", "ダート")
                 entry_store.upsert(rid, d[:4] + "-" + d[4:6] + "-" + d[6:8], payload)
                 ok += 1
             else:
