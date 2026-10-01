@@ -49,7 +49,16 @@ def list_today_races():
             "source": "prefetched",
         })
     out.sort(key=lambda x: (x["venue"] or "", x["race_nb"]))
-    return {"date": today, "races": out}
+    with _prefetch_lock:
+        running = _prefetch_state["running"]
+    return {
+        "date": today,
+        "races": out,
+        "prefetch": {
+            "running": running,
+            "started_this_call": started,
+        },
+    }
 
 
 def _venue_name(track_cd):
