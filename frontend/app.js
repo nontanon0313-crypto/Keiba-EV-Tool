@@ -1261,12 +1261,13 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
       .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
       .then(function(data){ analyticsData = data; renderView(); })
       .catch(function(err){
-        if (n < 15) {
-          anaSummary.textContent = "サーバー準備中... (" + (n+1) + ")";
+        var detail = (err && err.name ? err.name : "err") + ": " + (err && err.message ? err.message : String(err));
+        if (n < 30) {
+          anaSummary.textContent = "サーバー準備中... (" + (n+1) + ") " + detail;
           setTimeout(function(){ loadAnalytics(n+1); }, 3000);
           return;
         }
-        anaSummary.textContent = "取得失敗: " + err.message; anaView.textContent = "";
+        anaSummary.textContent = "取得失敗: " + detail; anaView.textContent = "";
       });
   }
 
@@ -1523,12 +1524,13 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
       }
       renderList(races);
     }).catch(function(err){
-      if (n < 20) {
-        list.textContent = "サーバー準備中... (" + (n+1) + ")";
+      var detail = (err && err.name ? err.name : "err") + ": " + (err && err.message ? err.message : String(err));
+      if (n < 30) {
+        list.textContent = "サーバー準備中... (" + (n+1) + ") " + detail;
         setTimeout(function(){ loadTodayRaces(n+1); }, 3000);
         return;
       }
-      list.textContent = "API取得失敗: " + err.message + " — 再読み込みしてください";
+      list.textContent = "API取得失敗: " + detail + " — 再読み込みしてください";
     });
   })(0);
   var horseData = null;
