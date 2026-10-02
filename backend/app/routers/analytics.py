@@ -163,14 +163,9 @@ def get_frame_by_condition():
     except Exception as e:
         raise HTTPException(503, "frame cache load failed: " + str(e))
 
-_feature_cache = {}
-
-
 @router.get("/feature_single")
 def get_feature_single():
     """単一特徴量の検証結果を返す。共有 Turso クライアント経由。"""
-    if "single" in _feature_cache:
-        return _feature_cache["single"]
     client, err = _get_client()
     if client is None:
         return {"error": err, "features": {}, "samples": 0}
@@ -181,32 +176,28 @@ def get_feature_single():
         d = json.loads(r.rows[0][0])
     except Exception as e:
         return {"error": str(e), "features": {}, "samples": 0}
-    _feature_cache["single"] = d
     return d
 
 
 @router.get("/feature_interactions")
 def get_feature_interactions():
-    """特徴量の交互作用検証結果を返す。all_cells は除外して軽量化。"""
-    if "interactions" in _feature_cache:
-        return _feature_cache["interactions"]
+    """特徴量の交互作用検証結果を返す。レスポンスを上位20件に絞って軽量化。"""
     client, err = _get_client()
     if client is None:
-        return {"error": err, "cells": [], "samples": 0}
+        return {"error": err, "promising_diff": [], "promising_roi": [], "samples": 0}
     try:
         r = client.execute("SELECT payload FROM feature_interactions_cache WHERE id=1")
         if not r.rows:
-            return {"cells": [], "samples": 0}
+            return {"promising_diff": [], "promising_roi": [], "samples": 0}
         d = json.loads(r.rows[0][0])
     except Exception as e:
-        return {"error": str(e), "cells": [], "samples": 0}
-    # all_cells はサイズが大きいので、有意セルとROIプラスセルのみ返す
-    d_light = {
+        return {"error": str(e), "promising_diff": [], "promising_roi": [], "samples": 0}
+    diff = d.get("promising_diff", [])
+    roi = d.get("promising_roi", [])
+    return {
         "samples": d.get("samples"),
         "total_cells": d.get("total_cells"),
-        "promising_diff": d.get("promising_diff", []),
-        "promising_roi": d.get("promising_roi", []),
+        "promising_diff": diff[:20],
+        "promising_roi": roi[:20],
         "generated_at": d.get("generated_at"),
     }
-    _feature_cache["interactions"] = d_light
-    return d_light
