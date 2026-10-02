@@ -50,6 +50,29 @@ class _Turso:
             payload = {}
         return payload, r.rows[0][1]
 
+
+    def get_many(self, lineage_nbs):
+        """複数の lineage_nb を一括取得。{lineage_nb: payload} を返す。"""
+        if not lineage_nbs:
+            return {}
+        out = {}
+        # Turso の IN 句は可変長制限があるため、500件ずつ
+        CHUNK = 500
+        ids = [str(x) for x in lineage_nbs if x]
+        for i in range(0, len(ids), CHUNK):
+            chunk = ids[i:i+CHUNK]
+            placeholders = ",".join(["?"] * len(chunk))
+            r = self.client.execute(
+                "SELECT lineage_nb, payload FROM horse_details WHERE lineage_nb IN (" + placeholders + ")",
+                chunk,
+            )
+            for row in r.rows:
+                try:
+                    out[row[0]] = json.loads(row[1])
+                except Exception:
+                    pass
+        return out
+
     def count(self):
         r = self.client.execute("SELECT COUNT(*) FROM horse_details")
         return r.rows[0][0] if r.rows else 0
@@ -80,3 +103,6 @@ def get(lineage_nb):
 
 def count():
     return _get().count()
+
+def get_many(lineage_nbs):
+    return _get().get_many(lineage_nbs)

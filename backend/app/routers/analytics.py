@@ -29,7 +29,7 @@ def close_client():
     turso_client.close_client()
 
 
-def _load_from_turso():
+def _load_from_turso(scope=""):
     url = os.getenv("TURSO_URL")
     token = os.getenv("TURSO_TOKEN")
     if not url or not token:
@@ -38,14 +38,35 @@ def _load_from_turso():
     if client is None:
         return None, err
     try:
-        r = client.execute("SELECT payload, updated_at FROM analytics_cache WHERE id=1")
+        if scope:
+            r = client.execute("SELECT payload, updated_at FROM analytics_cache WHERE id=1 AND scope=?", [scope])
+            rows = list(r.rows)
+            if not rows:
+                return None, "no cache row for scope=" + str(scope)
+            payload = json.loads(rows[0][0])
+            payload["_updated_at"] = rows[0][1]
+            payload["_source"] = "turso"
+            return payload, None
+        # scope 未指定: 全スコープを結合
+        r = client.execute("SELECT scope, payload, updated_at FROM analytics_cache WHERE id=1")
         rows = list(r.rows)
         if not rows:
-            return None, "no cache row"
-        payload = json.loads(rows[0][0])
-        payload["_updated_at"] = rows[0][1]
-        payload["_source"] = "turso"
-        return payload, None
+            return None, "no cache rows"
+        merged = {"scopes": {}, "ticket_stats": [], "meta": {}, "_source": "turso"}
+        latest = ""
+        for row in rows:
+            sc = row[0]
+            p2 = json.loads(row[1])
+            for k, v in (p2.get("scopes") or {}).items():
+                merged["scopes"][k] = v
+            if p2.get("ticket_stats") and not merged["ticket_stats"]:
+                merged["ticket_stats"] = p2["ticket_stats"]
+            if p2.get("meta") and not merged["meta"]:
+                merged["meta"] = p2["meta"]
+            if row[2] > latest:
+                latest = row[2]
+        merged["_updated_at"] = latest
+        return merged, None
     except Exception as e:
         return None, str(e)
 
@@ -64,15 +85,10 @@ def _load_from_file():
 
 @router.get("")
 def get_analytics(scope: str = ""):
-    data, err = _load_from_turso()
-    if data is not None and scope:
-        scopes = data.get("scopes") or {}
-        if scope in scopes:
-            return {"scopes": {scope: scopes[scope]}, "meta": data.get("meta", {}), "_source": data.get("_source"), "_updated_at": data.get("_updated_at")}
-    if data is not None and not scope:
-        # scope 未指定時は全スコープを返すが、metaのみ付与
-        pass
+    data, err = _load_from_turso(scope)
     if data is None:
+        if scope:
+            raise HTTPException(503, "analytics cache not available: turso=" + str(err))
         data, err2 = _load_from_file()
         if data is None:
             raise HTTPException(503, "analytics cache not available: turso=" + str(err) + " file=" + str(err2))

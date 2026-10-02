@@ -200,6 +200,7 @@ def compute_plan_set(race, pred, odds_payload):
 
 
 def _save_to_turso(result):
+    """スコープごとに別レコードで保存。1レコードのサイズを抑えてサーバーのメモリを節約。"""
     import libsql_client
     url = os.getenv("TURSO_URL")
     token = os.getenv("TURSO_TOKEN")
@@ -209,16 +210,34 @@ def _save_to_turso(result):
     client = libsql_client.create_client_sync(url=http_url, auth_token=token)
     client.execute(
         "CREATE TABLE IF NOT EXISTS analytics_cache ("
-        "id INTEGER PRIMARY KEY,"
+        "id INTEGER NOT NULL,"
+        "scope TEXT NOT NULL,"
         "payload TEXT NOT NULL,"
-        "updated_at TEXT NOT NULL)"
+        "updated_at TEXT NOT NULL,"
+        "PRIMARY KEY (id, scope))"
     )
-    payload = json.dumps(result, ensure_ascii=False)
-    client.execute(
-        "INSERT INTO analytics_cache (id, payload, updated_at) VALUES (1, ?, ?) "
-        "ON CONFLICT (id) DO UPDATE SET payload=EXCLUDED.payload, updated_at=EXCLUDED.updated_at",
-        [payload, datetime.now().isoformat()],
-    )
+    now = datetime.now().isoformat()
+    scopes = result.get("scopes") or {}
+    meta = {
+        "ticket_stats": result.get("ticket_stats", []),
+        "meta": result.get("meta", {}),
+        "generated_at": result.get("generated_at"),
+    }
+    stmts = []
+    for scope, scope_payload in scopes.items():
+        pj = json.dumps({
+            "scopes": {scope: scope_payload},
+            "ticket_stats": result.get("ticket_stats", []),
+            "meta": result.get("meta", {}),
+            "generated_at": result.get("generated_at"),
+        }, ensure_ascii=False)
+        stmts.append((
+            "INSERT INTO analytics_cache (id, scope, payload, updated_at) VALUES (1, ?, ?, ?) "
+            "ON CONFLICT (id, scope) DO UPDATE SET payload=EXCLUDED.payload, updated_at=EXCLUDED.updated_at",
+            [scope, pj, now],
+        ))
+    if stmts:
+        client.batch(stmts)
     try:
         client.close()
     except Exception:
