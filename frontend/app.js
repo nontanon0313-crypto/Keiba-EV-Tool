@@ -1473,7 +1473,7 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
         t.classList.add("active");
         currentAnaScope = t.getAttribute("data-ana-scope") || "all";
         analyticsData = null;
-        loadAnalytics();
+        preserveTabScroll(anaScopeTabs, function(){ loadAnalytics(); });
       });
     });
   }
@@ -1481,7 +1481,8 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
   anaViewTabs.querySelectorAll(".subtab").forEach(function(t){
     t.addEventListener("click", function(){
       anaViewTabs.querySelectorAll(".subtab").forEach(function(x){ x.classList.remove("active"); });
-      t.classList.add("active"); currentView = t.getAttribute("data-view"); renderView();
+      t.classList.add("active"); currentView = t.getAttribute("data-view");
+      preserveTabScroll(anaViewTabs, function(){ renderView(); });
     });
   });
   [fMinProb, fMinOdds, fCollateral, fMaxInv, fBetUnit, fBetMode].forEach(function(el){
@@ -1882,7 +1883,7 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
           var dcls = x.diff_pct > 1 ? "ev-mid" : (x.diff_pct < -1 ? "ev-neg" : "");
           var rcls = (x.roi_pct != null && x.roi_pct > 0) ? "ev-mid" : "ev-neg";
           h += "<tr>";
-          h += "<td>" + esc(name) + "</td>";
+          h += "<td>" + esc(featureLabelJa(name)) + "</td>";
           h += "<td>" + esc(x.label) + "</td>";
           h += "<td>" + x.n + "</td>";
           h += "<td>" + x.hit_pct.toFixed(2) + "</td>";
@@ -1908,13 +1909,13 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
       sig.sort(function(a,b){ return b.diff_pct - a.diff_pct; });
       h += "<h4 class=\"feature-title\">市場超過セル（上位50）</h4>";
       h += "<div class=\"decomp-scroll\"><table class=\"ev-table-decomp\"><thead><tr>";
-      h += "<th>特徴A</th><th>QA</th><th>特徴B</th><th>QB</th><th>n</th><th>実%</th><th>市場%</th><th>差</th><th>有意</th><th>ROI%</th>";
+      h += "<th>特徴A</th><th>分位A</th><th>特徴B</th><th>分位B</th><th>n</th><th>実%</th><th>市場%</th><th>差</th><th>有意</th><th>ROI%</th>";
       h += "</tr></thead><tbody>";
       sig.slice(0, 50).forEach(function(x){
         var rcls = (x.roi_pct != null && x.roi_pct > 0) ? "ev-mid" : "ev-neg";
         h += "<tr>";
-        h += "<td>" + esc(x.fa) + "</td><td>Q" + (x.a_q + 1) + "</td>";
-        h += "<td>" + esc(x.fb) + "</td><td>Q" + (x.b_q + 1) + "</td>";
+        h += "<td>" + esc(featureLabelJa(x.fa)) + "</td><td>Q" + (x.a_q + 1) + "</td>";
+        h += "<td>" + esc(featureLabelJa(x.fb)) + "</td><td>Q" + (x.b_q + 1) + "</td>";
         h += "<td>" + x.n + "</td>";
         h += "<td>" + x.hit_pct.toFixed(2) + "</td>";
         h += "<td>" + x.market_pct.toFixed(2) + "</td>";
@@ -1929,12 +1930,12 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
       roi_pos.sort(function(a,b){ return (b.roi_pct||0) - (a.roi_pct||0); });
       h += "<h4 class=\"feature-title\">ROI プラスセル " + roi_pos.length + "件</h4>";
       h += "<div class=\"decomp-scroll\"><table class=\"ev-table-decomp\"><thead><tr>";
-      h += "<th>特徴A</th><th>QA</th><th>特徴B</th><th>QB</th><th>n</th><th>実%</th><th>市場%</th><th>差</th><th>有意</th><th>ROI%</th>";
+      h += "<th>特徴A</th><th>分位A</th><th>特徴B</th><th>分位B</th><th>n</th><th>実%</th><th>市場%</th><th>差</th><th>有意</th><th>ROI%</th>";
       h += "</tr></thead><tbody>";
       roi_pos.slice(0, 50).forEach(function(x){
         h += "<tr>";
-        h += "<td>" + esc(x.fa) + "</td><td>Q" + (x.a_q + 1) + "</td>";
-        h += "<td>" + esc(x.fb) + "</td><td>Q" + (x.b_q + 1) + "</td>";
+        h += "<td>" + esc(featureLabelJa(x.fa)) + "</td><td>Q" + (x.a_q + 1) + "</td>";
+        h += "<td>" + esc(featureLabelJa(x.fb)) + "</td><td>Q" + (x.b_q + 1) + "</td>";
         h += "<td>" + x.n + "</td>";
         h += "<td>" + x.hit_pct.toFixed(2) + "</td>";
         h += "<td>" + x.market_pct.toFixed(2) + "</td>";
@@ -1946,6 +1947,76 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
       h += "</tbody></table></div>";
       anaView.innerHTML = h;
     });
+  }
+
+  var FEATURE_LABELS_JA = {
+    "win_rate": "勝率",
+    "place_rate": "連対率",
+    "show_rate": "3連対率",
+    "avg_finish": "平均着順",
+    "avg_agari_3f": "平均上3F",
+    "best_agari_3f": "最速上3F",
+    "recent5_avg_finish": "直近5走平均着順",
+    "recent3_avg_finish": "直近3走平均着順",
+    "recent1_finish": "前走着順",
+    "recent1_pop": "前走人気",
+    "recent1_agari": "前走上3F",
+    "recent5_avg_agari": "直近5走平均上3F",
+    "recent5_avg_pop": "直近5走平均人気",
+    "days_since_last": "前走間隔(日)",
+    "is_renntou": "連闘フラグ",
+    "is_long_break": "休み明けフラグ",
+    "same_dist_place_rate": "同距離帯 連対率",
+    "same_dist_avg_finish": "同距離帯 平均着順",
+    "same_dist_n": "同距離帯 出走数",
+    "same_cond_place_rate": "同馬場 連対率",
+    "same_cond_n": "同馬場 出走数",
+    "same_venue_place_rate": "同会場 連対率",
+    "same_venue_n": "同会場 出走数",
+    "same_surface_place_rate": "同芝ダート 連対率",
+    "same_surface_n": "同芝ダート 出走数",
+    "class_change": "クラス変動",
+    "horse_weight_trend": "馬体重トレンド",
+    "avg_corner_ratio": "平均先行度",
+    "weight": "斤量",
+    "popularity": "人気",
+    "horse_weight": "馬体重",
+    "avg_time_norm": "平均タイム(1000m換算)",
+    "best_time_norm": "最速タイム(1000m換算)",
+    "n_starts": "出走数",
+    "n_wins": "勝利数",
+    "n_2nd": "2着回数",
+    "n_3rd": "3着回数",
+    "age_sex": "性齢",
+    "style": "脚質",
+    "frame": "枠番",
+    "current_class": "現在クラス",
+    "jockey": "騎手",
+    "sire": "父",
+    "dam": "母",
+    "dam_sire": "母父",
+    "current_class_order": "現在クラス順序",
+    "last_class_order": "前走クラス順序",
+    "recent_avg_horse_weight": "直近平均馬体重",
+    "birth_date": "生年月日",
+    "color": "毛色",
+  };
+  function featureLabelJa(name){
+    return FEATURE_LABELS_JA[name] || name;
+  }
+
+  function preserveTabScroll(tabsEl, cb){
+    // タブの横スクロール位置を保ったままコールバックを実行する
+    if (!tabsEl) { cb(); return; }
+    var sx = tabsEl.scrollLeft;
+    cb();
+    // 再描画後にも同じ位置に戻す（2フレーム後まで試行）
+    requestAnimationFrame(function(){
+      tabsEl.scrollLeft = sx;
+      requestAnimationFrame(function(){ tabsEl.scrollLeft = sx; });
+    });
+    setTimeout(function(){ tabsEl.scrollLeft = sx; }, 50);
+    setTimeout(function(){ tabsEl.scrollLeft = sx; }, 200);
   }
 
 })();
