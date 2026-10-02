@@ -162,3 +162,46 @@ def get_frame_by_condition():
         raise
     except Exception as e:
         raise HTTPException(503, "frame cache load failed: " + str(e))
+
+@router.get("/feature_interactions")
+def get_feature_interactions():
+    """特徴量の交互作用検証結果を返す。"""
+    import os, json
+    import libsql_client
+    url = os.getenv("TURSO_URL"); token = os.getenv("TURSO_TOKEN")
+    if not url or not token:
+        return {"error": "TURSO not set"}
+    h = url.replace("libsql://", "https://").replace("wss://", "https://")
+    c = libsql_client.create_client_sync(url=h, auth_token=token)
+    try:
+        r = c.execute("SELECT payload FROM feature_interactions_cache WHERE id=1")
+        if not r.rows:
+            return {"cells": [], "samples": 0}
+        return json.loads(r.rows[0][0])
+    finally:
+        try:
+            c.close()
+        except Exception:
+            pass
+
+
+@router.get("/feature_single")
+def get_feature_single():
+    """単一特徴量の検証結果を返す。"""
+    import os, json
+    import libsql_client
+    url = os.getenv("TURSO_URL"); token = os.getenv("TURSO_TOKEN")
+    if not url or not token:
+        return {"error": "TURSO not set"}
+    h = url.replace("libsql://", "https://").replace("wss://", "https://")
+    c = libsql_client.create_client_sync(url=h, auth_token=token)
+    try:
+        r = c.execute("SELECT payload FROM feature_analytics_cache WHERE id=1")
+        if not r.rows:
+            return {"features": {}, "samples": 0}
+        return json.loads(r.rows[0][0])
+    finally:
+        try:
+            c.close()
+        except Exception:
+            pass
