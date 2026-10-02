@@ -1263,6 +1263,7 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
       .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
       .then(function(data){ analyticsData = data; renderView(); })
       .catch(function(err){
+        try { sessionStorage.setItem("lastAnalyticsErr", (err && err.name ? err.name : "") + "|" + (err && err.message ? err.message : "") + "|stack=" + (err && err.stack ? err.stack.slice(0,300) : "") + "|url=" + API_BASE + "/analytics" + q); } catch(e){}
         if (n < 60) {
           anaSummary.textContent = "サーバーに接続中... しばらくお待ちください";
           setTimeout(function(){ loadAnalytics(n+1); }, 3000);

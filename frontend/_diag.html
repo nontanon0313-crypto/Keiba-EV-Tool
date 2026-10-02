@@ -2,21 +2,27 @@
 <html><head><meta charset="utf-8"><title>diag</title></head>
 <body>
 <h3>diag</h3>
-<button id="b">fetch /analytics?scope=all</button>
-<pre id="out" style="white-space:pre-wrap;font-size:11px"></pre>
+<div>lastAnalyticsErr (sessionStorage):</div>
+<pre id="err" style="white-space:pre-wrap;font-size:11px;background:#111;color:#0f0;padding:5px"></pre>
+<button id="b1">fetch /analytics?scope=all</button>
+<pre id="out1" style="white-space:pre-wrap;font-size:11px"></pre>
+<button id="b2">fetch /analytics?scope=all_combos</button>
+<pre id="out2" style="white-space:pre-wrap;font-size:11px"></pre>
 <script>
-document.getElementById("b").addEventListener("click", async () => {
-  const out = document.getElementById("out");
+document.getElementById("err").textContent = sessionStorage.getItem("lastAnalyticsErr") || "(none)";
+function run(url, outId){
+  const out = document.getElementById(outId);
   out.textContent = "start\n";
-  try {
-    const r = await fetch("https://keiba-ev-tool.onrender.com/analytics?scope=all");
+  fetch(url).then(r => {
     out.textContent += "status=" + r.status + "\n";
-    const t = await r.text();
+    return r.text();
+  }).then(t => {
     out.textContent += "len=" + t.length + "\n";
-    out.textContent += "preview=" + t.slice(0,120) + "\n";
-  } catch (e) {
-    out.textContent += "ERR name=" + e.name + " msg=" + e.message + "\n";
-  }
-});
+  }).catch(e => {
+    out.textContent += "ERR " + e.name + ": " + e.message + "\n";
+  });
+}
+document.getElementById("b1").addEventListener("click", () => run("https://keiba-ev-tool.onrender.com/analytics?scope=all", "out1"));
+document.getElementById("b2").addEventListener("click", () => run("https://keiba-ev-tool.onrender.com/analytics?scope=all_combos", "out2"));
 </script>
 </body></html>
