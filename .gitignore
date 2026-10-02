@@ -16,3 +16,4 @@ bets.json
 # 検証用の一時ディレクトリ
 debug_html/
 scratch/checkpoint_*/
+scratch/*
