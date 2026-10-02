@@ -268,10 +268,8 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   function showList(){ detail.hidden = true; racesSection.hidden = false; window.scrollTo(0, 0); }
 
   function fetchWithTimeout(url, ms, opts){
-    var ctrl = new AbortController();
-    var timer = setTimeout(function(){ ctrl.abort(); }, ms);
-    var o = opts || {}; o.signal = ctrl.signal;
-    return fetch(url, o).finally(function(){ clearTimeout(timer); });
+    // AbortController を外して素の fetch に（Cloudflare の Bot 判定で中断されるのを避ける）
+    return fetch(url, opts || {});
   }
 
   function loadEvTable(raceId){
