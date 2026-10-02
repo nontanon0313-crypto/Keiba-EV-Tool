@@ -139,15 +139,9 @@ async def _fetch_ent1(client, sem, date, track_cd, sponsor_cd, race_nb):
 
 
 async def main_async(days_ahead=7, force=False):
-    import libsql_client
-    url = os.getenv("TURSO_URL")
-    token = os.getenv("TURSO_TOKEN")
-    if not url or not token:
-        _log("TURSO_URL/TURSO_TOKEN not set")
-        return
-    h = url.replace("libsql://", "https://").replace("wss://", "https://")
-    c = libsql_client.create_client_sync(url=h, auth_token=token)
-
+    # Turso クライアントは entry_store が内部で turso_client 経由で取得する。
+    # ここで直接 create_client_sync すると aiohttp セッションが二重になり、
+    # Render 無料プラン (512MB) でメモリ超過 kill の原因になる。
     today = datetime.now().date()
     dates = [(today + timedelta(days=i)).strftime("%Y%m%d") for i in range(0, days_ahead + 1)]
     tasks = []

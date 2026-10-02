@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from datetime import datetime
+import time
 from backend.app.services.race_fetcher import get_races
 from backend.app.services import entry_store
 
@@ -7,7 +8,7 @@ router = APIRouter(prefix="/races")
 
 
 _prefetch_lock = None
-_prefetch_state = {"running": False, "date": "", "started_at": ""}
+_prefetch_state = {"running": False, "date": "", "started_at": "", "last_attempt": 0}
 
 
 def _ensure_lock():
@@ -27,6 +28,7 @@ def _run_prefetch_today():
         _prefetch_state["running"] = True
         _prefetch_state["date"] = datetime.now().strftime("%Y%m%d")
         _prefetch_state["started_at"] = datetime.now().isoformat()
+        _prefetch_state["last_attempt"] = time.time()
     try:
         asyncio.run(pe.main_async(0, False))
     except Exception as exc:
@@ -56,7 +58,9 @@ def list_today_races():
     started = False
     if not entries:
         with _prefetch_lock:
-            if not _prefetch_state["running"]:
+            # 10分以内に試行済みなら再起動しない（リトライ連打で連続起動するのを防ぐ）
+            cooldown_ok = (time.time() - _prefetch_state.get("last_attempt", 0)) > 600
+            if not _prefetch_state["running"] and cooldown_ok:
                 started = True
         if started:
             import threading
