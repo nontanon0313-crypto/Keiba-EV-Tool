@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>diag</title></head>
+<body>
+<h3>diag</h3>
+<button id="b">fetch /analytics?scope=all</button>
+<pre id="out" style="white-space:pre-wrap;font-size:11px"></pre>
+<script>
+document.getElementById("b").addEventListener("click", async () => {
+  const out = document.getElementById("out");
+  out.textContent = "start\n";
+  try {
+    const r = await fetch("https://keiba-ev-tool.onrender.com/analytics?scope=all");
+    out.textContent += "status=" + r.status + "\n";
+    const t = await r.text();
+    out.textContent += "len=" + t.length + "\n";
+    out.textContent += "preview=" + t.slice(0,120) + "\n";
+  } catch (e) {
+    out.textContent += "ERR name=" + e.name + " msg=" + e.message + "\n";
+  }
+});
+</script>
+</body></html>
