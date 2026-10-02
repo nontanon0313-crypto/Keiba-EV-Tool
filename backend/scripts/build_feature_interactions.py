@@ -228,24 +228,42 @@ def main():
     promising_diff = sorted([x for x in results if x["diff_pct"] > 2], key=lambda x: -x["diff_pct"])[:200]
     promising_roi = sorted([x for x in results if x["roi_pct"] is not None and x["roi_pct"] > 0], key=lambda x: -(x["roi_pct"] or 0))[:200]
 
-    # 保存（全セル + CI）
+    # 保存: 2テーブルに分ける。light=API用（小さく）、full=参照用（全セル）
     c.execute(
         "CREATE TABLE IF NOT EXISTS feature_interactions_cache ("
         "id INTEGER PRIMARY KEY, payload TEXT NOT NULL, generated_at TEXT NOT NULL)"
     )
-    payload = {
+    c.execute(
+        "CREATE TABLE IF NOT EXISTS feature_interactions_full ("
+        "id INTEGER PRIMARY KEY, payload TEXT NOT NULL, generated_at TEXT NOT NULL)"
+    )
+    now = datetime.now().isoformat()
+    # light: API が読む方。promising 系のみ。
+    light = {
+        "samples": len(samples),
+        "total_cells": len(results),
+        "promising_diff": promising_diff,
+        "promising_roi": promising_roi,
+        "generated_at": now,
+    }
+    # full: 後から参照する用。全セル込み。
+    full = {
         "samples": len(samples),
         "total_cells": len(results),
         "all_cells": results,
-        "promising_diff": promising_diff,
-        "promising_roi": promising_roi,
-        "generated_at": datetime.now().isoformat(),
+        "generated_at": now,
     }
-    pj = json.dumps(payload, ensure_ascii=False)
+    pj_light = json.dumps(light, ensure_ascii=False)
+    pj_full = json.dumps(full, ensure_ascii=False)
     c.execute(
         "INSERT INTO feature_interactions_cache (id, payload, generated_at) VALUES (1, ?, ?) "
         "ON CONFLICT (id) DO UPDATE SET payload=EXCLUDED.payload, generated_at=EXCLUDED.generated_at",
-        [pj, datetime.now().isoformat()],
+        [pj_light, now],
+    )
+    c.execute(
+        "INSERT INTO feature_interactions_full (id, payload, generated_at) VALUES (1, ?, ?) "
+        "ON CONFLICT (id) DO UPDATE SET payload=EXCLUDED.payload, generated_at=EXCLUDED.generated_at",
+        [pj_full, now],
     )
     _log("DONE cells=" + str(len(results)) + " promising_diff=" + str(len(promising_diff)) + " promising_roi=" + str(len(promising_roi)))
     try:
