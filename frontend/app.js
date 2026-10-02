@@ -1839,8 +1839,7 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
   function loadFeatureSingleIfNeeded(cb, retryCount){
     if (featureSingleData) { cb(); return; }
     var n = retryCount || 0;
-    fetchWithTimeout(API_BASE + "/analytics/feature_single", 120000)
-      .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+    cachedFetchJson(API_BASE + "/analytics/feature_single", "cache_feature_single", 120000)
       .then(function(d){ featureSingleData = d; cb(); })
       .catch(function(err){
         if (n < 10) {
@@ -1854,8 +1853,7 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
   function loadFeatureInteractionsIfNeeded(cb, retryCount){
     if (featureInteractionsData) { cb(); return; }
     var n = retryCount || 0;
-    fetchWithTimeout(API_BASE + "/analytics/feature_interactions", 120000)
-      .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+    cachedFetchJson(API_BASE + "/analytics/feature_interactions", "cache_feature_interactions", 120000)
       .then(function(d){ featureInteractionsData = d; cb(); })
       .catch(function(err){
         if (n < 10) {
