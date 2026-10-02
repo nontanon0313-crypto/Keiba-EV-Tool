@@ -101,10 +101,12 @@
 - メインスレッドとバックグラウンドで Turso クライアントを共有すると
   Render 無料枠 (512MB) で OOM kill される
 
-### Turso クライアントの一元化
-- アプリ側 (backend/app/) では turso_client.get_client() のみ使用する
-- backend/scripts/ でも同じクライアントを使うか、別プロセスで起動する
-- create_client_sync を新規に呼ぶコードを追加してはならない
+### Turso クライアントの扱い
+- FastAPI アプリ内 (backend/app/) は turso_client.get_client() の共有クライアントのみ使う
+- これによりプロセスあたり1セッションに抑える
+- backend/scripts/ は別プロセスで単独実行されるため、各スクリプトが
+  自分の create_client_sync を持ってよい（アプリのクライアントとは別物）
+- 禁止: FastAPI アプリ内から、スレッド経由で別の Turso クライアントを作ること
 
 ## UI 表示ルール (2026-10-02)
 
