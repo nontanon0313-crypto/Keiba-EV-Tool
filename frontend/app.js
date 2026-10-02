@@ -1263,13 +1263,13 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
       .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
       .then(function(data){ analyticsData = data; renderView(); })
       .catch(function(err){
-        var detail = (err && err.name ? err.name : "err") + ": " + (err && err.message ? err.message : String(err));
-        if (n < 30) {
-          anaSummary.textContent = "サーバー準備中... (" + (n+1) + ") " + detail;
+        if (n < 60) {
+          anaSummary.textContent = "サーバーに接続中... しばらくお待ちください";
           setTimeout(function(){ loadAnalytics(n+1); }, 3000);
           return;
         }
-        anaSummary.textContent = "取得失敗: " + detail; anaView.textContent = "";
+        anaSummary.textContent = "サーバーに接続できません。通信環境を確認して再読み込みしてください";
+        anaView.textContent = "";
       });
   }
 
@@ -1527,13 +1527,12 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
       }
       renderList(races);
     }).catch(function(err){
-      var detail = (err && err.name ? err.name : "err") + ": " + (err && err.message ? err.message : String(err));
-      if (n < 30) {
-        list.textContent = "サーバー準備中... (" + (n+1) + ") " + detail;
+      if (n < 60) {
+        list.textContent = "サーバーに接続中... しばらくお待ちください";
         setTimeout(function(){ loadTodayRaces(n+1); }, 3000);
         return;
       }
-      list.textContent = "API取得失敗: " + detail + " — 再読み込みしてください";
+      list.textContent = "サーバーに接続できません。通信環境を確認して再読み込みしてください";
     });
   })(0);
   var horseData = null;
@@ -1823,12 +1822,12 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
       .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
       .then(function(d){ featureSingleData = d; cb(); })
       .catch(function(err){
-        if (n < 15) {
-          anaView.textContent = "サーバー準備中... (" + (n+1) + ")";
+        if (n < 60) {
+          anaView.textContent = "サーバーに接続中... しばらくお待ちください";
           setTimeout(function(){ loadFeatureSingleIfNeeded(cb, n+1); }, 3000);
           return;
         }
-        anaView.textContent = "取得失敗: " + err.message;
+        anaView.textContent = "サーバーに接続できません。通信環境を確認して再読み込みしてください";
       });
   }
   function loadFeatureInteractionsIfNeeded(cb, retryCount){
@@ -1838,12 +1837,12 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
       .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
       .then(function(d){ featureInteractionsData = d; cb(); })
       .catch(function(err){
-        if (n < 15) {
-          anaView.textContent = "サーバー準備中... (" + (n+1) + ")";
+        if (n < 60) {
+          anaView.textContent = "サーバーに接続中... しばらくお待ちください";
           setTimeout(function(){ loadFeatureInteractionsIfNeeded(cb, n+1); }, 3000);
           return;
         }
-        anaView.textContent = "取得失敗: " + err.message;
+        anaView.textContent = "サーバーに接続できません。通信環境を確認して再読み込みしてください";
       });
   }
 
