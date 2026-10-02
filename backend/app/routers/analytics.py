@@ -163,45 +163,50 @@ def get_frame_by_condition():
     except Exception as e:
         raise HTTPException(503, "frame cache load failed: " + str(e))
 
-@router.get("/feature_interactions")
-def get_feature_interactions():
-    """特徴量の交互作用検証結果を返す。"""
-    import os, json
-    import libsql_client
-    url = os.getenv("TURSO_URL"); token = os.getenv("TURSO_TOKEN")
-    if not url or not token:
-        return {"error": "TURSO not set"}
-    h = url.replace("libsql://", "https://").replace("wss://", "https://")
-    c = libsql_client.create_client_sync(url=h, auth_token=token)
-    try:
-        r = c.execute("SELECT payload FROM feature_interactions_cache WHERE id=1")
-        if not r.rows:
-            return {"cells": [], "samples": 0}
-        return json.loads(r.rows[0][0])
-    finally:
-        try:
-            c.close()
-        except Exception:
-            pass
+_feature_cache = {}
 
 
 @router.get("/feature_single")
 def get_feature_single():
-    """単一特徴量の検証結果を返す。"""
-    import os, json
-    import libsql_client
-    url = os.getenv("TURSO_URL"); token = os.getenv("TURSO_TOKEN")
-    if not url or not token:
-        return {"error": "TURSO not set"}
-    h = url.replace("libsql://", "https://").replace("wss://", "https://")
-    c = libsql_client.create_client_sync(url=h, auth_token=token)
+    """単一特徴量の検証結果を返す。共有 Turso クライアント経由。"""
+    if "single" in _feature_cache:
+        return _feature_cache["single"]
+    client, err = _get_client()
+    if client is None:
+        return {"error": err, "features": {}, "samples": 0}
     try:
-        r = c.execute("SELECT payload FROM feature_analytics_cache WHERE id=1")
+        r = client.execute("SELECT payload FROM feature_analytics_cache WHERE id=1")
         if not r.rows:
             return {"features": {}, "samples": 0}
-        return json.loads(r.rows[0][0])
-    finally:
-        try:
-            c.close()
-        except Exception:
-            pass
+        d = json.loads(r.rows[0][0])
+    except Exception as e:
+        return {"error": str(e), "features": {}, "samples": 0}
+    _feature_cache["single"] = d
+    return d
+
+
+@router.get("/feature_interactions")
+def get_feature_interactions():
+    """特徴量の交互作用検証結果を返す。all_cells は除外して軽量化。"""
+    if "interactions" in _feature_cache:
+        return _feature_cache["interactions"]
+    client, err = _get_client()
+    if client is None:
+        return {"error": err, "cells": [], "samples": 0}
+    try:
+        r = client.execute("SELECT payload FROM feature_interactions_cache WHERE id=1")
+        if not r.rows:
+            return {"cells": [], "samples": 0}
+        d = json.loads(r.rows[0][0])
+    except Exception as e:
+        return {"error": str(e), "cells": [], "samples": 0}
+    # all_cells はサイズが大きいので、有意セルとROIプラスセルのみ返す
+    d_light = {
+        "samples": d.get("samples"),
+        "total_cells": d.get("total_cells"),
+        "promising_diff": d.get("promising_diff", []),
+        "promising_roi": d.get("promising_roi", []),
+        "generated_at": d.get("generated_at"),
+    }
+    _feature_cache["interactions"] = d_light
+    return d_light

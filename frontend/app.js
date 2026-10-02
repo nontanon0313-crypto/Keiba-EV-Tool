@@ -1847,15 +1847,14 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     anaView.textContent = "読み込み中...";
     loadFeatureInteractionsIfNeeded(function(){
       var d = featureInteractionsData || {};
-      var cells = d.all_cells || [];
       var h = "<h3 class=\"feature-title\">特徴量の交互作用（サンプル " + (d.samples || 0) + "行 / " + (d.total_cells || 0) + "セル）</h3>";
       h += "<p class=\"hint\">2特徴を3分位に分割したセル。有意 = 実1着率が市場期待を有意に上回る（95%CI下限が+）。</p>";
-      // 有意セルのみ表示（上位50）
-      var sig = cells.filter(function(x){ return x.sig === "有意"; });
+      // 有意セル（promising_diff）
+      var sig = (d.promising_diff || []).slice();
       sig.sort(function(a,b){ return b.diff_pct - a.diff_pct; });
-      h += "<h4 class=\"feature-title\">有意セル " + sig.length + "件（上位50）</h4>";
+      h += "<h4 class=\"feature-title\">市場超過セル（上位50）</h4>";
       h += "<div class=\"decomp-scroll\"><table class=\"ev-table-decomp\"><thead><tr>";
-      h += "<th>特徴A</th><th>QA</th><th>特徴B</th><th>QB</th><th>n</th><th>実%</th><th>市場%</th><th>差</th><th>差CI下限</th><th>差CI上限</th><th>ROI%</th>";
+      h += "<th>特徴A</th><th>QA</th><th>特徴B</th><th>QB</th><th>n</th><th>実%</th><th>市場%</th><th>差</th><th>有意</th><th>ROI%</th>";
       h += "</tr></thead><tbody>";
       sig.slice(0, 50).forEach(function(x){
         var rcls = (x.roi_pct != null && x.roi_pct > 0) ? "ev-mid" : "ev-neg";
@@ -1866,14 +1865,13 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
         h += "<td>" + x.hit_pct.toFixed(2) + "</td>";
         h += "<td>" + x.market_pct.toFixed(2) + "</td>";
         h += "<td class=\"ev-mid\">+" + x.diff_pct.toFixed(2) + "</td>";
-        h += "<td>" + x.diff_ci_lo.toFixed(2) + "</td>";
-        h += "<td>" + x.diff_ci_hi.toFixed(2) + "</td>";
+        h += "<td>" + esc(x.sig || "-") + "</td>";
         h += "<td class=\"" + rcls + "\">" + (x.roi_pct != null ? (x.roi_pct >= 0 ? "+" : "") + x.roi_pct.toFixed(1) : "-") + "</td>";
         h += "</tr>";
       });
       h += "</tbody></table></div>";
       // ROI プラスセル
-      var roi_pos = cells.filter(function(x){ return x.roi_pct != null && x.roi_pct > 0; });
+      var roi_pos = (d.promising_roi || []).slice();
       roi_pos.sort(function(a,b){ return (b.roi_pct||0) - (a.roi_pct||0); });
       h += "<h4 class=\"feature-title\">ROI プラスセル " + roi_pos.length + "件</h4>";
       h += "<div class=\"decomp-scroll\"><table class=\"ev-table-decomp\"><thead><tr>";
