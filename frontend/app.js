@@ -1256,7 +1256,9 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     var n = retryCount || 0;
     anaSummary.textContent = "読み込み中..."; anaView.textContent = "読み込み中...";
     loadModelOptions();
-    var q = currentModelFilter ? "?model_version=" + encodeURIComponent(currentModelFilter) : "";
+    var params = ["scope=" + encodeURIComponent(currentAnaScope)];
+    if (currentModelFilter) params.push("model_version=" + encodeURIComponent(currentModelFilter));
+    var q = "?" + params.join("&");
     fetchWithTimeout(API_BASE + "/analytics" + q, 120000)
       .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
       .then(function(data){ analyticsData = data; renderView(); })
@@ -1449,7 +1451,8 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
         anaScopeTabs.querySelectorAll(".subtab").forEach(function(x){ x.classList.remove("active"); });
         t.classList.add("active");
         currentAnaScope = t.getAttribute("data-ana-scope") || "all";
-        renderView();
+        analyticsData = null;
+        loadAnalytics();
       });
     });
   }

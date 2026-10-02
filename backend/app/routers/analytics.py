@@ -63,8 +63,15 @@ def _load_from_file():
 
 
 @router.get("")
-def get_analytics():
+def get_analytics(scope: str = ""):
     data, err = _load_from_turso()
+    if data is not None and scope:
+        scopes = data.get("scopes") or {}
+        if scope in scopes:
+            return {"scopes": {scope: scopes[scope]}, "meta": data.get("meta", {}), "_source": data.get("_source"), "_updated_at": data.get("_updated_at")}
+    if data is not None and not scope:
+        # scope 未指定時は全スコープを返すが、metaのみ付与
+        pass
     if data is None:
         data, err2 = _load_from_file()
         if data is None:
