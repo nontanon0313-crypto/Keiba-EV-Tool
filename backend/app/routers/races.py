@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from datetime import datetime
+import os
 import time
 from backend.app.services.race_fetcher import get_races
 from backend.app.services import entry_store
@@ -19,8 +20,14 @@ def _ensure_lock():
 
 
 def _run_prefetch_today():
-    import asyncio
-    from backend.scripts import prefetch_entries as pe
+    """出走表の事前取得を別プロセスで起動する。
+
+    スレッドで動かすとメインスレッドと Turso クライアント (libsql_client) を
+    共有してスレッドセーフでなくなり、Render 無料プランで OOM kill される。
+    別プロセスにすることで完全に分離する。
+    """
+    import subprocess
+    import sys
     _ensure_lock()
     with _prefetch_lock:
         if _prefetch_state["running"]:
@@ -29,10 +36,20 @@ def _run_prefetch_today():
         _prefetch_state["date"] = datetime.now().strftime("%Y%m%d")
         _prefetch_state["started_at"] = datetime.now().isoformat()
         _prefetch_state["last_attempt"] = time.time()
+    env = os.environ.copy()
     try:
-        asyncio.run(pe.main_async(0, False))
+        proc = subprocess.Popen(
+            [sys.executable, "-m", "backend.scripts.prefetch_entries", "0"],
+            cwd=os.getcwd(),
+            env=env,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            close_fds=True,
+        )
+        # 完了を待って running を解除する
+        proc.wait()
     except Exception as exc:
-        print("[races.prefetch] error: " + repr(exc), flush=True)
+        print("[races.prefetch] spawn error: " + repr(exc), flush=True)
     finally:
         with _prefetch_lock:
             _prefetch_state["running"] = False
