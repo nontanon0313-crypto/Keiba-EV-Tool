@@ -1264,9 +1264,9 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
       .then(function(data){ analyticsData = data; renderView(); })
       .catch(function(err){
         try { sessionStorage.setItem("lastAnalyticsErr", (err && err.name ? err.name : "") + "|" + (err && err.message ? err.message : "") + "|stack=" + (err && err.stack ? err.stack.slice(0,300) : "") + "|url=" + API_BASE + "/analytics" + q); } catch(e){}
-        if (n < 60) {
+        if (n < 10) {
           anaSummary.textContent = "サーバーに接続中... しばらくお待ちください";
-          setTimeout(function(){ loadAnalytics(n+1); }, 3000);
+          setTimeout(function(){ loadAnalytics(n+1); }, 8000);
           return;
         }
         anaSummary.textContent = "サーバーに接続できません。通信環境を確認して再読み込みしてください";
@@ -1528,9 +1528,9 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
       }
       renderList(races);
     }).catch(function(err){
-      if (n < 60) {
+      if (n < 10) {
         list.textContent = "サーバーに接続中... しばらくお待ちください";
-        setTimeout(function(){ loadTodayRaces(n+1); }, 3000);
+        setTimeout(function(){ loadTodayRaces(n+1); }, 8000);
         return;
       }
       list.textContent = "サーバーに接続できません。通信環境を確認して再読み込みしてください";
@@ -1823,9 +1823,9 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
       .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
       .then(function(d){ featureSingleData = d; cb(); })
       .catch(function(err){
-        if (n < 60) {
+        if (n < 10) {
           anaView.textContent = "サーバーに接続中... しばらくお待ちください";
-          setTimeout(function(){ loadFeatureSingleIfNeeded(cb, n+1); }, 3000);
+          setTimeout(function(){ loadFeatureSingleIfNeeded(cb, n+1); }, 8000);
           return;
         }
         anaView.textContent = "サーバーに接続できません。通信環境を確認して再読み込みしてください";
@@ -1838,9 +1838,9 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
       .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
       .then(function(d){ featureInteractionsData = d; cb(); })
       .catch(function(err){
-        if (n < 60) {
+        if (n < 10) {
           anaView.textContent = "サーバーに接続中... しばらくお待ちください";
-          setTimeout(function(){ loadFeatureInteractionsIfNeeded(cb, n+1); }, 3000);
+          setTimeout(function(){ loadFeatureInteractionsIfNeeded(cb, n+1); }, 8000);
           return;
         }
         anaView.textContent = "サーバーに接続できません。通信環境を確認して再読み込みしてください";
