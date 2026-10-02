@@ -1252,14 +1252,22 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     }).catch(function(){});
   }
 
-  function loadAnalytics(){
+  function loadAnalytics(retryCount){
+    var n = retryCount || 0;
     anaSummary.textContent = "読み込み中..."; anaView.textContent = "読み込み中...";
     loadModelOptions();
     var q = currentModelFilter ? "?model_version=" + encodeURIComponent(currentModelFilter) : "";
     fetchWithTimeout(API_BASE + "/analytics" + q, 120000)
       .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
       .then(function(data){ analyticsData = data; renderView(); })
-      .catch(function(err){ anaSummary.textContent = "取得失敗: " + err.message; anaView.textContent = ""; });
+      .catch(function(err){
+        if (n < 15) {
+          anaSummary.textContent = "サーバー準備中... (" + (n+1) + ")";
+          setTimeout(function(){ loadAnalytics(n+1); }, 3000);
+          return;
+        }
+        anaSummary.textContent = "取得失敗: " + err.message; anaView.textContent = "";
+      });
   }
 
   function drawCurve(data){
@@ -1514,7 +1522,14 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
         return;
       }
       renderList(races);
-    }).catch(function(err){ list.textContent = "API取得失敗: " + err.message + " — 再読み込みしてください"; });
+    }).catch(function(err){
+      if (n < 20) {
+        list.textContent = "サーバー準備中... (" + (n+1) + ")";
+        setTimeout(function(){ loadTodayRaces(n+1); }, 3000);
+        return;
+      }
+      list.textContent = "API取得失敗: " + err.message + " — 再読み込みしてください";
+    });
   })(0);
   var horseData = null;
   var horseViewTab = "basic";
@@ -1796,19 +1811,35 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
   var featureSingleData = null;
   var featureInteractionsData = null;
 
-  function loadFeatureSingleIfNeeded(cb){
+  function loadFeatureSingleIfNeeded(cb, retryCount){
     if (featureSingleData) { cb(); return; }
+    var n = retryCount || 0;
     fetchWithTimeout(API_BASE + "/analytics/feature_single", 120000)
       .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
       .then(function(d){ featureSingleData = d; cb(); })
-      .catch(function(err){ anaView.textContent = "取得失敗: " + err.message; });
+      .catch(function(err){
+        if (n < 15) {
+          anaView.textContent = "サーバー準備中... (" + (n+1) + ")";
+          setTimeout(function(){ loadFeatureSingleIfNeeded(cb, n+1); }, 3000);
+          return;
+        }
+        anaView.textContent = "取得失敗: " + err.message;
+      });
   }
-  function loadFeatureInteractionsIfNeeded(cb){
+  function loadFeatureInteractionsIfNeeded(cb, retryCount){
     if (featureInteractionsData) { cb(); return; }
+    var n = retryCount || 0;
     fetchWithTimeout(API_BASE + "/analytics/feature_interactions", 120000)
       .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
       .then(function(d){ featureInteractionsData = d; cb(); })
-      .catch(function(err){ anaView.textContent = "取得失敗: " + err.message; });
+      .catch(function(err){
+        if (n < 15) {
+          anaView.textContent = "サーバー準備中... (" + (n+1) + ")";
+          setTimeout(function(){ loadFeatureInteractionsIfNeeded(cb, n+1); }, 3000);
+          return;
+        }
+        anaView.textContent = "取得失敗: " + err.message;
+      });
   }
 
   function renderFeatureSingleView(){
