@@ -268,8 +268,31 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   function showList(){ detail.hidden = true; racesSection.hidden = false; window.scrollTo(0, 0); }
 
   function fetchWithTimeout(url, ms, opts){
-    // AbortController を外して素の fetch に（Cloudflare の Bot 判定で中断されるのを避ける）
-    return fetch(url, opts || {});
+    var ctrl = new AbortController();
+    var timer = setTimeout(function(){ ctrl.abort(); }, ms);
+    var o = opts || {}; o.signal = ctrl.signal;
+    return fetch(url, o).finally(function(){ clearTimeout(timer); });
+  }
+  function cachedFetchJson(url, cacheKey, ms, opts){
+    // 成功したら localStorage に保存、失敗したら保存済みを返す
+    return fetchWithTimeout(url, ms, opts).then(function(res){
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return res.json().then(function(d){
+        try { localStorage.setItem(cacheKey, JSON.stringify({ t: Date.now(), d: d })); } catch(e){}
+        return d;
+      });
+    }).catch(function(err){
+      try {
+        var raw = localStorage.getItem(cacheKey);
+        if (raw) {
+          var parsed = JSON.parse(raw);
+          parsed.d._cached = true;
+          parsed.d._cachedAt = parsed.t;
+          return parsed.d;
+        }
+      } catch(e){}
+      throw err;
+    });
   }
 
   function loadEvTable(raceId){
@@ -1257,8 +1280,7 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     var params = ["scope=" + encodeURIComponent(currentAnaScope)];
     if (currentModelFilter) params.push("model_version=" + encodeURIComponent(currentModelFilter));
     var q = "?" + params.join("&");
-    fetchWithTimeout(API_BASE + "/analytics" + q, 120000)
-      .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+    cachedFetchJson(API_BASE + "/analytics" + q, "cache_analytics_" + currentAnaScope, 120000)
       .then(function(data){ analyticsData = data; renderView(); })
       .catch(function(err){
         try { sessionStorage.setItem("lastAnalyticsErr", (err && err.name ? err.name : "") + "|" + (err && err.message ? err.message : "") + "|stack=" + (err && err.stack ? err.stack.slice(0,300) : "") + "|url=" + API_BASE + "/analytics" + q); } catch(e){}
@@ -1512,7 +1534,7 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
   list.textContent = "読み込み中... (サーバー起動待ちの場合があります)";
   (function loadTodayRaces(retryCount){
     var n = retryCount || 0;
-    fetchWithTimeout(API_BASE + "/races/today", TIMEOUT_MS).then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); }).then(function(data){
+    cachedFetchJson(API_BASE + "/races/today", "cache_races_today", TIMEOUT_MS).then(function(data){
       var races = Array.isArray(data) ? data : (data.races || data.items || []);
       var pref = (data && data.prefetch) || {};
       if (!races.length && pref.running && n < 30) {
