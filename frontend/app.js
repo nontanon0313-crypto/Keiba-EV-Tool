@@ -19,8 +19,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   var anaSummary = $("ana-summary"), anaView = $("ana-view");
   var anaViewTabs = $("ana-view-tabs");
   var betsSummary = $("bets-summary"), betsList = $("bets-list"), curveCanvas = $("curve-chart");
-  var analyticsData = null, currentScope = "all", currentView = "ev", filters = {}, currentBets = [];
-  var currentFeatureTab = null;
+  var analyticsData = null, currentView = "ev", filters = {}, currentBets = [];
   var analyticsFeaturesData = null;
   var analyticsMultiData = null;
   var analyticsFrameData = null;
@@ -30,11 +29,8 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   var currentFeatureFilter = "all";
   var currentRaceTableFeature = null;
   var currentSingleFeature = null;
-  var singleFeatureFilter = "sig";
   var currentTicket = "mixed";
   var currentAnaScope = "all";
-  var currentTabName = "predict";
-  var ticketStats = null;
   var currentModelVersion = null;
   var anaModelFilter = null;
   var currentModelFilter = "";
@@ -100,6 +96,9 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   function sortRaces(races){ return races.slice().sort(function(a, b){ var sa = a.start_at || "", sb = b.start_at || ""; return sa < sb ? -1 : sa > sb ? 1 : 0; }); }
   function isFinished(r){ var t = null; if (r.deadline_at) t = Date.parse(r.deadline_at); else if (r.start_at) t = Date.parse(r.start_at) - 120000; if (t == null || isNaN(t)) return false; return Date.now() > t; }
 
+  // ============================================================
+  // 予想ページ: レース一覧・詳細
+  // ============================================================
   function renderList(races){
     var visible = sortRaces(races.filter(function(r){ return !isFinished(r); }));
     if (!visible.length) { list.textContent = "本日のレースはありません（終了分を除く）"; return; }
@@ -316,6 +315,9 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
       .catch(function(err){ detailBody.textContent = "取得失敗: " + err.message; });
   }
 
+  // ============================================================
+  // 検証: 期待値/確率/オッズ テーブル
+  // ============================================================
   function tableRows(rows, label){
     if (!rows || !rows.length) return "<p>該当データなし</p>";
     var html = "<table class=\"ev-table ev-table-13col2\"><thead><tr>";
@@ -652,6 +654,9 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     return html;
   }
 
+  // ============================================================
+  // 検証: 枠番タブ（会場別・条件別分解表）
+  // ============================================================
   var FRAME_Z = 1.96;
 
   function emptyAcc() {
@@ -1087,6 +1092,9 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     return html;
   }
 
+  // ============================================================
+  // 検証: 券種別検証タブ
+  // ============================================================
   function renderMultiTableVsMarket(rows){
     if (!rows || !rows.length) return "<p>該当データなし</p>";
     var html = "<table class=\"ev-table ev-table-12col\"><thead><tr>";
@@ -1218,6 +1226,9 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     }
   }
 
+  // ============================================================
+  // 検証: ビュー切替・データ読込
+  // ============================================================
   function renderView(){
     if (currentView === "features") {
       renderRaceTable();
@@ -1293,6 +1304,9 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
       });
   }
 
+  // ============================================================
+  // 収益ページ
+  // ============================================================
   function drawCurve(data){
     if (!curveCanvas || !data) return;
     var ctx = curveCanvas.getContext("2d");
@@ -1450,8 +1464,10 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     fetchWithTimeout(API_BASE + "/bets", TIMEOUT_MS).then(function(res){ return res.json(); }).then(renderBetsList).catch(function(err){ betsList.textContent = "取得失敗: " + err.message; });
   }
 
+  // ============================================================
+  // 大タブ切替
+  // ============================================================
   function switchTab(name){
-    currentTabName = name;
     try { localStorage.setItem("keiba-current-tab", name); } catch (e) {}
     document.querySelectorAll(".tab").forEach(function(t){ t.classList.toggle("active", t.getAttribute("data-tab") === name); });
     tabPredict.hidden = name !== "predict";
@@ -1501,7 +1517,7 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
 
   loadFiltersFromStorage();
   anaModelFilter = document.getElementById("ana-model-filter");
-  if (anaModelFilter) anaModelFilter.addEventListener("change", function(){ currentModelFilter = anaModelFilter.value || ""; ticketStats = null; renderView(); });
+  if (anaModelFilter) anaModelFilter.addEventListener("change", function(){ currentModelFilter = anaModelFilter.value || ""; renderView(); });
   var ticketTabs = document.getElementById("ticket-tabs");
   if (ticketTabs) ticketTabs.querySelectorAll(".subtab").forEach(function(t){
     t.addEventListener("click", function(){
@@ -1556,6 +1572,9 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
       list.textContent = "サーバーに接続できません。通信環境を確認して再読み込みしてください";
     });
   })(0);
+  // ============================================================
+  // 馬ページ
+  // ============================================================
   var horseData = null;
   var horseViewTab = "basic";
 
@@ -1833,6 +1852,9 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     });
   })();
 
+  // ============================================================
+  // 検証: 単一特徴 / 特徴交互作用
+  // ============================================================
   var featureSingleData = null;
   var featureInteractionsData = null;
 
@@ -1948,6 +1970,9 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     });
   }
 
+  // ============================================================
+  // 共通ユーティリティ
+  // ============================================================
   var FEATURE_LABELS_JA = {
     "win_rate": "勝率",
     "place_rate": "連対率",
