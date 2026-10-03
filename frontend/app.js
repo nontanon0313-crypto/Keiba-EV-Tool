@@ -1278,6 +1278,10 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
       renderModelParamsView();
       return;
     }
+    if (currentView === "condition_deviation") {
+      renderConditionDeviationView();
+      return;
+    }
     if (!analyticsData) return;
     var scopeData = (analyticsData.scopes || {})[currentAnaScope] || {};
     var races = (analyticsData.meta || {}).races || 0;
@@ -2128,6 +2132,83 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
         h += "</tbody></table>";
       }
       anaView.innerHTML = h;
+    });
+  }
+
+  var conditionDevData = null;
+  var conditionDevDim = "venue";
+  function loadConditionDevIfNeeded(cb, retryCount){
+    if (conditionDevData) { cb(); return; }
+    var n = retryCount || 0;
+    jsonFetch(API_BASE + "/analytics/condition_deviation", 90000)
+      .then(function(d){ conditionDevData = d; cb(); })
+      .catch(function(err){
+        if (n < 10) {
+          anaView.textContent = "サーバーに接続中... しばらくお待ちください";
+          setTimeout(function(){ loadConditionDevIfNeeded(cb, n+1); }, 8000);
+          return;
+        }
+        anaView.textContent = "取得失敗: " + err.message;
+      });
+  }
+  function renderConditionDevView(){
+    var d = conditionDevData || {};
+    if (d.error) { return "<p>取得失敗: " + esc(d.error) + "</p>"; }
+    var results = d.results || {};
+    var h = "";
+    h += "<h3 class=\"feature-title\">条件別 市場乖離（サンプル " + (d.samples || 0) + " 行）</h3>";
+    h += "<p class=\"hint\">会場×距離×馬場×クラスを1〜3条件で組み合わせ、各セルで「実1着率 − 市場期待1着率」と単勝ROIを集計。有意 = 実1着率が市場を95%CIで上回る。</p>";
+    var dimKeys = Object.keys(results).sort();
+    h += "<div class=\"subtabs\" id=\"cond-dev-dims\">";
+    dimKeys.forEach(function(k){
+      var active = (k === conditionDevDim) ? " active" : "";
+      h += "<button class=\"subtab" + active + "\" data-cond-dev-dim=\"" + esc(k) + "\" type=\"button\">" + esc(k) + "</button>";
+    });
+    h += "</div>";
+    var rows = results[conditionDevDim] || [];
+    if (!rows.length) {
+      return h + "<p>該当データなし</p>";
+    }
+    h += "<h4 class=\"feature-title\">" + esc(conditionDevDim) + "（" + rows.length + "セル）</h4>";
+    h += "<div class=\"decomp-scroll\"><table class=\"ev-table-decomp\"><thead><tr>";
+    h += "<th>条件</th><th>n</th><th>実1着%</th><th>市場%</th><th>差</th><th>CI下限</th><th>CI上限</th><th>有意</th><th>ROI%</th>";
+    h += "</tr></thead><tbody>";
+    rows.forEach(function(x){
+      var diffCls = x.diff_pct > 0 ? "ev-mid" : (x.diff_pct < 0 ? "ev-neg" : "");
+      var sigCls = x.sig === "有意" ? "ev-mid" : (x.sig === "劣位" ? "ev-neg" : "");
+      var roiCls = (x.roi_pct != null && x.roi_pct > 0) ? "ev-mid" : "ev-neg";
+      h += "<tr>";
+      h += "<td>" + esc((x.key || []).join(" / ")) + "</td>";
+      h += "<td>" + x.n + "</td>";
+      h += "<td>" + Number(x.hit_pct).toFixed(2) + "</td>";
+      h += "<td>" + Number(x.market_pct).toFixed(2) + "</td>";
+      h += "<td class=\"" + diffCls + "\">" + (x.diff_pct >= 0 ? "+" : "") + Number(x.diff_pct).toFixed(2) + "</td>";
+      h += "<td>" + Number(x.diff_ci_lo).toFixed(2) + "</td>";
+      h += "<td>" + Number(x.diff_ci_hi).toFixed(2) + "</td>";
+      h += "<td class=\"" + sigCls + "\">" + esc(x.sig || "-") + "</td>";
+      h += "<td class=\"" + roiCls + "\">" + (x.roi_pct != null ? (x.roi_pct >= 0 ? "+" : "") + Number(x.roi_pct).toFixed(1) : "-") + "</td>";
+      h += "</tr>";
+    });
+    h += "</tbody></table></div>";
+    return h;
+  }
+  function bindCondDevDims(){
+    var btns = anaView.querySelectorAll("[data-cond-dev-dim]");
+    for (var i = 0; i < btns.length; i++) {
+      (function(b){
+        b.addEventListener("click", function(){
+          conditionDevDim = b.getAttribute("data-cond-dev-dim");
+          anaView.innerHTML = renderConditionDevView();
+          bindCondDevDims();
+        });
+      })(btns[i]);
+    }
+  }
+  function renderConditionDeviationView(){
+    anaView.textContent = "読み込み中...";
+    loadConditionDevIfNeeded(function(){
+      anaView.innerHTML = renderConditionDevView();
+      bindCondDevDims();
     });
   }
 

@@ -244,3 +244,18 @@ def get_model_params():
         step = max(1, len(lh) // 20)
         d["loss_history"] = lh[::step]
     return d
+
+@router.get("/condition_deviation")
+def get_condition_deviation():
+    """条件別（会場×距離×馬場×クラス）の市場乖離分析結果を返す。"""
+    client, err = _get_client()
+    if client is None:
+        return {"error": err}
+    try:
+        r = client.execute("SELECT payload FROM condition_deviation_cache WHERE id=1")
+        if not r.rows:
+            return {"error": "no cache"}
+        d = json.loads(r.rows[0][0])
+    except Exception as e:
+        return {"error": str(e)}
+    return d
