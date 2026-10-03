@@ -129,6 +129,66 @@ def _venue_name(track_cd):
     return TRACK_CD_TO_VENUE.get(str(track_cd), "")
 
 
+@router.get("/search")
+def search_races(date_from: str = "", date_to: str = "", venue: str = "", limit: int = 200):
+    """過去レースを検索する。日付範囲・会場で絞り込み。"""
+    import os, json
+    import libsql_client
+    url = os.getenv("TURSO_URL")
+    token = os.getenv("TURSO_TOKEN")
+    if not url or not token:
+        raise HTTPException(500, "TURSO not set")
+    h = url.replace("libsql://", "https://").replace("wss://", "https://")
+    c = libsql_client.create_client_sync(url=h, auth_token=token)
+    try:
+        where = ["race_id LIKE 'nar-%'"]
+        args = []
+        if date_from:
+            df = date_from.replace("-", "")
+            where.append("race_id >= ?")
+            args.append("nar-" + df + "-00-0")
+        if date_to:
+            dt = date_to.replace("-", "")
+            where.append("race_id <= ?")
+            args.append("nar-" + dt + "-99-99")
+        sql = "SELECT race_id, payload FROM scraped_races WHERE " + " AND ".join(where) + " ORDER BY race_id LIMIT ?"
+        args.append(int(limit))
+        r = c.execute(sql, args)
+        rows = list(r.rows)
+        out = []
+        for row in rows:
+            try:
+                d = json.loads(row[1]) if isinstance(row[1], str) else row[1]
+            except Exception:
+                continue
+            v = (d.get("venue") or "").strip()
+            if venue and v != venue:
+                continue
+            out.append({
+                "race_id": row[0],
+                "date": d.get("date"),
+                "venue": v,
+                "race_number": d.get("race_number"),
+                "surface": d.get("surface"),
+                "distance": d.get("distance"),
+                "start_at": d.get("start_at"),
+                "n_runners": len(d.get("runners") or []),
+                "has_result": bool(d.get("finish_order")),
+            })
+        return {"races": out, "count": len(out)}
+    finally:
+        try:
+            c.close()
+        except Exception:
+            pass
+
+
+@router.get("/venues")
+def list_venues():
+    """利用可能な会場一覧を返す。"""
+    from backend.constants import TRACK_CD_TO_VENUE
+    return {"venues": sorted(set(TRACK_CD_TO_VENUE.values()))}
+
 @router.get("/{race_id}")
 def get_race(race_id: str):
     for r in get_races():

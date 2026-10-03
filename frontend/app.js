@@ -1506,9 +1506,12 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     tabAnalytics.hidden = name !== "analytics";
     tabBets.hidden = name !== "bets";
     if (tabHorse) tabHorse.hidden = name !== "horse";
+    var tabPast = document.getElementById("tab-past");
+    if (tabPast) tabPast.hidden = name !== "past";
     window.scrollTo(0, 0);
     if (name === "analytics") loadAnalytics();
     if (name === "bets") loadBets();
+    if (name === "past") initPastTab();
   }
 
   document.querySelectorAll(".tab").forEach(function(t){ t.addEventListener("click", function(){ switchTab(t.getAttribute("data-tab")); }); });
@@ -2230,6 +2233,146 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
   };
   function dimLabelJa(k){
     return DIM_LABELS_JA[k] || k;
+  }
+
+  var pastInitialized = false;
+  function initPastTab(){
+    if (pastInitialized) return;
+    pastInitialized = true;
+    var venueSel = document.getElementById("past-venue");
+    if (venueSel && venueSel.options.length <= 1) {
+      jsonFetch(API_BASE + "/races/venues", 20000).then(function(d){
+        var venues = d.venues || [];
+        var html = "<option value=\"\">すべて</option>";
+        venues.forEach(function(v){
+          html += "<option value=\"" + esc(v) + "\">" + esc(v) + "</option>";
+        });
+        venueSel.innerHTML = html;
+      }).catch(function(){});
+    }
+    var btn = document.getElementById("past-search");
+    if (btn) btn.addEventListener("click", runPastSearch);
+    var back = document.getElementById("past-back");
+    if (back) back.addEventListener("click", function(){
+      document.getElementById("past-detail").hidden = true;
+      document.getElementById("past-result").hidden = false;
+    });
+  }
+  function runPastSearch(){
+    var df = document.getElementById("past-date-from");
+    var dt = document.getElementById("past-date-to");
+    var vn = document.getElementById("past-venue");
+    var out = document.getElementById("past-result");
+    var params = [];
+    if (df && df.value) params.push("date_from=" + encodeURIComponent(df.value));
+    if (dt && dt.value) params.push("date_to=" + encodeURIComponent(dt.value));
+    if (vn && vn.value) params.push("venue=" + encodeURIComponent(vn.value));
+    params.push("limit=200");
+    out.innerHTML = "検索中...";
+    jsonFetch(API_BASE + "/races/search?" + params.join("&"), 60000)
+      .then(function(d){
+        var races = d.races || [];
+        if (!races.length) { out.innerHTML = "<p>該当レースなし</p>"; return; }
+        var html = "<p class=\"hint\">" + races.length + "件</p>";
+        html += "<div class=\"decomp-scroll\"><table class=\"ev-table-decomp\"><thead><tr>";
+        html += "<th>日付</th><th>会場</th><th>R</th><th>芝ダ</th><th>距離</th><th>頭数</th><th>結果</th><th></th>";
+        html += "</tr></thead><tbody>";
+        races.forEach(function(r){
+          html += "<tr>";
+          html += "<td>" + esc(r.date || "") + "</td>";
+          html += "<td>" + esc(r.venue || "") + "</td>";
+          html += "<td>" + (r.race_number || "") + "R</td>";
+          html += "<td>" + esc(r.surface || "") + "</td>";
+          html += "<td>" + (r.distance || "") + "m</td>";
+          html += "<td>" + (r.n_runners || 0) + "</td>";
+          html += "<td>" + (r.has_result ? "あり" : "-") + "</td>";
+          html += "<td><button class=\"bet-btn\" data-past-race=\"" + esc(r.race_id) + "\" type=\"button\">詳細</button></td>";
+          html += "</tr>";
+        });
+        html += "</tbody></table></div>";
+        out.innerHTML = html;
+        var btns = out.querySelectorAll("[data-past-race]");
+        for (var i = 0; i < btns.length; i++) {
+          (function(b){
+            b.addEventListener("click", function(){
+              var rid = b.getAttribute("data-past-race");
+              showPastDetail(rid);
+            });
+          })(btns[i]);
+        }
+      })
+      .catch(function(err){ out.textContent = "検索失敗: " + err.message; });
+  }
+  function showPastDetail(raceId){
+    var box = document.getElementById("past-detail");
+    var body = document.getElementById("past-detail-body");
+    document.getElementById("past-result").hidden = true;
+    box.hidden = false;
+    body.innerHTML = "読み込み中...";
+    jsonFetch(API_BASE + "/races/" + encodeURIComponent(raceId), 60000)
+      .then(function(d){
+        var html = "";
+        html += "<h3 class=\"ev-title\">" + esc(d.venue || "") + " " + (d.race_number || "") + "R</h3>";
+        html += "<p class=\"hint\">" + esc(d.date || "") + " " + esc(d.surface || "") + " " + (d.distance || "") + "m " + esc(d.track_condition || "") + "</p>";
+        // 結果一覧
+        var results = d.result_runners || [];
+        var runners = d.runners || [];
+        if (results.length) {
+          html += "<h4 class=\"feature-title\">結果</h4>";
+          html += "<div class=\"decomp-scroll\"><table class=\"ev-table-decomp\"><thead><tr>";
+          html += "<th>着</th><th>枠</th><th>番</th><th>馬名</th><th>騎手</th><th>斤量</th><th>人気</th><th>タイム</th><th>上3F</th><th>通過</th>";
+          html += "</tr></thead><tbody>";
+          results.sort(function(a, b){ return (a.finish || 99) - (b.finish || 99); });
+          results.forEach(function(r){
+            html += "<tr>";
+            html += "<td>" + (r.finish || "") + "</td>";
+            html += "<td>" + (r.frame_number || "") + "</td>";
+            html += "<td>" + (r.horse_number || "") + "</td>";
+            html += "<td>" + esc(r.horse_name || "") + "</td>";
+            html += "<td>" + esc(r.jockey || "") + "</td>";
+            html += "<td>" + (r.weight || "") + "</td>";
+            html += "<td>" + (r.popularity || "") + "</td>";
+            html += "<td>" + esc(r.time || "") + "</td>";
+            html += "<td>" + (r.agari_3f || "") + "</td>";
+            html += "<td>" + esc(r.corner || "") + "</td>";
+            html += "</tr>";
+          });
+          html += "</tbody></table></div>";
+        } else if (runners.length) {
+          html += "<h4 class=\"feature-title\">出走馬</h4>";
+          html += "<div class=\"decomp-scroll\"><table class=\"ev-table-decomp\"><thead><tr>";
+          html += "<th>枠</th><th>番</th><th>馬名</th><th>騎手</th><th>斤量</th><th>単勝</th><th>人気</th>";
+          html += "</tr></thead><tbody>";
+          runners.forEach(function(r){
+            html += "<tr>";
+            html += "<td>" + (r.frame_number || "") + "</td>";
+            html += "<td>" + (r.horse_number || "") + "</td>";
+            html += "<td>" + esc(r.horse_name || "") + "</td>";
+            html += "<td>" + esc(r.jockey || "") + "</td>";
+            html += "<td>" + (r.weight || "") + "</td>";
+            html += "<td>" + (r.odds_win || "") + "</td>";
+            html += "<td>" + (r.popularity || "") + "</td>";
+            html += "</tr>";
+          });
+          html += "</tbody></table></div>";
+        }
+        // 払戻
+        var payouts = d.payouts || {};
+        if (Object.keys(payouts).length) {
+          html += "<h4 class=\"feature-title\">払戻</h4>";
+          html += "<table class=\"ev-table\"><thead><tr><th>券種</th><th>組み合わせ</th><th>払戻</th></tr></thead><tbody>";
+          Object.keys(payouts).forEach(function(tk){
+            (payouts[tk] || []).forEach(function(row){
+              var combo = row[0] || "";
+              var amount = row[1] || "";
+              html += "<tr><td>" + esc(tk) + "</td><td>" + esc(combo) + "</td><td>" + esc(amount) + "</td></tr>";
+            });
+          });
+          html += "</tbody></table>";
+        }
+        body.innerHTML = html;
+      })
+      .catch(function(err){ body.textContent = "取得失敗: " + err.message; });
   }
 
 })();
