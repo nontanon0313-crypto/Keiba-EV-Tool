@@ -2362,10 +2362,27 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
           html += "<h4 class=\"feature-title\">払戻</h4>";
           html += "<table class=\"ev-table\"><thead><tr><th>券種</th><th>組み合わせ</th><th>払戻</th></tr></thead><tbody>";
           Object.keys(payouts).forEach(function(tk){
+            var first = true;
             (payouts[tk] || []).forEach(function(row){
-              var combo = row[0] || "";
-              var amount = row[1] || "";
-              html += "<tr><td>" + esc(tk) + "</td><td>" + esc(combo) + "</td><td>" + esc(amount) + "</td></tr>";
+              // 形式A: [券種名, 組み合わせ, 金額, 人気]（券種名付き）
+              // 形式B: [組み合わせ, 金額, 人気]（券種名なし）
+              var combo = "", amount = "";
+              if (row.length >= 4 && row[0] === tk) {
+                combo = row[1] || "";
+                amount = row[2] || "";
+              } else if (row.length === 3) {
+                combo = row[0] || "";
+                amount = row[1] || "";
+              } else if (row.length >= 2) {
+                combo = row[0] || "";
+                amount = row[1] || "";
+              } else {
+                combo = row[0] || "";
+                amount = "";
+              }
+              var tkCell = first ? esc(tk) : "";
+              html += "<tr><td>" + tkCell + "</td><td>" + esc(combo) + "</td><td>" + esc(amount) + "</td></tr>";
+              first = false;
             });
           });
           html += "</tbody></table>";
