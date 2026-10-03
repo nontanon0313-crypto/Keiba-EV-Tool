@@ -1282,6 +1282,10 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
       renderConditionDeviationView();
       return;
     }
+    if (currentView === "venue_stats") {
+      renderVenueStatsViewWrapper();
+      return;
+    }
     if (!analyticsData) return;
     var scopeData = (analyticsData.scopes || {})[currentAnaScope] || {};
     var races = (analyticsData.meta || {}).races || 0;
@@ -2555,6 +2559,94 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
         view.innerHTML = h;
       })
       .catch(function(err){ view.textContent = "取得失敗: " + err.message; });
+  }
+
+  var venueStatsData = null;
+  var venueStatsCache = null;
+  function loadVenueStatsIfNeeded(cb, retryCount){
+    if (venueStatsData) { cb(); return; }
+    var n = retryCount || 0;
+    // 枠番キャッシュ + 条件別乖離 を並行取得
+    var p1 = jsonFetch(API_BASE + "/analytics/frame_by_condition", 90000);
+    var p2 = jsonFetch(API_BASE + "/analytics/condition_deviation", 90000);
+    Promise.all([p1, p2]).then(function(arr){
+      venueStatsData = arr[0];
+      venueStatsCache = arr[1];
+      cb();
+    }).catch(function(err){
+      if (n < 10) {
+        anaView.textContent = "サーバーに接続中... しばらくお待ちください";
+        setTimeout(function(){ loadVenueStatsIfNeeded(cb, n+1); }, 8000);
+        return;
+      }
+      anaView.textContent = "取得失敗: " + err.message;
+    });
+  }
+  function renderVenueStatsView(){
+    var d = venueStatsData || {};
+    var cond = venueStatsCache || {};
+    var cells = d.cells || [];
+    if (!cells.length) return "<p>データなし</p>";
+    // 会場ごとに集計
+    var byVenue = {};
+    cells.forEach(function(c){
+      var v = (c.venue || "").trim();
+      if (!v) return;
+      if (!byVenue[v]) byVenue[v] = { n_races: 0, n_runners: 0, perFrame: {} };
+      byVenue[v].n_races += (c.n_races || 0);
+      byVenue[v].n_runners += (c.total_n || 0);
+      (c.frames || []).forEach(function(fr){
+        if (!fr.n) return;
+        if (!byVenue[v].perFrame[fr.frame]) byVenue[v].perFrame[fr.frame] = { n:0, hit:0, mp:0, profit:0 };
+        var p = byVenue[v].perFrame[fr.frame];
+        p.n += fr.n;
+        p.hit += fr.sum_hit || 0;
+        p.mp += fr.sum_market_prob || 0;
+        p.profit += fr.sum_profit || 0;
+      });
+    });
+    var h = "";
+    h += "<h3 class=\"feature-title\">会場統計（全" + Object.keys(byVenue).length + "場）</h3>";
+    h += "<p class=\"hint\">会場ごとの開催数・平均頭数・枠番有利（実1着率 − 市場期待値）。内/外 = 1-3枠 / 6-8枠 の平均差。</p>";
+    // 会場別サマリ
+    h += "<h4 class=\"feature-title\">会場別サマリ</h4>";
+    h += "<div class=\"decomp-scroll\"><table class=\"ev-table-decomp\"><thead><tr>";
+    h += "<th>会場</th><th>開催数</th><th>総頭数</th><th>1枠</th><th>2枠</th><th>3枠</th><th>4枠</th><th>5枠</th><th>6枠</th><th>7枠</th><th>8枠</th><th>内有利</th><th>外有利</th><th>内外差</th>";
+    h += "</tr></thead><tbody>";
+    var venues = Object.keys(byVenue).sort();
+    venues.forEach(function(v){
+      var b = byVenue[v];
+      h += "<tr>";
+      h += "<td>" + esc(v) + "</td>";
+      h += "<td>" + b.n_races + "</td>";
+      h += "<td>" + b.n_runners + "</td>";
+      var innerDiffs = [], outerDiffs = [];
+      for (var f = 1; f <= 8; f++) {
+        var p = b.perFrame[f];
+        if (!p || !p.n) { h += "<td>-</td>"; continue; }
+        var diff = (p.hit / p.n - p.mp / p.n) * 100;
+        var cls = diff > 0.5 ? "ev-mid" : (diff < -0.5 ? "ev-neg" : "");
+        h += "<td class=\"" + cls + "\">" + (diff >= 0 ? "+" : "") + diff.toFixed(2) + "</td>";
+        if (f >= 1 && f <= 3) innerDiffs.push(diff);
+        if (f >= 6 && f <= 8) outerDiffs.push(diff);
+      }
+      var inner = innerDiffs.length ? innerDiffs.reduce(function(a,b){return a+b;},0)/innerDiffs.length : 0;
+      var outer = outerDiffs.length ? outerDiffs.reduce(function(a,b){return a+b;},0)/outerDiffs.length : 0;
+      var gap = outer - inner;
+      h += "<td>" + (inner >= 0 ? "+" : "") + inner.toFixed(2) + "</td>";
+      h += "<td>" + (outer >= 0 ? "+" : "") + outer.toFixed(2) + "</td>";
+      var gcls = gap > 0.5 ? "ev-mid" : (gap < -0.5 ? "ev-neg" : "");
+      h += "<td class=\"" + gcls + "\">" + (gap >= 0 ? "+" : "") + gap.toFixed(2) + "</td>";
+      h += "</tr>";
+    });
+    h += "</tbody></table></div>";
+    return h;
+  }
+  function renderVenueStatsViewWrapper(){
+    anaView.textContent = "読み込み中...";
+    loadVenueStatsIfNeeded(function(){
+      anaView.innerHTML = renderVenueStatsView();
+    });
   }
 
 })();
