@@ -2162,14 +2162,14 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     h += "<div class=\"subtabs\" id=\"cond-dev-dims\">";
     dimKeys.forEach(function(k){
       var active = (k === conditionDevDim) ? " active" : "";
-      h += "<button class=\"subtab" + active + "\" data-cond-dev-dim=\"" + esc(k) + "\" type=\"button\">" + esc(k) + "</button>";
+      h += "<button class=\"subtab" + active + "\" data-cond-dev-dim=\"" + esc(k) + "\" type=\"button\">" + esc(dimLabelJa(k)) + "</button>";
     });
     h += "</div>";
     var rows = results[conditionDevDim] || [];
     if (!rows.length) {
       return h + "<p>該当データなし</p>";
     }
-    h += "<h4 class=\"feature-title\">" + esc(conditionDevDim) + "（" + rows.length + "セル）</h4>";
+    h += "<h4 class=\"feature-title\">" + esc(dimLabelJa(conditionDevDim)) + "（" + rows.length + "セル）</h4>";
     h += "<div class=\"decomp-scroll\"><table class=\"ev-table-decomp\"><thead><tr>";
     h += "<th>条件</th><th>n</th><th>実1着%</th><th>市場%</th><th>差</th><th>CI下限</th><th>CI上限</th><th>有意</th><th>ROI%</th>";
     h += "</tr></thead><tbody>";
@@ -2210,6 +2210,26 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
       anaView.innerHTML = renderConditionDevView();
       bindCondDevDims();
     });
+  }
+
+  var DIM_LABELS_JA = {
+    "venue": "会場",
+    "distance_band": "距離帯",
+    "track_condition": "馬場",
+    "class": "クラス",
+    "venue+distance_band": "会場×距離帯",
+    "venue+track_condition": "会場×馬場",
+    "venue+class": "会場×クラス",
+    "distance_band+track_condition": "距離帯×馬場",
+    "distance_band+class": "距離帯×クラス",
+    "track_condition+class": "馬場×クラス",
+    "venue+distance_band+track_condition": "会場×距離帯×馬場",
+    "venue+distance_band+class": "会場×距離帯×クラス",
+    "venue+track_condition+class": "会場×馬場×クラス",
+    "distance_band+track_condition+class": "距離帯×馬場×クラス"
+  };
+  function dimLabelJa(k){
+    return DIM_LABELS_JA[k] || k;
   }
 
 })();
