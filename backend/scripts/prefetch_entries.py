@@ -17,6 +17,7 @@ from bs4 import BeautifulSoup
 
 from backend.app.services import entry_store
 from backend.scraper.oddspark_keiba import fetch_one_day_detail, fetch_shutuba
+from backend.constants import EXCLUDED_TRACK_CODES
 from backend.scripts.bulk_fetch_nar import fetch_race_list_async, fetch_one_day_races_async
 
 HEADERS = {
@@ -154,6 +155,8 @@ async def main_async(days_ahead=7, force=False):
             if not venues:
                 continue
             for (tc, sc) in venues:
+                if str(tc) in EXCLUDED_TRACK_CODES:
+                    continue
                 try:
                     race_nbs = await fetch_one_day_races_async(client, d, tc, sc)
                 except Exception:
