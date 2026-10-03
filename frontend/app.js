@@ -1508,10 +1508,13 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     if (tabHorse) tabHorse.hidden = name !== "horse";
     var tabPast = document.getElementById("tab-past");
     if (tabPast) tabPast.hidden = name !== "past";
+    var tabJockey = document.getElementById("tab-jockey");
+    if (tabJockey) tabJockey.hidden = name !== "jockey";
     window.scrollTo(0, 0);
     if (name === "analytics") loadAnalytics();
     if (name === "bets") loadBets();
     if (name === "past") initPastTab();
+    if (name === "jockey") initJockeyTab();
   }
 
   document.querySelectorAll(".tab").forEach(function(t){ t.addEventListener("click", function(){ switchTab(t.getAttribute("data-tab")); }); });
@@ -2390,6 +2393,147 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
         body.innerHTML = html;
       })
       .catch(function(err){ body.textContent = "取得失敗: " + err.message; });
+  }
+
+  var jockeyInitialized = false;
+  function initJockeyTab(){
+    if (jockeyInitialized) return;
+    jockeyInitialized = true;
+    var btn = document.getElementById("jockey-load");
+    if (btn) btn.addEventListener("click", loadJockeySearch);
+    var inp = document.getElementById("jockey-search");
+    if (inp) inp.addEventListener("keydown", function(e){ if (e.key === "Enter") loadJockeySearch(); });
+  }
+  function loadJockeySearch(){
+    var inp = document.getElementById("jockey-search");
+    var res = document.getElementById("jockey-result");
+    var view = document.getElementById("jockey-view");
+    if (!inp || !res) return;
+    var q = (inp.value || "").trim();
+    if (!q) { res.innerHTML = "<p>騎手名を入力してください</p>"; return; }
+    if (view) view.innerHTML = "";
+    res.innerHTML = "検索中...";
+    jsonFetch(API_BASE + "/jockeys/search?q=" + encodeURIComponent(q) + "&limit=50", 30000)
+      .then(function(d){
+        var items = d.items || [];
+        if (!items.length) { res.innerHTML = "<p>該当騎手なし</p>"; return; }
+        var h = "<h4 class=\"feature-title\">検索結果 " + items.length + "件</h4>";
+        h += "<div class=\"decomp-scroll\"><table class=\"ev-table-decomp\"><thead><tr>";
+        h += "<th>騎手</th><th>n</th><th>勝率</th><th>連対率</th><th>3連対率</th><th>単勝ROI</th><th></th>";
+        h += "</tr></thead><tbody>";
+        items.forEach(function(x){
+          var roiCls = (x.roi_pct != null && x.roi_pct > 0) ? "ev-mid" : "ev-neg";
+          h += "<tr>";
+          h += "<td>" + esc(x.name) + "</td>";
+          h += "<td>" + x.n + "</td>";
+          h += "<td>" + Number(x.win_rate).toFixed(2) + "%</td>";
+          h += "<td>" + Number(x.place_rate).toFixed(2) + "%</td>";
+          h += "<td>" + Number(x.show_rate).toFixed(2) + "%</td>";
+          h += "<td class=\"" + roiCls + "\">" + (x.roi_pct != null ? (x.roi_pct >= 0 ? "+" : "") + Number(x.roi_pct).toFixed(1) + "%" : "-") + "</td>";
+          h += "<td><button class=\"bet-btn\" data-jockey-load=\"" + esc(x.name) + "\" type=\"button\">詳細</button></td>";
+          h += "</tr>";
+        });
+        h += "</tbody></table></div>";
+        res.innerHTML = h;
+        var btns = res.querySelectorAll("[data-jockey-load]");
+        for (var i = 0; i < btns.length; i++) {
+          (function(b){
+            b.addEventListener("click", function(){
+              loadJockeyDetail(b.getAttribute("data-jockey-load"));
+            });
+          })(btns[i]);
+        }
+        if (items.length === 1) loadJockeyDetail(items[0].name);
+      })
+      .catch(function(err){ res.textContent = "検索失敗: " + err.message; });
+  }
+  function loadJockeyDetail(name){
+    var view = document.getElementById("jockey-view");
+    if (!view) return;
+    view.innerHTML = "読み込み中...";
+    jsonFetch(API_BASE + "/jockeys/" + encodeURIComponent(name), 30000)
+      .then(function(d){
+        if (d.error) { view.innerHTML = "<p>取得失敗: " + esc(d.error) + "</p>"; return; }
+        var h = "";
+        h += "<h3 class=\"feature-title\">" + esc(d.name) + "</h3>";
+        h += "<table class=\"ev-table\"><tbody>";
+        h += "<tr><td>出走数</td><td>" + d.n + "</td></tr>";
+        h += "<tr><td>1着</td><td>" + d.wins + "</td></tr>";
+        h += "<tr><td>2着</td><td>" + (d.place - d.wins) + "</td></tr>";
+        h += "<tr><td>3着</td><td>" + (d.show - d.place) + "</td></tr>";
+        h += "<tr><td>勝率</td><td>" + Number(d.win_rate).toFixed(2) + "%</td></tr>";
+        h += "<tr><td>連対率</td><td>" + Number(d.place_rate).toFixed(2) + "%</td></tr>";
+        h += "<tr><td>3連対率</td><td>" + Number(d.show_rate).toFixed(2) + "%</td></tr>";
+        if (d.roi_pct != null) {
+          var cls = d.roi_pct >= 0 ? "ev-mid" : "ev-neg";
+          h += "<tr><td>単勝ROI</td><td class=\"" + cls + "\">" + (d.roi_pct >= 0 ? "+" : "") + Number(d.roi_pct).toFixed(1) + "%</td></tr>";
+        }
+        if (d.n_marker) {
+          h += "<tr><td>減量・若手印の回数</td><td>" + d.n_marker + "</td></tr>";
+        }
+        h += "</tbody></table>";
+        if (d.by_venue && Object.keys(d.by_venue).length) {
+          h += "<h4 class=\"feature-title\">会場別</h4>";
+          h += "<div class=\"decomp-scroll\"><table class=\"ev-table-decomp\"><thead><tr>";
+          h += "<th>会場</th><th>n</th><th>1着</th><th>2着</th><th>3着</th><th>勝率</th><th>連対率</th><th>3連対率</th>";
+          h += "</tr></thead><tbody>";
+          var vs = Object.keys(d.by_venue).sort(function(a,b){ return d.by_venue[b].n - d.by_venue[a].n; });
+          vs.forEach(function(v){
+            var x = d.by_venue[v];
+            h += "<tr>";
+            h += "<td>" + esc(v) + "</td>";
+            h += "<td>" + x.n + "</td>";
+            h += "<td>" + x.wins + "</td>";
+            h += "<td>" + (x.place - x.wins) + "</td>";
+            h += "<td>" + (x.show - x.place) + "</td>";
+            h += "<td>" + (x.n ? (x.wins/x.n*100).toFixed(2) : "-") + "%</td>";
+            h += "<td>" + (x.n ? (x.place/x.n*100).toFixed(2) : "-") + "%</td>";
+            h += "<td>" + (x.n ? (x.show/x.n*100).toFixed(2) : "-") + "%</td>";
+            h += "</tr>";
+          });
+          h += "</tbody></table></div>";
+        }
+        if (d.by_dist && Object.keys(d.by_dist).length) {
+          h += "<h4 class=\"feature-title\">距離帯別</h4>";
+          h += "<div class=\"decomp-scroll\"><table class=\"ev-table-decomp\"><thead><tr>";
+          h += "<th>距離帯</th><th>n</th><th>1着</th><th>勝率</th><th>連対率</th><th>3連対率</th>";
+          h += "</tr></thead><tbody>";
+          var ds = Object.keys(d.by_dist).sort();
+          ds.forEach(function(k){
+            var x = d.by_dist[k];
+            h += "<tr>";
+            h += "<td>" + esc(k) + "m</td>";
+            h += "<td>" + x.n + "</td>";
+            h += "<td>" + x.wins + "</td>";
+            h += "<td>" + (x.n ? (x.wins/x.n*100).toFixed(2) : "-") + "%</td>";
+            h += "<td>" + (x.n ? (x.place/x.n*100).toFixed(2) : "-") + "%</td>";
+            h += "<td>" + (x.n ? (x.show/x.n*100).toFixed(2) : "-") + "%</td>";
+            h += "</tr>";
+          });
+          h += "</tbody></table></div>";
+        }
+        if (d.by_cond && Object.keys(d.by_cond).length) {
+          h += "<h4 class=\"feature-title\">馬場別</h4>";
+          h += "<div class=\"decomp-scroll\"><table class=\"ev-table-decomp\"><thead><tr>";
+          h += "<th>馬場</th><th>n</th><th>1着</th><th>勝率</th><th>連対率</th><th>3連対率</th>";
+          h += "</tr></thead><tbody>";
+          var cs = Object.keys(d.by_cond);
+          cs.forEach(function(k){
+            var x = d.by_cond[k];
+            h += "<tr>";
+            h += "<td>" + esc(k) + "</td>";
+            h += "<td>" + x.n + "</td>";
+            h += "<td>" + x.wins + "</td>";
+            h += "<td>" + (x.n ? (x.wins/x.n*100).toFixed(2) : "-") + "%</td>";
+            h += "<td>" + (x.n ? (x.place/x.n*100).toFixed(2) : "-") + "%</td>";
+            h += "<td>" + (x.n ? (x.show/x.n*100).toFixed(2) : "-") + "%</td>";
+            h += "</tr>";
+          });
+          h += "</tbody></table></div>";
+        }
+        view.innerHTML = h;
+      })
+      .catch(function(err){ view.textContent = "取得失敗: " + err.message; });
   }
 
 })();
