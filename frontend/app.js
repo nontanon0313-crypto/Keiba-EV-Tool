@@ -273,7 +273,22 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     return fetch(url, o).finally(function(){ clearTimeout(timer); });
   }
   function cachedFetchJson(url, cacheKey, ms, opts){
-    // 成功したら localStorage に保存、失敗したら保存済みを返す
+    // 成功したら localStorage に保存、失敗したら保存済みを返す。
+    // races 系キャッシュは当日分のみ有効（翌日になったら捨てる）。
+    var isDaily = (cacheKey.indexOf("races_") === 0);
+    var today = new Date().toISOString().slice(0, 10);
+    if (isDaily) {
+      try {
+        var chk = localStorage.getItem(cacheKey);
+        if (chk) {
+          var cp = JSON.parse(chk);
+          var savedDate = cp.t ? new Date(cp.t).toISOString().slice(0, 10) : "";
+          if (savedDate !== today) {
+            localStorage.removeItem(cacheKey);
+          }
+        }
+      } catch(e){}
+    }
     return fetchWithTimeout(url, ms, opts).then(function(res){
       if (!res.ok) throw new Error("HTTP " + res.status);
       return res.json().then(function(d){
@@ -285,6 +300,13 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
         var raw = localStorage.getItem(cacheKey);
         if (raw) {
           var parsed = JSON.parse(raw);
+          if (isDaily) {
+            var savedDate = parsed.t ? new Date(parsed.t).toISOString().slice(0, 10) : "";
+            if (savedDate !== today) {
+              localStorage.removeItem(cacheKey);
+              throw err;
+            }
+          }
           parsed.d._cached = true;
           parsed.d._cachedAt = parsed.t;
           return parsed.d;
