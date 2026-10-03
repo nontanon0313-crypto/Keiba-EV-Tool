@@ -19,6 +19,17 @@ import libsql_client
 LOG_PATH = "jockey_stats.log"
 
 MARKER_CHARS = "◇☆△▲★◆○●◎"
+MARKER_LABELS = {
+    "◇": "女性騎手",
+    "☆": "若手騎手",
+    "△": "2kg減",
+    "▲": "3kg減",
+    "★": "女性＋減量",
+    "◆": "その他印",
+    "○": "その他印",
+    "●": "その他印",
+    "◎": "その他印",
+}
 
 
 def _log(msg):
@@ -66,6 +77,7 @@ def main():
     stats = defaultdict(lambda: {
         "n": 0, "wins": 0, "place": 0, "show": 0,
         "n_marker": 0,
+        "markers": defaultdict(int),
         "payout": 0.0, "cost": 0.0,
         "by_venue": defaultdict(lambda: {"n": 0, "wins": 0, "place": 0, "show": 0}),
         "by_dist": defaultdict(lambda: {"n": 0, "wins": 0, "place": 0, "show": 0}),
@@ -112,6 +124,7 @@ def main():
                     st["n"] += 1
                     if has_marker:
                         st["n_marker"] += 1
+                        st["markers"][j_raw[0]] += 1
                     if fin == 1:
                         st["wins"] += 1
                     if fin <= 2:
@@ -213,6 +226,7 @@ def main():
                 "name": jname,
                 "n": n,
                 "n_marker": st["n_marker"],
+                "markers": dict(st["markers"]),
                 "wins": st["wins"],
                 "place": st["place"],
                 "show": st["show"],

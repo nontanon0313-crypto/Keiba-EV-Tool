@@ -2469,9 +2469,30 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
           h += "<tr><td>単勝ROI</td><td class=\"" + cls + "\">" + (d.roi_pct >= 0 ? "+" : "") + Number(d.roi_pct).toFixed(1) + "%</td></tr>";
         }
         if (d.n_marker) {
-          h += "<tr><td>減量・若手印の回数</td><td>" + d.n_marker + "</td></tr>";
+          h += "<tr><td>減量・若手印の合計</td><td>" + d.n_marker + "</td></tr>";
         }
         h += "</tbody></table>";
+        // 記号別の内訳
+        if (d.markers && Object.keys(d.markers).length) {
+          var MARKER_LABELS = {
+            "◇": "女性騎手",
+            "☆": "若手騎手",
+            "△": "2kg減",
+            "▲": "3kg減",
+            "★": "女性＋減量",
+            "◆": "その他印",
+            "○": "その他印",
+            "●": "その他印",
+            "◎": "その他印"
+          };
+          h += "<h4 class=\"feature-title\">印の内訳</h4>";
+          h += "<table class=\"ev-table\"><thead><tr><th>印</th><th>意味</th><th>回数</th></tr></thead><tbody>";
+          var mk = Object.keys(d.markers).sort(function(a,b){ return d.markers[b] - d.markers[a]; });
+          mk.forEach(function(k){
+            h += "<tr><td>" + esc(k) + "</td><td>" + esc(MARKER_LABELS[k] || "-") + "</td><td>" + d.markers[k] + "</td></tr>";
+          });
+          h += "</tbody></table>";
+        }
         if (d.by_venue && Object.keys(d.by_venue).length) {
           h += "<h4 class=\"feature-title\">会場別</h4>";
           h += "<div class=\"decomp-scroll\"><table class=\"ev-table-decomp\"><thead><tr>";
