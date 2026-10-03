@@ -224,3 +224,23 @@ def get_feature_interactions():
         "promising_roi": roi[:20],
         "generated_at": d.get("generated_at"),
     }
+
+@router.get("/model_params")
+def get_model_params():
+    """学習済み PL モデルのパラメータを返す。"""
+    client, err = _get_client()
+    if client is None:
+        return {"error": err}
+    try:
+        r = client.execute("SELECT payload FROM model_params WHERE id='pl'")
+        if not r.rows:
+            return {"error": "no model params"}
+        d = json.loads(r.rows[0][0])
+    except Exception as e:
+        return {"error": str(e)}
+    # loss_history は 200点あるので 20点に間引く
+    lh = d.get("loss_history", [])
+    if len(lh) > 20:
+        step = max(1, len(lh) // 20)
+        d["loss_history"] = lh[::step]
+    return d

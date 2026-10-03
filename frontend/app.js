@@ -1274,6 +1274,10 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
       renderFeatureInteractionsView();
       return;
     }
+    if (currentView === "model_params") {
+      renderModelParamsView();
+      return;
+    }
     if (!analyticsData) return;
     var scopeData = (analyticsData.scopes || {})[currentAnaScope] || {};
     var races = (analyticsData.meta || {}).races || 0;
@@ -2064,6 +2068,67 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     });
     setTimeout(function(){ tabsEl.scrollLeft = sx; }, 50);
     setTimeout(function(){ tabsEl.scrollLeft = sx; }, 200);
+  }
+
+
+  var modelParamsData = null;
+  function loadModelParamsIfNeeded(cb, retryCount){
+    if (modelParamsData) { cb(); return; }
+    var n = retryCount || 0;
+    jsonFetch(API_BASE + "/analytics/model_params", 60000)
+      .then(function(d){ modelParamsData = d; cb(); })
+      .catch(function(err){
+        if (n < 10) {
+          anaView.textContent = "サーバーに接続中... しばらくお待ちください";
+          setTimeout(function(){ loadModelParamsIfNeeded(cb, n+1); }, 8000);
+          return;
+        }
+        anaView.textContent = "取得失敗: " + err.message;
+      });
+  }
+  function renderModelParamsView(){
+    anaView.textContent = "読み込み中...";
+    loadModelParamsIfNeeded(function(){
+      var d = modelParamsData || {};
+      if (d.error) { anaView.innerHTML = "<p>取得失敗: " + esc(d.error) + "</p>"; return; }
+      var h = "";
+      h += "<h3 class=\"feature-title\">Plackett-Luce モデル（市場情報除外版）</h3>";
+      h += "<p class=\"hint\">市場オッズ・人気を特徴から除外し、公開データ（走歴・条件別成績など）のみで学習。損失がランダム予想（log 頭数 ≈ 2.30）より下がらなければ、公開データだけでは予測困難と判断できる。</p>";
+      h += "<table class=\"ev-table\"><tbody>";
+      h += "<tr><td>学習日時</td><td>" + esc(d.trained_at || "") + "</td></tr>";
+      h += "<tr><td>特徴数</td><td>" + (d.feature_keys || []).length + "</td></tr>";
+      h += "</tbody></table>";
+
+      // loss 推移
+      var lh = d.loss_history || [];
+      if (lh.length) {
+        h += "<h4 class=\"feature-title\">損失の推移</h4>";
+        h += "<div class=\"decomp-scroll\"><table class=\"ev-table-decomp\"><thead><tr><th>エポック</th><th>損失</th></tr></thead><tbody>";
+        lh.forEach(function(v, i){
+          var ep = Math.round((i + 1) * (200 / lh.length));
+          h += "<tr><td>" + ep + "</td><td>" + Number(v).toFixed(4) + "</td></tr>";
+        });
+        h += "</tbody></table></div>";
+        h += "<p class=\"hint\">ランダム予想 = log(頭数) ≈ 2.30。最終損失 " + Number(lh[lh.length-1]).toFixed(3) + "</p>";
+      }
+
+      // 重み
+      var keys = d.feature_keys || [];
+      var ws = d.weights || [];
+      if (keys.length && ws.length) {
+        var pairs = [];
+        for (var i = 0; i < keys.length; i++) pairs.push([keys[i], ws[i]]);
+        pairs.sort(function(a, b){ return Math.abs(b[1]) - Math.abs(a[1]); });
+        h += "<h4 class=\"feature-title\">重み（絶対値順）</h4>";
+        h += "<table class=\"ev-table\"><thead><tr><th>特徴</th><th>重み</th></tr></thead><tbody>";
+        pairs.forEach(function(p){
+          var cls = p[1] >= 0 ? "ev-mid" : "ev-neg";
+          h += "<tr><td>" + esc(featureLabelJa(p[0])) + "</td><td class=\"" + cls + "\">" + (p[1]>=0?"+":"") + Number(p[1]).toFixed(4) + "</td></tr>";
+        });
+        h += "</tbody></table>";
+      }
+      anaView.innerHTML = h;
+    });
   }
 
 })();
