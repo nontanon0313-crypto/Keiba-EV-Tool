@@ -194,6 +194,26 @@ def get_race(race_id: str):
     for r in get_races():
         if r.race_id == race_id:
             return r
+    # 過去レース: scraped_races を参照
+    import os, json
+    import libsql_client
+    url = os.getenv("TURSO_URL")
+    token = os.getenv("TURSO_TOKEN")
+    if url and token:
+        h = url.replace("libsql://", "https://").replace("wss://", "https://")
+        c = libsql_client.create_client_sync(url=h, auth_token=token)
+        try:
+            r2 = c.execute("SELECT payload FROM scraped_races WHERE race_id=?", [race_id])
+            if r2.rows:
+                d = json.loads(r2.rows[0][0])
+                return d
+        except Exception as exc:
+            print("[races.detail] scraped lookup error: " + repr(exc), flush=True)
+        finally:
+            try:
+                c.close()
+            except Exception:
+                pass
     try:
         payload, _scraped_at = entry_store.get(race_id)
         if payload:
