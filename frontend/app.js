@@ -244,8 +244,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   }
 
   function postBet(raceId, b, amount){
-    return fetchWithTimeout(API_BASE + "/bets", TIMEOUT_MS, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ race_id: raceId, combo: b.combination, amount: amount, odds: b.odds, prob: b.prob, ev: b.ev, ticket_type: currentTicket, model_version: currentModelVersion }) })
-      .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); });
+    return jsonFetch(API_BASE + "/bets", TIMEOUT_MS, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ race_id: raceId, combo: b.combination, amount: amount, odds: b.odds, prob: b.prob, ev: b.ev, ticket_type: currentTicket, model_version: currentModelVersion }) });
   }
 
   function recordBet(raceId, b, amount){
@@ -271,6 +270,13 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     var timer = setTimeout(function(){ ctrl.abort(); }, ms);
     var o = opts || {}; o.signal = ctrl.signal;
     return fetch(url, o).finally(function(){ clearTimeout(timer); });
+  }
+  function jsonFetch(url, ms, opts){
+    // fetchWithTimeout + HTTP エラー判定 + JSON パースを1つにまとめる
+    return fetchWithTimeout(url, ms, opts).then(function(res){
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return res.json();
+    });
   }
   function cachedFetchJson(url, cacheKey, ms, opts){
     // 成功したら localStorage に保存、失敗したら保存済みを返す。
@@ -331,8 +337,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   function loadDetail(raceId){
     detail.hidden = false; racesSection.hidden = true;
     detailTitle.textContent = "読み込み中..."; detailBody.innerHTML = "";
-    fetchWithTimeout(API_BASE + "/races/" + encodeURIComponent(raceId), TIMEOUT_MS)
-      .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+    jsonFetch(API_BASE + "/races/" + encodeURIComponent(raceId), TIMEOUT_MS)
       .then(function(race){ renderDetail(race); })
       .catch(function(err){ detailBody.textContent = "取得失敗: " + err.message; });
   }
@@ -878,8 +883,7 @@ function renderFrameDecompositionTable(title, rows) {
 }
 function renderFrameTabConditionFilter() {
     if (!analyticsFrameData) {
-      fetchWithTimeout(API_BASE + "/analytics/frame_by_condition", 60000)
-        .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+      jsonFetch(API_BASE + "/analytics/frame_by_condition", 60000)
         .then(function(d){ analyticsFrameData = d; renderView(); })
         .catch(function(err){});
       return "<p>条件データ読み込み中...</p>";
@@ -1025,8 +1029,7 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
   function ensureFeaturesData(cb){
     if (analyticsFeaturesData) { cb(); return; }
     anaView.textContent = "読み込み中...";
-    fetchWithTimeout(API_BASE + "/analytics/features", 60000)
-      .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+    jsonFetch(API_BASE + "/analytics/features", 60000)
       .then(function(d){ analyticsFeaturesData = d; cb(); })
       .catch(function(err){ anaView.textContent = "取得失敗: " + err.message; });
   }
@@ -1203,8 +1206,7 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
   function renderMultiView(){
     if (!analyticsMultiData) {
       anaView.textContent = "読み込み中...";
-      fetchWithTimeout(API_BASE + "/analytics/multi", 120000)
-        .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+      jsonFetch(API_BASE + "/analytics/multi", 120000)
         .then(function(d){ analyticsMultiData = d; renderMultiView(); })
         .catch(function(err){ anaView.textContent = "取得失敗: " + err.message; });
       return;
@@ -1824,8 +1826,7 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     var view = $("horse-view");
     if (!view) return;
     view.innerHTML = "<p>読み込み中...</p>";
-    fetchWithTimeout(API_BASE + "/horses/" + encodeURIComponent(lineageNb), 30000)
-      .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+    jsonFetch(API_BASE + "/horses/" + encodeURIComponent(lineageNb), 30000)
       .then(function(d){ view.innerHTML = renderHorseView(d); })
       .catch(function(err){ view.innerHTML = "<p>取得失敗: " + esc(err.message) + "</p>"; });
   }
