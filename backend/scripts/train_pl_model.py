@@ -139,7 +139,7 @@ def load_data(limit=None):
 
 
 def build_matrix(samples):
-    """各サンプルを (X_race (n×d), winner_idx) に変換。統計は学習時に計算。"""
+    """各サンプルを (X_race (n×d), market_log (n), winner_idx) に変換。"""
     # 第一パス: 全値を集めて平均・標準偏差を計算
     all_vals = {k: [] for k in FEATURE_KEYS}
     for rid, runners, w in samples:
@@ -163,19 +163,32 @@ def build_matrix(samples):
     # 第二パス: 実際の行列を作成
     out = []
     for rid, runners, w in samples:
-        X = np.zeros((len(runners), len(FEATURE_KEYS)), dtype=np.float64)
+        n = len(runners)
+        X = np.zeros((n, len(FEATURE_KEYS)), dtype=np.float64)
+        market_log = np.zeros(n, dtype=np.float64)
         wi = -1
+        inv_sum = 0.0
+        for i, (num, f) in enumerate(runners):
+            ow = _to_num(f.get("odds_win"))
+            if ow and ow > 0:
+                inv_sum += 1.0 / ow
         for i, (num, f) in enumerate(runners):
             if num == w:
                 wi = i
             for j, k in enumerate(FEATURE_KEYS):
                 v = _to_num(f.get(k))
                 if v is None:
-                    v = STATS[k][0]  # 欠損は平均で埋める
+                    v = STATS[k][0]
                 X[i, j] = (v - STATS[k][0]) / STATS[k][1]
+            ow = _to_num(f.get("odds_win"))
+            if ow and ow > 0 and inv_sum > 0:
+                p_mkt = (1.0 / ow) / inv_sum
+                market_log[i] = math.log(max(p_mkt, 1e-12))
+            else:
+                market_log[i] = math.log(1.0 / n) if n > 0 else -30.0
         if wi < 0:
             continue
-        out.append((X, wi))
+        out.append((X, market_log, wi))
     return out
 
 
@@ -189,11 +202,22 @@ def train(matrices, epochs=200, lr=0.05, l2=1e-4):
     n = len(matrices)
     loss_history = []
     _log("training start: n=" + str(n) + " d=" + str(d))
+    # w=0 の損失を計算（市場確率そのまま）
+    base_loss = 0.0
+    for idx in range(n):
+        X, market_log, wi = matrices[idx]
+        sc = market_log.copy()
+        sc -= sc.max()
+        ex = np.exp(sc)
+        p0 = ex / ex.sum()
+        base_loss += -math.log(max(p0[wi], 1e-12))
+    base_loss /= n
+    _log("baseline (market only) loss=" + str(round(base_loss, 5)))
     for ep in range(epochs):
         perm = np.random.permutation(n)
         total_loss = 0.0
         for idx in perm:
-            X, wi = matrices[idx]
+            X, market_log, wi = matrices[idx]
             scores = X @ w
             scores -= scores.max()
             exp_s = np.exp(scores)
