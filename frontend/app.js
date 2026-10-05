@@ -2607,7 +2607,7 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     });
     var h = "";
     h += "<h3 class=\"feature-title\">会場統計（全" + Object.keys(byVenue).length + "場）</h3>";
-    h += "<p class=\"hint\">会場ごとの開催数・平均頭数・枠番有利（実1着率 − 市場期待値）。内/外 = 1-3枠 / 6-8枠 の平均差。</p>";
+    h += "<p class=\"hint\">会場ごとの開催数・平均頭数・枠番有利（実1着率 − 市場期待値）。内/外 = 1-3枠 / 6-8枠 の平均差。<br>枠セルは n>=50 のもののみ色付け（* は参考値）。内外差は総頭数 n>=1000 の会場のみ色付け。</p>";
     // 会場別サマリ
     h += "<h4 class=\"feature-title\">会場別サマリ</h4>";
     h += "<div class=\"decomp-scroll\"><table class=\"ev-table-decomp\"><thead><tr>";
@@ -2621,22 +2621,34 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
       h += "<td>" + b.n_races + "</td>";
       h += "<td>" + b.n_runners + "</td>";
       var innerDiffs = [], outerDiffs = [];
+      var minCellN = 50;
       for (var f = 1; f <= 8; f++) {
         var p = b.perFrame[f];
         if (!p || !p.n) { h += "<td>-</td>"; continue; }
         var diff = (p.hit / p.n - p.mp / p.n) * 100;
-        var cls = diff > 0.5 ? "ev-mid" : (diff < -0.5 ? "ev-neg" : "");
-        h += "<td class=\"" + cls + "\">" + (diff >= 0 ? "+" : "") + diff.toFixed(2) + "</td>";
-        if (f >= 1 && f <= 3) innerDiffs.push(diff);
-        if (f >= 6 && f <= 8) outerDiffs.push(diff);
+        // n が小さいセルは数値のみ表示（色付けしない）
+        var cls = "";
+        if (p.n >= minCellN) {
+          cls = diff > 0.5 ? "ev-mid" : (diff < -0.5 ? "ev-neg" : "");
+        }
+        var label = (diff >= 0 ? "+" : "") + diff.toFixed(2);
+        if (p.n < minCellN) label += "*";
+        h += "<td class=\"" + cls + "\">" + label + "</td>";
+        if (p.n >= minCellN) {
+          if (f >= 1 && f <= 3) innerDiffs.push(diff);
+          if (f >= 6 && f <= 8) outerDiffs.push(diff);
+        }
       }
-      var inner = innerDiffs.length ? innerDiffs.reduce(function(a,b){return a+b;},0)/innerDiffs.length : 0;
-      var outer = outerDiffs.length ? outerDiffs.reduce(function(a,b){return a+b;},0)/outerDiffs.length : 0;
-      var gap = outer - inner;
-      h += "<td>" + (inner >= 0 ? "+" : "") + inner.toFixed(2) + "</td>";
-      h += "<td>" + (outer >= 0 ? "+" : "") + outer.toFixed(2) + "</td>";
-      var gcls = gap > 0.5 ? "ev-mid" : (gap < -0.5 ? "ev-neg" : "");
-      h += "<td class=\"" + gcls + "\">" + (gap >= 0 ? "+" : "") + gap.toFixed(2) + "</td>";
+      var inner = innerDiffs.length ? innerDiffs.reduce(function(a,b){return a+b;},0)/innerDiffs.length : null;
+      var outer = outerDiffs.length ? outerDiffs.reduce(function(a,b){return a+b;},0)/outerDiffs.length : null;
+      var gap = (inner != null && outer != null) ? (outer - inner) : null;
+      h += "<td>" + (inner != null ? (inner >= 0 ? "+" : "") + inner.toFixed(2) : "-") + "</td>";
+      h += "<td>" + (outer != null ? (outer >= 0 ? "+" : "") + outer.toFixed(2) : "-") + "</td>";
+      var gcls = "";
+      if (gap != null && b.n_runners >= 1000) {
+        gcls = gap > 0.5 ? "ev-mid" : (gap < -0.5 ? "ev-neg" : "");
+      }
+      h += "<td class=\"" + gcls + "\">" + (gap != null ? (gap >= 0 ? "+" : "") + gap.toFixed(2) : "-") + "</td>";
       h += "</tr>";
     });
     h += "</tbody></table></div>";
