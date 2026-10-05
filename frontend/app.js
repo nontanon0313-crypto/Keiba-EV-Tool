@@ -2611,14 +2611,13 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     // 会場別サマリ
     h += "<h4 class=\"feature-title\">会場別サマリ</h4>";
     h += "<div class=\"decomp-scroll\"><table class=\"ev-table-decomp\"><thead><tr>";
-    h += "<th>会場</th><th>開催数</th><th>総頭数</th><th>1枠</th><th>2枠</th><th>3枠</th><th>4枠</th><th>5枠</th><th>6枠</th><th>7枠</th><th>8枠</th><th>内有利</th><th>外有利</th><th>内外差</th>";
+    h += "<th>会場</th><th>総頭数</th><th>1枠</th><th>2枠</th><th>3枠</th><th>4枠</th><th>5枠</th><th>6枠</th><th>7枠</th><th>8枠</th><th>内有利</th><th>外有利</th><th>内外差</th>";
     h += "</tr></thead><tbody>";
     var venues = Object.keys(byVenue).sort();
     venues.forEach(function(v){
       var b = byVenue[v];
       h += "<tr>";
       h += "<td>" + esc(v) + "</td>";
-      h += "<td>" + b.n_races + "</td>";
       h += "<td>" + b.n_runners + "</td>";
       var innerDiffs = [], outerDiffs = [];
       var minCellN = 50;
