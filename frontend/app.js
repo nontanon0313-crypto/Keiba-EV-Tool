@@ -2318,7 +2318,7 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
         if (!races.length) { out.innerHTML = "<p>該当レースなし</p>"; return; }
         var html = "<p class=\"hint\">" + races.length + "件</p>";
         html += "<div class=\"decomp-scroll\"><table class=\"ev-table-decomp\"><thead><tr>";
-        html += "<th>日付</th><th>会場</th><th>R</th><th>芝ダ</th><th>距離</th><th>頭数</th><th>結果</th><th></th>";
+        html += "<th>日付</th><th>会場</th><th>R</th><th>クラス</th><th>芝ダ</th><th>距離</th><th>頭数</th><th>結果</th><th></th>";
         html += "</tr></thead><tbody>";
         races.forEach(function(r){
           html += "<tr>";
