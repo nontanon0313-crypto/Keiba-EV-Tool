@@ -1841,12 +1841,32 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     return h;
   }
   function loadHorseDetail(lineageNb){
+    var listView = document.getElementById("horse-list-view");
+    var detailView = document.getElementById("horse-detail-view");
     var view = $("horse-view");
     if (!view) return;
+    if (listView) listView.hidden = true;
+    if (detailView) detailView.hidden = false;
     view.innerHTML = "<p>読み込み中...</p>";
+    var titleEl = document.getElementById("horse-detail-title");
+    if (titleEl) titleEl.innerHTML = "";
+    window.scrollTo(0, 0);
     jsonFetch(API_BASE + "/horses/" + encodeURIComponent(lineageNb), 30000)
-      .then(function(d){ view.innerHTML = renderHorseView(d); })
+      .then(function(d){
+        if (titleEl) {
+          var t = (d.title || "").split("の成績")[0];
+          titleEl.innerHTML = "<h3 class=\"feature-title\">" + esc(t || lineageNb) + "</h3>";
+        }
+        view.innerHTML = renderHorseView(d);
+      })
       .catch(function(err){ view.innerHTML = "<p>取得失敗: " + esc(err.message) + "</p>"; });
+  }
+  function showHorseList(){
+    var listView = document.getElementById("horse-list-view");
+    var detailView = document.getElementById("horse-detail-view");
+    if (listView) listView.hidden = false;
+    if (detailView) detailView.hidden = true;
+    window.scrollTo(0, 0);
   }
   function loadHorse(){
     var idEl = $("horse-id");
@@ -1856,6 +1876,7 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     var q = (idEl.value || "").trim();
     if (!q) { res.innerHTML = "<p>馬名 or 馬IDを入力してください</p>"; return; }
     if (view) view.innerHTML = "";
+    showHorseList();
     res.innerHTML = "<p>検索中...</p>";
     fetchWithTimeout(API_BASE + "/horses/search?q=" + encodeURIComponent(q) + "&limit=50", 20000)
       .then(function(r){ if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
@@ -1879,6 +1900,10 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     if (btn) btn.addEventListener("click", loadHorse);
     var idEl = $("horse-id");
     if (idEl) idEl.addEventListener("keydown", function(e){ if (e.key === "Enter") loadHorse(); });
+  })();
+  (function(){
+    var backBtn = document.getElementById("horse-back");
+    if (backBtn) backBtn.addEventListener("click", showHorseList);
   })();
   (function(){
     var tabsEl = document.getElementById("horse-view-tabs");
