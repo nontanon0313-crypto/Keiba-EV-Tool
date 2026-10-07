@@ -121,6 +121,10 @@
 <label>開始日<input id="past-date-from" type="date"></label>
 <label>終了日<input id="past-date-to" type="date"></label>
 <label>会場<select id="past-venue"><option value="">すべて</option></select></label>
+<label>クラス<input id="past-class" type="text" placeholder="C1, A2, 3歳など"></label>
+<label>距離下限<input id="past-dist-min" type="number" step="100" placeholder="例: 1400"></label>
+<label>距離上限<input id="past-dist-max" type="number" step="100" placeholder="例: 1600"></label>
+<label>馬名<input id="past-horse" type="text" placeholder="部分一致"></label>
 </div>
 <button id="past-search" class="bulk-btn" type="button">検索</button>
 <div id="past-result"></div>
@@ -171,6 +175,6 @@
 </div>
 </div>
 <script src="./ev-theme.js"></script>
-<script src="./app.js?v=106"></script>
+<script src="./app.js?v=107"></script>
 </body>
 </html>
