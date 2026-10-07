@@ -129,9 +129,34 @@ def _venue_name(track_cd):
     return TRACK_CD_TO_VENUE.get(str(track_cd), "")
 
 
+def _parse_class(name):
+    if not name:
+        return ""
+    import re
+    t = name.translate(str.maketrans("ＡＢＣ１２３４５６７８９０", "ABC1234567890"))
+    m = re.search(r"([ABC])([1-3])", t)
+    if m:
+        return m.group(1) + m.group(2)
+    m2 = re.search(r"(\d)歳", t)
+    if m2:
+        return m2.group(1) + "歳"
+    if "新馬" in name:
+        return "新馬"
+    return ""
+
+
 @router.get("/search")
-def search_races(date_from: str = "", date_to: str = "", venue: str = "", limit: int = 200):
-    """過去レースを検索する。日付範囲・会場で絞り込み。"""
+def search_races(
+    date_from: str = "",
+    date_to: str = "",
+    venue: str = "",
+    race_class: str = "",
+    distance_min: int = 0,
+    distance_max: int = 0,
+    horse_name: str = "",
+    limit: int = 200,
+):
+    """過去レースを検索する。日付範囲・会場・クラス・距離帯・馬名で絞り込み。"""
     import os, json
     import libsql_client
     url = os.getenv("TURSO_URL")
@@ -152,7 +177,11 @@ def search_races(date_from: str = "", date_to: str = "", venue: str = "", limit:
             where.append("race_id <= ?")
             args.append("nar-" + dt + "-99-99")
         sql = "SELECT race_id, payload FROM scraped_races WHERE " + " AND ".join(where) + " ORDER BY race_id LIMIT ?"
-        args.append(int(limit))
+        # horse_name 等の Python フィルタがある場合は多めに読む
+        fetch_limit = int(limit) * 20 if (race_class or distance_min or distance_max or horse_name) else int(limit)
+        if fetch_limit > 20000:
+            fetch_limit = 20000
+        args.append(fetch_limit)
         r = c.execute(sql, args)
         rows = list(r.rows)
         out = []
@@ -164,6 +193,27 @@ def search_races(date_from: str = "", date_to: str = "", venue: str = "", limit:
             v = (d.get("venue") or "").strip()
             if venue and v != venue:
                 continue
+            if race_class:
+                if _parse_class(d.get("race_name")) != race_class:
+                    continue
+            dist = d.get("distance") or 0
+            try:
+                dist = int(dist)
+            except (ValueError, TypeError):
+                dist = 0
+            if distance_min and dist < int(distance_min):
+                continue
+            if distance_max and dist > int(distance_max):
+                continue
+            if horse_name:
+                hit = False
+                for run in (d.get("runners") or []):
+                    hn = run.get("horse_name") or ""
+                    if horse_name in hn:
+                        hit = True
+                        break
+                if not hit:
+                    continue
             out.append({
                 "race_id": row[0],
                 "date": d.get("date"),
@@ -174,7 +224,11 @@ def search_races(date_from: str = "", date_to: str = "", venue: str = "", limit:
                 "start_at": d.get("start_at"),
                 "n_runners": len(d.get("runners") or []),
                 "has_result": bool(d.get("finish_order")),
+                "race_class": _parse_class(d.get("race_name")),
+                "race_name": d.get("race_name") or "",
             })
+            if len(out) >= int(limit):
+                break
         return {"races": out, "count": len(out)}
     finally:
         try:
