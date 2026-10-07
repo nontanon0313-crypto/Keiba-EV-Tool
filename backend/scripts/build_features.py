@@ -50,17 +50,34 @@ def main(limit=None):
     try:
         done_races = feature_store.races_done()
         _log("already computed: " + str(len(done_races)) + " races")
-        r = c.execute("SELECT race_id, payload FROM scraped_races ORDER BY race_id")
         races = []
-        for row in r.rows:
-            rid = row[0]
-            if rid in done_races:
-                continue
-            try:
-                d = json.loads(row[1]) if isinstance(row[1], str) else row[1]
-                races.append((rid, d))
-            except Exception:
-                continue
+        last_rid = ""
+        PAGE = 300
+        n_read = 0
+        while True:
+            r = c.execute(
+                "SELECT race_id, payload FROM scraped_races WHERE race_id > ? ORDER BY race_id LIMIT ?",
+                [last_rid, PAGE],
+            )
+            rows = list(r.rows)
+            if not rows:
+                break
+            for row in rows:
+                n_read += 1
+                rid = row[0]
+                if rid in done_races:
+                    continue
+                try:
+                    d = json.loads(row[1]) if isinstance(row[1], str) else row[1]
+                    races.append((rid, d))
+                except Exception:
+                    continue
+            last_rid = rows[-1][0]
+            if len(rows) < PAGE:
+                break
+            if n_read % 3000 == 0:
+                _log("  読込: " + str(n_read) + "件")
+        _log("読込完了: " + str(n_read) + "件")
     finally:
         try:
             c.close()

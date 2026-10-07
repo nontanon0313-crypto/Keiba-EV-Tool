@@ -64,31 +64,45 @@ def main():
     http_url = url.replace("libsql://", "https://").replace("wss://", "https://")
     client = libsql_client.create_client_sync(url=http_url, auth_token=token)
 
-    r = client.execute("SELECT race_id, payload FROM scraped_races ORDER BY race_id")
-    rows = list(r.rows)
-    print(f"全レース: {len(rows)}", flush=True)
-
     targets = []
     payload_map = {}
     n_skipped_exist = 0
     n_skipped_excl = 0
-    for row in rows:
-        rid = row[0]
-        parts = rid.split("-")
-        if len(parts) >= 3 and parts[2] in EXCLUDED_TRACK_CODES:
-            n_skipped_excl += 1
-            continue
-        try:
-            payload = json.loads(row[1]) if isinstance(row[1], str) else row[1]
-        except Exception:
-            continue
-        if payload.get("weather") and payload.get("track_condition"):
-            n_skipped_exist += 1
-            continue
-        date = payload.get("date", "").replace("-", "")
-        targets.append((rid, date, payload.get("track_cd", ""),
-                        payload.get("sponsor_cd", ""), payload.get("race_nb", 0)))
-        payload_map[rid] = payload
+    n_total = 0
+    last_rid = ""
+    PAGE = 300
+    while True:
+        r = client.execute(
+            "SELECT race_id, payload FROM scraped_races WHERE race_id > ? ORDER BY race_id LIMIT ?",
+            [last_rid, PAGE],
+        )
+        rows = list(r.rows)
+        if not rows:
+            break
+        for row in rows:
+            n_total += 1
+            rid = row[0]
+            parts = rid.split("-")
+            if len(parts) >= 3 and parts[2] in EXCLUDED_TRACK_CODES:
+                n_skipped_excl += 1
+                continue
+            try:
+                payload = json.loads(row[1]) if isinstance(row[1], str) else row[1]
+            except Exception:
+                continue
+            if payload.get("weather") and payload.get("track_condition"):
+                n_skipped_exist += 1
+                continue
+            date = payload.get("date", "").replace("-", "")
+            targets.append((rid, date, payload.get("track_cd", ""),
+                            payload.get("sponsor_cd", ""), payload.get("race_nb", 0)))
+            payload_map[rid] = payload
+        last_rid = rows[-1][0]
+        if len(rows) < PAGE:
+            break
+        if n_total % 3000 == 0:
+            print(f"  読込: {n_total}件", flush=True)
+    print(f"全レース: {n_total}", flush=True)
 
     print(f"対象: {len(targets)} (skipped_exist={n_skipped_exist} excl={n_skipped_excl})", flush=True)
 

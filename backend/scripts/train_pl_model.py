@@ -35,6 +35,19 @@ FEATURE_KEYS = [
     "weight", "horse_weight",
 ]
 
+# 交互作用特徴: (派生キー, [(元キー, 元キー or 定数), ...])
+# 各派生 = 元キー1 * 元キー2（正規化後の値の積）
+INTERACTIONS = [
+    ("dist_x_cond", "same_dist_place_rate", "same_cond_place_rate"),
+    ("dist_x_weight", "same_dist_place_rate", "weight"),
+    ("recent_x_dist", "recent3_avg_finish", "same_dist_place_rate"),
+    ("corner_x_weight", "avg_corner_ratio", "weight"),
+    ("weight_x_hw", "weight", "horse_weight"),
+    ("agari_x_time", "avg_agari_3f", "avg_time_norm"),
+    ("venue_x_dist", "same_venue_place_rate", "same_dist_place_rate"),
+    ("winrate_x_dist", "win_rate", "same_dist_place_rate"),
+]
+
 # 学習時のスケーリングに使う統計
 STATS = {}
 

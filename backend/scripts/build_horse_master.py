@@ -142,14 +142,26 @@ async def main_async(limit=None):
     h = url.replace("libsql://", "https://").replace("wss://", "https://")
     c = libsql_client.create_client_sync(url=h, auth_token=token)
     try:
-        r = c.execute("SELECT race_id, payload FROM scraped_races ORDER BY race_id")
         races = []
-        for row in r.rows:
-            try:
-                d = json.loads(row[1]) if isinstance(row[1], str) else row[1]
-                races.append({"race_id": row[0], "payload": d})
-            except Exception:
-                continue
+        last_rid = ""
+        PAGE = 300
+        while True:
+            r = c.execute(
+                "SELECT race_id, payload FROM scraped_races WHERE race_id > ? ORDER BY race_id LIMIT ?",
+                [last_rid, PAGE],
+            )
+            rows = list(r.rows)
+            if not rows:
+                break
+            for row in rows:
+                try:
+                    d = json.loads(row[1]) if isinstance(row[1], str) else row[1]
+                    races.append({"race_id": row[0], "payload": d})
+                except Exception:
+                    continue
+            last_rid = rows[-1][0]
+            if len(rows) < PAGE:
+                break
     finally:
         try:
             c.close()

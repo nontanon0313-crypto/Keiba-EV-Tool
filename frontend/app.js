@@ -1514,11 +1514,14 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     if (tabPast) tabPast.hidden = name !== "past";
     var tabJockey = document.getElementById("tab-jockey");
     if (tabJockey) tabJockey.hidden = name !== "jockey";
+    var tabPed = document.getElementById("tab-pedigree");
+    if (tabPed) tabPed.hidden = name !== "pedigree";
     window.scrollTo(0, 0);
     if (name === "analytics") loadAnalytics();
     if (name === "bets") loadBets();
     if (name === "past") initPastTab();
     if (name === "jockey") initJockeyTab();
+    if (name === "pedigree") initPedigreeTab();
   }
 
   document.querySelectorAll(".tab").forEach(function(t){ t.addEventListener("click", function(){ switchTab(t.getAttribute("data-tab")); }); });
@@ -2683,6 +2686,107 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     loadVenueStatsIfNeeded(function(){
       anaView.innerHTML = renderVenueStatsView();
     });
+  }
+
+  var pedInitialized = false;
+  var pedData = null;
+  function initPedigreeTab(){
+    if (pedInitialized) return;
+    pedInitialized = true;
+    var btn = document.getElementById("ped-search");
+    if (btn) btn.addEventListener("click", runPedSearch);
+    var inp = document.getElementById("ped-name");
+    if (inp) inp.addEventListener("keydown", function(e){ if (e.key === "Enter") runPedSearch(); });
+    var back = document.getElementById("ped-back");
+    if (back) back.addEventListener("click", function(){
+      document.getElementById("ped-detail").hidden = true;
+      document.getElementById("ped-list").hidden = false;
+    });
+    // 種別変更時に一覧をロード
+    var kind = document.getElementById("ped-kind");
+    if (kind) kind.addEventListener("change", loadPedList);
+    loadPedList();
+  }
+  function loadPedList(){
+    var kind = (document.getElementById("ped-kind") || {}).value || "sire";
+    var out = document.getElementById("ped-list");
+    if (!out) return;
+    out.innerHTML = "読み込み中...";
+    var url = kind === "sire" ? API_BASE + "/pedigrees/sires?limit=200" : API_BASE + "/pedigrees/dam_sires?limit=200";
+    jsonFetch(url, 60000)
+      .then(function(d){
+        var items = d.items || [];
+        if (!items.length) { out.innerHTML = "<p>データなし</p>"; return; }
+        var label = kind === "sire" ? "父" : "母父";
+        var h = "<h4 class=\"feature-title\">" + label + "一覧（産駒数順、上位" + items.length + "件）</h4>";
+        h += "<div class=\"decomp-scroll\"><table class=\"ev-table-decomp\"><thead><tr><th>" + label + "</th><th>産駒数</th><th></th></tr></thead><tbody>";
+        items.forEach(function(x){
+          h += "<tr>";
+          h += "<td>" + esc(x.name) + "</td>";
+          h += "<td>" + x.count + "</td>";
+          h += "<td><button class=\"bet-btn\" data-ped-name=\"" + esc(x.name) + "\" type=\"button\">産駒</button></td>";
+          h += "</tr>";
+        });
+        h += "</tbody></table></div>";
+        out.innerHTML = h;
+        var btns = out.querySelectorAll("[data-ped-name]");
+        for (var i = 0; i < btns.length; i++) {
+          (function(b){
+            b.addEventListener("click", function(){
+              showPedOffspring(b.getAttribute("data-ped-name"));
+            });
+          })(btns[i]);
+        }
+      })
+      .catch(function(err){ out.textContent = "取得失敗: " + err.message; });
+  }
+  function runPedSearch(){
+    var kind = (document.getElementById("ped-kind") || {}).value || "sire";
+    var inp = document.getElementById("ped-name");
+    if (!inp) return;
+    var name = (inp.value || "").trim();
+    if (!name) { alert("名前を入力してください"); return; }
+    showPedOffspring(name);
+  }
+  function showPedOffspring(name){
+    var kind = (document.getElementById("ped-kind") || {}).value || "sire";
+    var listBox = document.getElementById("ped-list");
+    var detail = document.getElementById("ped-detail");
+    var body = document.getElementById("ped-detail-body");
+    if (listBox) listBox.hidden = true;
+    if (detail) detail.hidden = false;
+    body.innerHTML = "読み込み中...";
+    var url = API_BASE + "/pedigrees/offspring?kind=" + encodeURIComponent(kind) + "&name=" + encodeURIComponent(name) + "&limit=200";
+    jsonFetch(url, 60000)
+      .then(function(d){
+        var items = d.items || [];
+        var label = kind === "sire" ? "父" : "母父";
+        var h = "<h3 class=\"feature-title\">" + label + ": " + esc(name) + "（産駒 " + items.length + "件）</h3>";
+        if (!items.length) { body.innerHTML = h + "<p>該当馬なし</p>"; return; }
+        h += "<div class=\"decomp-scroll\"><table class=\"ev-table-decomp\"><thead><tr>";
+        h += "<th>馬名</th><th>父</th><th>母</th><th>母父</th><th></th>";
+        h += "</tr></thead><tbody>";
+        items.forEach(function(x){
+          h += "<tr>";
+          h += "<td>" + esc(x.name) + "</td>";
+          h += "<td>" + esc(x.sire || "") + "</td>";
+          h += "<td>" + esc(x.dam || "") + "</td>";
+          h += "<td>" + esc(x.dam_sire || "") + "</td>";
+          h += "<td><button class=\"bet-btn\" data-ped-horse=\"" + esc(x.lineage_nb) + "\" type=\"button\">馬詳細</button></td>";
+          h += "</tr>";
+        });
+        h += "</tbody></table></div>";
+        body.innerHTML = h;
+        var btns = body.querySelectorAll("[data-ped-horse]");
+        for (var i = 0; i < btns.length; i++) {
+          (function(b){
+            b.addEventListener("click", function(){
+              openHorseByLineage(b.getAttribute("data-ped-horse"));
+            });
+          })(btns[i]);
+        }
+      })
+      .catch(function(err){ body.textContent = "取得失敗: " + err.message; });
   }
 
 })();
