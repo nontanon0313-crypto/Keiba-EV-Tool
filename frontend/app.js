@@ -2764,14 +2764,24 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
         var h = "<h3 class=\"feature-title\">" + label + ": " + esc(name) + "（産駒 " + items.length + "件）</h3>";
         if (!items.length) { body.innerHTML = h + "<p>該当馬なし</p>"; return; }
         h += "<div class=\"decomp-scroll\"><table class=\"ev-table-decomp\"><thead><tr>";
-        h += "<th>馬名</th><th>父</th><th>母</th><th>母父</th><th></th>";
+        h += "<th>馬名</th>";
+        if (kind === "sire") {
+          h += "<th>母</th><th>母父</th>";
+        } else {
+          h += "<th>父</th><th>母</th>";
+        }
+        h += "<th></th>";
         h += "</tr></thead><tbody>";
         items.forEach(function(x){
           h += "<tr>";
           h += "<td>" + esc(x.name) + "</td>";
-          h += "<td>" + esc(x.sire || "") + "</td>";
-          h += "<td>" + esc(x.dam || "") + "</td>";
-          h += "<td>" + esc(x.dam_sire || "") + "</td>";
+          if (kind === "sire") {
+            h += "<td>" + esc(x.dam || "") + "</td>";
+            h += "<td>" + esc(x.dam_sire || "") + "</td>";
+          } else {
+            h += "<td>" + esc(x.sire || "") + "</td>";
+            h += "<td>" + esc(x.dam || "") + "</td>";
+          }
           h += "<td><button class=\"bet-btn\" data-ped-horse=\"" + esc(x.lineage_nb) + "\" type=\"button\">馬詳細</button></td>";
           h += "</tr>";
         });
