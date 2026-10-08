@@ -2483,8 +2483,6 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
           html += "</tbody></table>";
         }
         body.innerHTML = html;
-      })
-        body.innerHTML = html;
         // 馬名リンク
         var hls = body.querySelectorAll("[data-past-horse]");
         for (var i = 0; i < hls.length; i++) {
