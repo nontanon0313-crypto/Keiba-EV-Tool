@@ -127,9 +127,24 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
 
   function renderDetail(race){
     detailTitle.textContent = (race.venue || "") + " " + (race.race_number || "") + "R";
+    var metaParts = [];
+    if (race.date) metaParts.push(race.date);
+    if (race.surface) metaParts.push(race.surface);
+    if (race.distance) metaParts.push(race.distance + "m");
+    if (race.track_condition) metaParts.push("馬場:" + race.track_condition);
+    if (race.weather) metaParts.push("天気:" + race.weather);
+    if (race.start_at) metaParts.push(race.start_at.slice(11,16) + "発走");
+    var raceMeta = metaParts.join(" / ");
     var evLabel = document.getElementById("ev-title-label");
     if (evLabel) evLabel.textContent = "EV上位の買い目 (" + ticketLabel(currentTicket) + ")";
-    var html = "<h3 class=\"ev-title\" id=\"ev-title-label\">EV上位の買い目</h3><div id=\"ev-table\">読み込み中...</div>";
+    var html = "";
+    if (race.race_name) {
+      html += "<p class=\"hint\">" + esc(race.race_name) + "</p>";
+    }
+    if (raceMeta) {
+      html += "<p class=\"hint\">" + esc(raceMeta) + "</p>";
+    }
+    html += "<h3 class=\"ev-title\" id=\"ev-title-label\">EV上位の買い目</h3><div id=\"ev-table\">読み込み中...</div>";
     html += "<h3 class=\"ev-title\">出走馬</h3>";
     html += "<div class=\"sort-bar\" id=\"runner-sort-bar\">" +
             "<button class=\"sort-btn active\" data-sort=\"num\" type=\"button\">馬番</button>" +
