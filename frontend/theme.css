@@ -371,3 +371,11 @@ main{width:100%;max-width:100vw;overflow-x:hidden;}
   z-index: 1;
   box-shadow: 2px 0 0 rgba(212,175,55,0.15);
 }
+
+/* 血統産駒一覧: 馬名列を折り返し許可 */
+.ev-table-decomp.ped-offspring td:first-child,
+.ev-table-decomp.ped-offspring th:first-child{
+  white-space: normal;
+  word-break: break-all;
+  max-width: 8em;
+}

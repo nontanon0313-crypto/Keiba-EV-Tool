@@ -2944,7 +2944,7 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
         var label = kind === "sire" ? "父" : "母父";
         var h = "<h3 class=\"feature-title\">" + label + ": " + esc(name) + "（産駒 " + items.length + "件）</h3>";
         if (!items.length) { body.innerHTML = h + "<p>該当馬なし</p>"; return; }
-        h += "<div class=\"decomp-scroll\"><table class=\"ev-table-decomp\"><thead><tr>";
+        h += "<div class=\"decomp-scroll\"><table class=\"ev-table-decomp ped-offspring\"><thead><tr>";
         h += "<th>馬名</th>";
         if (kind === "sire") {
           h += "<th>母</th><th>母父</th>";
