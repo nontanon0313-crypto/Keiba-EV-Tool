@@ -38,6 +38,17 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   var runnerSort = "num";
   var storageBadge = $("storage-badge");
 
+
+  // タブ別の状態を localStorage に保存・復元する
+  function saveState(key, obj){
+    try { localStorage.setItem("keiba-state-" + key, JSON.stringify(obj)); } catch (e) {}
+  }
+  function loadState(key){
+    try {
+      var raw = localStorage.getItem("keiba-state-" + key);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
   function esc(s){ return String(s == null ? "" : s).replace(/[&<>\x27]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","\x27":"&#39;"}[c]; }); }
   function ticketLabel(t){ return ({mixed:"馬連",trifecta:"3連単",trio:"3連複",exacta:"馬単",quinella:"馬連",wide:"ワイド",win:"単勝",place:"複勝"}[t] || t); }
   var TRACK_NAMES = {"12":"水沢","42":"笠松","51":"園田","31":"浦和","06":"水沢","20":"笠松","26":"園田","13":"浦和","11":"門別","55":"大井","61":"川崎","03":"船橋","41":"名古屋","43":"金沢"};
@@ -278,7 +289,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
     chain.then(function(){ alert("一括投票完了: 成功 " + okCount + " / 失敗 " + failCount); });
   }
 
-  function showList(){ detail.hidden = true; racesSection.hidden = false; window.scrollTo(0, 0); }
+  function showList(){ detail.hidden = true; racesSection.hidden = false; window.scrollTo(0, 0); saveState("predict", {type: "list"}); }
 
   function fetchWithTimeout(url, ms, opts){
     var ctrl = new AbortController();
@@ -352,6 +363,7 @@ const FINISH_GRACE_MS = 30 * 60 * 1000;
   function loadDetail(raceId){
     detail.hidden = false; racesSection.hidden = true;
     detailTitle.textContent = "読み込み中..."; detailBody.innerHTML = "";
+    saveState("predict", {type: "detail", raceId: raceId});
     jsonFetch(API_BASE + "/races/" + encodeURIComponent(raceId), TIMEOUT_MS)
       .then(function(race){ renderDetail(race); })
       .catch(function(err){ detailBody.textContent = "取得失敗: " + err.message; });
@@ -1607,6 +1619,47 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     if (savedTab !== "predict") switchTab(savedTab);
   } catch (e) {}
 
+  // 詳細画面の復元
+  function restoreDetailStates(){
+    try {
+      // 予想タブ
+      var ps = loadState("predict");
+      if (ps && ps.type === "detail" && ps.raceId) {
+        loadDetail(ps.raceId);
+      }
+      // 馬タブ
+      var hs = loadState("horse");
+      if (hs && hs.type === "detail" && hs.lineageNb) {
+        if (hs.tab) horseViewTab = hs.tab;
+        var idEl = $("horse-id");
+        if (idEl) idEl.value = hs.lineageNb;
+        loadHorseDetail(hs.lineageNb);
+      }
+      // 騎手タブ
+      var js = loadState("jockey");
+      if (js && js.type === "detail" && js.name) {
+        var inp = document.getElementById("jockey-search");
+        if (inp) inp.value = js.name;
+        loadJockeyDetail(js.name);
+      }
+      // 血統タブ
+      var ds = loadState("ped");
+      if (ds && ds.type === "detail" && ds.name) {
+        var kindEl = document.getElementById("ped-kind");
+        if (kindEl) kindEl.value = ds.kind || "sire";
+        var pInp = document.getElementById("ped-name");
+        if (pInp) pInp.value = ds.name;
+        showPedOffspring(ds.name);
+      }
+      // 過去タブ
+      var tps = loadState("past");
+      if (tps && tps.type === "detail" && tps.raceId) {
+        showPastDetail(tps.raceId);
+      }
+    } catch (e) {}
+  }
+  setTimeout(restoreDetailStates, 500);
+
   list.textContent = "読み込み中... (サーバー起動待ちの場合があります)";
   (function loadTodayRaces(retryCount){
     var n = retryCount || 0;
@@ -1965,6 +2018,7 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     if (listView) listView.hidden = true;
     if (detailView) detailView.hidden = false;
     view.innerHTML = "<p>読み込み中...</p>";
+    saveState("horse", {type: "detail", lineageNb: lineageNb, tab: horseViewTab});
     var titleEl = document.getElementById("horse-detail-title");
     if (titleEl) titleEl.innerHTML = "";
     window.scrollTo(0, 0);
@@ -1985,6 +2039,7 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     if (listView) listView.hidden = false;
     if (detailView) detailView.hidden = true;
     window.scrollTo(0, 0);
+    saveState("horse", {type: "list"});
   }
   function loadHorse(){
     var idEl = $("horse-id");
@@ -2035,6 +2090,11 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
       if (view && horseData) {
         view.innerHTML = renderHorseTab(horseViewTab);
         bindHorseViewLinks();
+        var st = loadState("horse");
+        if (st && st.type === "detail") {
+          st.tab = horseViewTab;
+          saveState("horse", st);
+        }
       }
     });
   })();
@@ -2470,6 +2530,7 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     var body = document.getElementById("past-detail-body");
     document.getElementById("past-result").hidden = true;
     box.hidden = false;
+    saveState("past", {type: "detail", raceId: raceId});
     body.innerHTML = "読み込み中...";
     jsonFetch(API_BASE + "/races/" + encodeURIComponent(raceId), 60000)
       .then(function(d){
@@ -2663,6 +2724,7 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
   function loadJockeyDetail(name){
     var view = document.getElementById("jockey-view");
     if (!view) return;
+    saveState("jockey", {type: "detail", name: name});
     view.innerHTML = "読み込み中...";
     jsonFetch(API_BASE + "/jockeys/" + encodeURIComponent(name), 30000)
       .then(function(d){
@@ -2936,6 +2998,7 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     var body = document.getElementById("ped-detail-body");
     if (listBox) listBox.hidden = true;
     if (detail) detail.hidden = false;
+    saveState("ped", {type: "detail", kind: kind, name: name});
     body.innerHTML = "読み込み中...";
     var url = API_BASE + "/pedigrees/offspring?kind=" + encodeURIComponent(kind) + "&name=" + encodeURIComponent(name) + "&limit=200";
     jsonFetch(url, 60000)
