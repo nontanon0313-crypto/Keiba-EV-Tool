@@ -2372,10 +2372,43 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
       .then(function(d){
         var html = "";
         html += "<h3 class=\"ev-title\">" + esc(d.venue || "") + " " + (d.race_number || "") + "R</h3>";
-        html += "<p class=\"hint\">" + esc(d.date || "") + " " + esc(d.surface || "") + " " + (d.distance || "") + "m " + esc(d.track_condition || "") + "</p>";
-        // 結果一覧
+        // レースメタ情報
+        var metaParts = [];
+        if (d.date) metaParts.push(d.date);
+        if (d.surface) metaParts.push(d.surface);
+        if (d.distance) metaParts.push(d.distance + "m");
+        if (d.track_condition) metaParts.push("馬場:" + d.track_condition);
+        if (d.weather) metaParts.push("天気:" + d.weather);
+        if (d.start_at) metaParts.push(d.start_at.slice(11,16) + "発走");
+        if (d.race_name) {
+          html += "<p class=\"hint\">" + esc(d.race_name) + "</p>";
+        }
+        if (metaParts.length) {
+          html += "<p class=\"hint\">" + esc(metaParts.join(" / ")) + "</p>";
+        }
         var results = d.result_runners || [];
         var runners = d.runners || [];
+        // 馬番 -> lineage_nb
+        var lnMap = {};
+        runners.forEach(function(r){
+          var n = r.horse_number;
+          var ln = r.lineage_nb || r.horse_id || "";
+          if (n) lnMap[n] = ln;
+        });
+        function horseLink(num, name){
+          var ln = lnMap[num] || "";
+          if (ln) {
+            return "<a class=\"horse-link\" href=\"#\" data-past-horse=\"" + esc(ln) + "\">" + esc(name || "") + "</a>";
+          }
+          return esc(name || "");
+        }
+        function jockeyLink(name){
+          var jk = (name || "").replace(/\s*[\(（][^\)）]*[\)）]\s*$/, "").trim();
+          if (jk) {
+            return "<a class=\"horse-link\" href=\"#\" data-past-jockey=\"" + esc(jk) + "\">" + esc(name || "") + "</a>";
+          }
+          return esc(name || "");
+        }
         if (results.length) {
           html += "<h4 class=\"feature-title\">結果</h4>";
           html += "<div class=\"decomp-scroll\"><table class=\"ev-table-decomp\"><thead><tr>";
@@ -2387,8 +2420,8 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
             html += "<td>" + (r.finish || "") + "</td>";
             html += "<td>" + (r.frame_number || "") + "</td>";
             html += "<td>" + (r.horse_number || "") + "</td>";
-            html += "<td>" + esc(r.horse_name || "") + "</td>";
-            html += "<td>" + esc(r.jockey || "") + "</td>";
+            html += "<td>" + horseLink(r.horse_number, r.horse_name) + "</td>";
+            html += "<td>" + jockeyLink(r.jockey) + "</td>";
             html += "<td>" + (r.weight || "") + "</td>";
             html += "<td>" + (r.popularity || "") + "</td>";
             html += "<td>" + esc(r.time || "") + "</td>";
@@ -2400,15 +2433,18 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
         } else if (runners.length) {
           html += "<h4 class=\"feature-title\">出走馬</h4>";
           html += "<div class=\"decomp-scroll\"><table class=\"ev-table-decomp\"><thead><tr>";
-          html += "<th>枠</th><th>番</th><th>馬名</th><th>騎手</th><th>斤量</th><th>単勝</th><th>人気</th>";
+          html += "<th>枠</th><th>番</th><th>馬名</th><th>性齢</th><th>騎手</th><th>斤量</th><th>馬体重</th><th>単勝</th><th>人気</th>";
           html += "</tr></thead><tbody>";
           runners.forEach(function(r){
+            var hw = r.horse_weight != null ? r.horse_weight : "";
             html += "<tr>";
             html += "<td>" + (r.frame_number || "") + "</td>";
             html += "<td>" + (r.horse_number || "") + "</td>";
-            html += "<td>" + esc(r.horse_name || "") + "</td>";
-            html += "<td>" + esc(r.jockey || "") + "</td>";
+            html += "<td>" + horseLink(r.horse_number, r.horse_name) + "</td>";
+            html += "<td>" + esc(r.age_sex || "") + "</td>";
+            html += "<td>" + jockeyLink(r.jockey) + "</td>";
             html += "<td>" + (r.weight || "") + "</td>";
+            html += "<td>" + hw + "</td>";
             html += "<td>" + (r.odds_win || "") + "</td>";
             html += "<td>" + (r.popularity || "") + "</td>";
             html += "</tr>";
@@ -2447,6 +2483,26 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
           html += "</tbody></table>";
         }
         body.innerHTML = html;
+      })
+        body.innerHTML = html;
+        // 馬名リンク
+        var hls = body.querySelectorAll("[data-past-horse]");
+        for (var i = 0; i < hls.length; i++) {
+          hls[i].addEventListener("click", function(e){
+            e.preventDefault();
+            var ln3 = this.getAttribute("data-past-horse");
+            if (ln3) openHorseByLineage(ln3);
+          });
+        }
+        // 騎手リンク
+        var jls = body.querySelectorAll("[data-past-jockey]");
+        for (var k = 0; k < jls.length; k++) {
+          jls[k].addEventListener("click", function(e){
+            e.preventDefault();
+            var jk3 = this.getAttribute("data-past-jockey");
+            if (jk3) openJockeyByName(jk3);
+          });
+        }
       })
       .catch(function(err){ body.textContent = "取得失敗: " + err.message; });
   }
