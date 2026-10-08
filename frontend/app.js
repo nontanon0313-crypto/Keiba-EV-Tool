@@ -1975,6 +1975,7 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
           titleEl.innerHTML = "<h3 class=\"feature-title\">" + esc(t || lineageNb) + "</h3>";
         }
         view.innerHTML = renderHorseView(d);
+        bindHorseViewLinks();
       })
       .catch(function(err){ view.innerHTML = "<p>取得失敗: " + esc(err.message) + "</p>"; });
   }
@@ -2031,7 +2032,10 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
       horseViewTab = b.getAttribute("data-hv");
       syncHorseSubtabs();
       var view = document.getElementById("horse-view");
-      if (view && horseData) view.innerHTML = renderHorseTab(horseViewTab);
+      if (view && horseData) {
+        view.innerHTML = renderHorseTab(horseViewTab);
+        bindHorseViewLinks();
+      }
     });
   })();
 
