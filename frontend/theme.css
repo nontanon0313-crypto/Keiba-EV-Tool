@@ -361,3 +361,13 @@ main{width:100%;max-width:100vw;overflow-x:hidden;}
 /* 馬名リンク */
 .horse-link{color:var(--keiba-gold);text-decoration:none;border-bottom:1px dotted var(--keiba-gold);}
 .horse-link:active{opacity:0.7;}
+
+/* 分解表の左端列を横スクロール時に固定 */
+.ev-table-decomp td:first-child,
+.ev-table-decomp th:first-child{
+  position: sticky;
+  left: 0;
+  background: #0B1426;
+  z-index: 1;
+  box-shadow: 2px 0 0 rgba(212,175,55,0.15);
+}
