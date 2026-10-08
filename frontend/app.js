@@ -2963,7 +2963,7 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
             h += "<td>" + esc(x.sire || "") + "</td>";
             h += "<td>" + esc(x.dam || "") + "</td>";
           }
-          h += "<td><button class=\"bet-btn\" data-ped-horse=\"" + esc(x.lineage_nb) + "\" type=\"button\">馬詳細</button></td>";
+          h += "<td><button class=\"bet-btn\" data-ped-horse=\"" + esc(x.lineage_nb) + "\" type=\"button\">詳細</button></td>";
           h += "</tr>";
         });
         h += "</tbody></table></div>";
