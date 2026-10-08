@@ -1716,13 +1716,32 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
   function renderHorseHistory(d){
     var hist = d.history;
     if (!hist || !hist.rows || !hist.rows.length) return "<p>走歴なし</p>";
+    var header = hist.header || [];
+    // 列インデックス
+    var iDate = header.indexOf("年月日");
+    var iVenue = header.indexOf("競馬場");
+    var iJockey = header.indexOf("騎手");
     var h = "<h3 class=\"feature-title\">走歴</h3>";
+    h += "<p class=\"hint\">競馬場・騎手名をタップで詳細へ</p>";
     h += "<div class=\"decomp-scroll\"><table class=\"ev-table-decomp\"><thead><tr>";
-    (hist.header||[]).forEach(function(x){ h += "<th>" + esc(x) + "</th>"; });
+    header.forEach(function(x){ h += "<th>" + esc(x) + "</th>"; });
     h += "</tr></thead><tbody>";
     hist.rows.forEach(function(row){
       h += "<tr>";
-      row.forEach(function(x){ h += "<td>" + esc(x) + "</td>"; });
+      row.forEach(function(x, idx){
+        if (idx === iVenue && x) {
+          h += "<td><a class=\"horse-link\" href=\"#\" data-past-venue-link=\"" + esc(x) + "\">" + esc(x) + "</a></td>";
+        } else if (idx === iJockey && x) {
+          var jk = String(x).replace(/\s*[\(（][^\)）]*[\)）]\s*$/, "").trim();
+          if (jk) {
+            h += "<td><a class=\"horse-link\" href=\"#\" data-jockey-link=\"" + esc(jk) + "\">" + esc(x) + "</a></td>";
+          } else {
+            h += "<td>" + esc(x) + "</td>";
+          }
+        } else {
+          h += "<td>" + esc(x) + "</td>";
+        }
+      });
       h += "</tr>";
     });
     h += "</tbody></table></div>";
@@ -1802,15 +1821,30 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
   function renderHorsePedigree(d){
     var pg = d.pedigree || {};
     if (!pg.sire && !pg.dam) return "<p>血統データなし</p>";
+    function sireLink(name){
+      if (!name) return "";
+      return "<a class=\"horse-link\" href=\"#\" data-ped-sire=\"" + esc(name) + "\">" + esc(name) + "</a>";
+    }
+    function damSireLink(name){
+      if (!name) return "";
+      return "<a class=\"horse-link\" href=\"#\" data-ped-damsire=\"" + esc(name) + "\">" + esc(name) + "</a>";
+    }
     var h = "<h3 class=\"feature-title\">血統</h3>";
     h += "<table class=\"ev-table\"><tbody>";
-    h += "<tr><td>父</td><td>" + esc(pg.sire || "") + "</td></tr>";
+    h += "<tr><td>父</td><td>" + sireLink(pg.sire) + "</td></tr>";
     h += "<tr><td>父父</td><td>" + esc(pg.sire_sire || "") + "</td></tr>";
     h += "<tr><td>父母</td><td>" + esc(pg.sire_dam || "") + "</td></tr>";
     h += "<tr><td>母</td><td>" + esc(pg.dam || "") + "</td></tr>";
-    h += "<tr><td>母父</td><td>" + esc(pg.dam_sire || "") + "</td></tr>";
+    h += "<tr><td>母父</td><td>" + damSireLink(pg.dam_sire) + "</td></tr>";
     h += "<tr><td>母母</td><td>" + esc(pg.dam_dam || "") + "</td></tr>";
     h += "</tbody></table>";
+    // 父系の産駒を見るボタン
+    if (pg.sire) {
+      h += "<p><button class=\"bet-btn\" data-ped-sire-offspring=\"" + esc(pg.sire) + "\" type=\"button\">父 " + esc(pg.sire) + " の産駒一覧</button></p>";
+    }
+    if (pg.dam_sire) {
+      h += "<p><button class=\"bet-btn\" data-ped-damsire-offspring=\"" + esc(pg.dam_sire) + "\" type=\"button\">母父 " + esc(pg.dam_sire) + " の産駒一覧</button></p>";
+    }
     return h;
   }
   function renderHorseTab(tab){
@@ -1840,7 +1874,72 @@ bodyHtml += "<h4 class=\"feature-title\">利益率</h4>";
     var tabsEl = document.getElementById("horse-view-tabs");
     if (tabsEl) tabsEl.hidden = false;
     syncHorseSubtabs();
-    return renderHorseTab(horseViewTab);
+    var html = renderHorseTab(horseViewTab);
+    setTimeout(bindHorseViewLinks, 0);
+    return html;
+  }
+  function bindHorseViewLinks(){
+    var view = document.getElementById("horse-view");
+    if (!view) return;
+    var sireLinks = view.querySelectorAll("[data-ped-sire]");
+    for (var i = 0; i < sireLinks.length; i++) {
+      (function(el){
+        el.addEventListener("click", function(e){
+          e.preventDefault();
+          openPedigreeTab("sire", el.getAttribute("data-ped-sire"));
+        });
+      })(sireLinks[i]);
+    }
+    var damSireLinks = view.querySelectorAll("[data-ped-damsire]");
+    for (var j = 0; j < damSireLinks.length; j++) {
+      (function(el){
+        el.addEventListener("click", function(e){
+          e.preventDefault();
+          openPedigreeTab("dam_sire", el.getAttribute("data-ped-damsire"));
+        });
+      })(damSireLinks[j]);
+    }
+    var sireBtn = view.querySelector("[data-ped-sire-offspring]");
+    if (sireBtn) sireBtn.addEventListener("click", function(){
+      openPedigreeTab("sire", sireBtn.getAttribute("data-ped-sire-offspring"));
+    });
+    var damSireBtn = view.querySelector("[data-ped-damsire-offspring]");
+    if (damSireBtn) damSireBtn.addEventListener("click", function(){
+      openPedigreeTab("dam_sire", damSireBtn.getAttribute("data-ped-damsire-offspring"));
+    });
+    var jlinks = view.querySelectorAll("[data-jockey-link]");
+    for (var k = 0; k < jlinks.length; k++) {
+      (function(el){
+        el.addEventListener("click", function(e){
+          e.preventDefault();
+          openJockeyByName(el.getAttribute("data-jockey-link"));
+        });
+      })(jlinks[k]);
+    }
+    var vlinks = view.querySelectorAll("[data-past-venue-link]");
+    for (var m = 0; m < vlinks.length; m++) {
+      (function(el){
+        el.addEventListener("click", function(e){
+          e.preventDefault();
+          openPastTab(el.getAttribute("data-past-venue-link"));
+        });
+      })(vlinks[m]);
+    }
+  }
+  function openPedigreeTab(kind, name){
+    switchTab("pedigree");
+    var kindEl = document.getElementById("ped-kind");
+    if (kindEl) kindEl.value = kind;
+    var inp = document.getElementById("ped-name");
+    if (inp) inp.value = name;
+    // 詳細画面を出して産駒一覧を表示
+    showPedOffspring(name);
+  }
+  function openPastTab(venue){
+    switchTab("past");
+    var vn = document.getElementById("past-venue");
+    if (vn) vn.value = venue;
+    runPastSearch();
   }
 
   function renderHorseSearchResult(items){
