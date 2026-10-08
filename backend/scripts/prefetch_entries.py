@@ -112,9 +112,20 @@ async def _fetch_ent1(client, sem, date, track_cd, sponsor_cd, race_nb):
         mo = re.search(r"([\d.]+)\s*(\d+)人気", odds_txt)
         odds_win = float(mo.group(1)) if mo else None
         popularity = int(mo.group(2)) if mo else None
-        wt = w_cell.get_text(strip=True)
-        mh = re.search(r"(\d+)", wt)
-        horse_weight = int(mh.group(1)) if mh else None
+        wt = w_cell.get_text(" ", strip=True)
+        mh = re.search(r"(\d+)\s*[（(]?([+-]?\d+)?", wt)
+        horse_weight = None
+        hw_change = None
+        if mh:
+            try:
+                horse_weight = int(mh.group(1))
+            except Exception:
+                horse_weight = None
+            if mh.group(2):
+                try:
+                    hw_change = int(mh.group(2))
+                except Exception:
+                    hw_change = None
         runners.append({
             "frame_number": frame,
             "horse_number": num,
@@ -122,6 +133,7 @@ async def _fetch_ent1(client, sem, date, track_cd, sponsor_cd, race_nb):
             "jockey": jockey,
             "weight": weight,
             "horse_weight": horse_weight,
+            "horse_weight_change": hw_change,
             "odds_win": odds_win,
             "popularity": popularity,
             "lineage_nb": lineage_nb,

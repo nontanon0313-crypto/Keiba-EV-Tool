@@ -291,6 +291,9 @@ def get_race(race_id: str):
                 "start_at": (date_iso + "T" + start_hhmm + ":00") if date_iso else "",
                 "start_hhmm": start_hhmm,
                 "runners": payload.get("runners", []),
+                "race_name": payload.get("race_name", ""),
+                "weather": payload.get("weather", ""),
+                "track_condition": payload.get("track_condition", ""),
                 "source": "prefetched",
             }
     except Exception as exc:
