@@ -279,11 +279,39 @@ def build():
                                       "sum_profit": 0.0, "sum_profit_sq": 0.0})
     RACE_COUNT = 0
 
-    races = race_store.list_races()
-    print("[build] races:", len(races), flush=True)
-    rids = [it["race_id"] for it in races]
-    odds_map = odds_store.get_odds_batch(rids)
-    print("[build] odds fetched:", len(odds_map), flush=True)
+    # 分割読み込み: scraped_races を300件ずつ処理する
+    def _iter_race_pages(page_size=300):
+        from backend.app.services import turso_client
+        import json as _json
+        client, err = turso_client.get_client()
+        if client is None:
+            raise RuntimeError("turso_client: " + str(err))
+        last_rid = ""
+        while True:
+            r = client.execute(
+                "SELECT race_id, payload FROM scraped_races WHERE race_id > ? ORDER BY race_id LIMIT ?",
+                [last_rid, page_size],
+            )
+            rows = list(r.rows)
+            if not rows:
+                break
+            batch = []
+            for row in rows:
+                try:
+                    d = _json.loads(row[1]) if isinstance(row[1], str) else row[1]
+                except Exception:
+                    continue
+                batch.append({"race_id": row[0], "payload": d})
+            if batch:
+                batch_rids = [it["race_id"] for it in batch]
+                odds_map_local = odds_store.get_odds_batch(batch_rids)
+                yield batch, odds_map_local
+            last_rid = rows[-1][0]
+            if len(rows) < page_size:
+                break
+
+    n_total_races = 0
+    n_processed = 0
 
     def add_to_scope(scope, prob, odds, hit, payout_yen, market_prob, rho_race):
         mp = market_prob
@@ -309,125 +337,128 @@ def build():
             if ev >= th:
                 scope["ev_cum"][j].add(prob, odds, hit, payout_yen, mp, rr)
 
-    for i, it in enumerate(races):
-        rid = it["race_id"]
-        parts_rid = rid.split("-")
-        if len(parts_rid) >= 3 and parts_rid[2] in EXCLUDED_TRACK_CODES:
-            continue
-        payload = it.get("payload") or {}
-        finish = payload.get("finish_order") or []
-        if len(finish) < 3:
-            continue
-        odds_p = odds_map.get(rid) or {}
-        payouts_dict = extract_payouts(payload.get("payouts") or {})
-        race = race_obj(rid, payload)
-        try:
-            pred = predict_race(race)
-        except Exception:
-            continue
-        plan_set = compute_plan_set(race, pred, odds_p)
-        runner_map = {r.horse_number: r for r in race.runners}
-        raw_runner_map = {r0.get("horse_number"): r0 for r0 in payload.get("runners", [])}
-        result_runner_map = {r0.get("horse_number"): r0 for r0 in payload.get("result_runners", [])}
-        RACE_COUNT += 1
-
-        for t in tickets:
-            # パス1: 候補リストを作成 + Σ(1/odds) を計算
-            cand_list = []
-            for combo, prob in _candidates(pred, t):
-                if prob <= 0:
-                    continue
-                ro = real_odds(odds_p, t, combo)
-                if not ro or ro <= 1:
-                    continue
-                cand_list.append((combo, prob, ro))
-            if not cand_list:
+    for batch, odds_map in _iter_race_pages(300):
+        n_total_races += len(batch)
+        for i, it in enumerate(batch):
+            n_processed += 1
+            rid = it["race_id"]
+            parts_rid = rid.split("-")
+            if len(parts_rid) >= 3 and parts_rid[2] in EXCLUDED_TRACK_CODES:
                 continue
-            inv_sum = 0.0
-            for _, _, ro in cand_list:
-                inv_sum += 1.0 / ro
-            if inv_sum <= 0:
+            payload = it.get("payload") or {}
+            finish = payload.get("finish_order") or []
+            if len(finish) < 3:
                 continue
-            hpr = HITS_PER_RACE.get(t, 1)
-            rho_race = 1.0 - hpr / inv_sum
-            market_factor = 1.0 - rho_race
+            odds_p = odds_map.get(rid) or {}
+            payouts_dict = extract_payouts(payload.get("payouts") or {})
+            race = race_obj(rid, payload)
+            try:
+                pred = predict_race(race)
+            except Exception:
+                continue
+            plan_set = compute_plan_set(race, pred, odds_p)
+            runner_map = {r.horse_number: r for r in race.runners}
+            raw_runner_map = {r0.get("horse_number"): r0 for r0 in payload.get("runners", [])}
+            result_runner_map = {r0.get("horse_number"): r0 for r0 in payload.get("result_runners", [])}
+            RACE_COUNT += 1
 
-            # パス2: 各買い目を集計
-            for combo, prob, ro in cand_list:
-                market_prob = market_factor / ro
-                hit = hit_check(t, combo, finish)
-                ticket_jp = _TICKET_LABEL.get(t, t)
-                payout = payout_yen(payouts_dict, ticket_jp, combo) or 0
+            for t in tickets:
+                # パス1: 候補リストを作成 + Σ(1/odds) を計算
+                cand_list = []
+                for combo, prob in _candidates(pred, t):
+                    if prob <= 0:
+                        continue
+                    ro = real_odds(odds_p, t, combo)
+                    if not ro or ro <= 1:
+                        continue
+                    cand_list.append((combo, prob, ro))
+                if not cand_list:
+                    continue
+                inv_sum = 0.0
+                for _, _, ro in cand_list:
+                    inv_sum += 1.0 / ro
+                if inv_sum <= 0:
+                    continue
+                hpr = HITS_PER_RACE.get(t, 1)
+                rho_race = 1.0 - hpr / inv_sum
+                market_factor = 1.0 - rho_race
 
-                # 全組み合わせ
-                add_to_scope(scopes_data["all_combos"], prob, ro, hit, payout, market_prob, rho_race)
+                # パス2: 各買い目を集計
+                for combo, prob, ro in cand_list:
+                    market_prob = market_factor / ro
+                    hit = hit_check(t, combo, finish)
+                    ticket_jp = _TICKET_LABEL.get(t, t)
+                    payout = payout_yen(payouts_dict, ticket_jp, combo) or 0
 
-                # 券種別
-                ta = ticket_agg[t]
-                ta["count"] += 1
-                ta["hits"] += hit
-                ta["prob_sum"] += prob
-                ta["odds_sum"] += ro
-                ta["prob_odds_sum"] += prob * ro
-                ta["sum_inv_odds"] += 1.0 / ro
-                ta["stake"] += 100
-                profit = payout / STAKE_PER_BET - 1.0
-                ta["sum_profit"] += profit
-                ta["sum_profit_sq"] += profit * profit
-                if hit:
-                    ta["payout"] += payout
+                    # 全組み合わせ
+                    add_to_scope(scopes_data["all_combos"], prob, ro, hit, payout, market_prob, rho_race)
 
-                # フィルタ判定
-                ev = prob * ro - 1.0
-                passes_filter = (ro >= settings.MIXED_ODDS_MIN) and (ev >= settings.MIXED_EV_MIN) and (t in settings.MIXED_TICKETS)
-                if passes_filter:
-                    add_to_scope(scopes_data["all"], prob, ro, hit, payout, market_prob, rho_race)
-                    if (t, combo) in plan_set:
-                        add_to_scope(scopes_data["plan"], prob, ro, hit, payout, market_prob, rho_race)
-                    else:
-                        add_to_scope(scopes_data["non_plan"], prob, ro, hit, payout, market_prob, rho_race)
+                    # 券種別
+                    ta = ticket_agg[t]
+                    ta["count"] += 1
+                    ta["hits"] += hit
+                    ta["prob_sum"] += prob
+                    ta["odds_sum"] += ro
+                    ta["prob_odds_sum"] += prob * ro
+                    ta["sum_inv_odds"] += 1.0 / ro
+                    ta["stake"] += 100
+                    profit = payout / STAKE_PER_BET - 1.0
+                    ta["sum_profit"] += profit
+                    ta["sum_profit_sq"] += profit * profit
+                    if hit:
+                        ta["payout"] += payout
 
-                # features（all_combos のみ。メモリ節約のため）
-                parts = combo.split("-")
-                try:
-                    first_num = int(parts[0])
-                except (ValueError, IndexError):
-                    first_num = None
-                if first_num is not None:
-                    r = runner_map.get(first_num)
-                    raw_r = raw_runner_map.get(first_num) or {}
-                    if r is not None:
-                        pop = getattr(r, "popularity", None)
-                        wt = getattr(r, "weight", None)
-                        fr = getattr(r, "frame_number", None)
-                        ow = getattr(r, "odds_win", None)
-                        age_sex = (raw_r.get("age_sex")
-                                   or (result_runner_map.get(first_num) or {}).get("age_sex")
-                                   or "")
-                        fagg = scopes_data["all_combos"]["features"]
-                        if pop is not None:
-                            for (label, lo, hi) in fc["popularity"]["ranges"]:
-                                if lo <= pop <= hi:
-                                    fagg["popularity"][label].add(prob, ro, hit, payout)
-                        if wt is not None:
-                            for (label, lo, hi) in fc["weight"]["ranges"]:
-                                if lo <= wt < hi:
-                                    fagg["weight"][label].add(prob, ro, hit, payout)
-                        if fr is not None:
-                            for (label, lo, hi) in fc["frame"]["ranges"]:
-                                if lo <= fr <= hi:
-                                    fagg["frame"][label].add(prob, ro, hit, payout)
-                        if ow is not None:
-                            for (label, lo, hi) in fc["odds_win"]["ranges"]:
-                                if lo <= ow < hi:
-                                    fagg["odds_win"][label].add(prob, ro, hit, payout)
-                        if age_sex:
-                            a = age_sex[0] if age_sex else ""
-                            if a in ("牡", "牝", "セ"):
-                                fagg["age_sex"][a].add(prob, ro, hit, payout)
+                    # フィルタ判定
+                    ev = prob * ro - 1.0
+                    passes_filter = (ro >= settings.MIXED_ODDS_MIN) and (ev >= settings.MIXED_EV_MIN) and (t in settings.MIXED_TICKETS)
+                    if passes_filter:
+                        add_to_scope(scopes_data["all"], prob, ro, hit, payout, market_prob, rho_race)
+                        if (t, combo) in plan_set:
+                            add_to_scope(scopes_data["plan"], prob, ro, hit, payout, market_prob, rho_race)
+                        else:
+                            add_to_scope(scopes_data["non_plan"], prob, ro, hit, payout, market_prob, rho_race)
 
-        if (i + 1) % 200 == 0:
-            print("[build] {}/{} {:.1f}s".format(i + 1, len(races), time.time() - t0), flush=True)
+                    # features（all_combos のみ。メモリ節約のため）
+                    parts = combo.split("-")
+                    try:
+                        first_num = int(parts[0])
+                    except (ValueError, IndexError):
+                        first_num = None
+                    if first_num is not None:
+                        r = runner_map.get(first_num)
+                        raw_r = raw_runner_map.get(first_num) or {}
+                        if r is not None:
+                            pop = getattr(r, "popularity", None)
+                            wt = getattr(r, "weight", None)
+                            fr = getattr(r, "frame_number", None)
+                            ow = getattr(r, "odds_win", None)
+                            age_sex = (raw_r.get("age_sex")
+                                       or (result_runner_map.get(first_num) or {}).get("age_sex")
+                                       or "")
+                            fagg = scopes_data["all_combos"]["features"]
+                            if pop is not None:
+                                for (label, lo, hi) in fc["popularity"]["ranges"]:
+                                    if lo <= pop <= hi:
+                                        fagg["popularity"][label].add(prob, ro, hit, payout)
+                            if wt is not None:
+                                for (label, lo, hi) in fc["weight"]["ranges"]:
+                                    if lo <= wt < hi:
+                                        fagg["weight"][label].add(prob, ro, hit, payout)
+                            if fr is not None:
+                                for (label, lo, hi) in fc["frame"]["ranges"]:
+                                    if lo <= fr <= hi:
+                                        fagg["frame"][label].add(prob, ro, hit, payout)
+                            if ow is not None:
+                                for (label, lo, hi) in fc["odds_win"]["ranges"]:
+                                    if lo <= ow < hi:
+                                        fagg["odds_win"][label].add(prob, ro, hit, payout)
+                            if age_sex:
+                                a = age_sex[0] if age_sex else ""
+                                if a in ("牡", "牝", "セ"):
+                                    fagg["age_sex"][a].add(prob, ro, hit, payout)
+
+            if n_processed % 200 == 0:
+                print("[build] processed={} {:.1f}s".format(n_processed, time.time() - t0), flush=True)
 
     def features_out(scope):
         out = []
@@ -535,7 +566,7 @@ def build():
     result = {
         "scopes": scopes_out,
         "ticket_stats": ticket_stats,
-        "meta": {"races": len(races)},
+        "meta": {"races": n_total_races},
         "generated_at": datetime.now().isoformat(),
     }
     CACHE_FILE.write_text(json.dumps(result, ensure_ascii=False), encoding="utf-8")
