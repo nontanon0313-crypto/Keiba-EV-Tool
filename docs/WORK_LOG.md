@@ -80,3 +80,26 @@ train_pl_model.py を精査して判明。過去の私の報告に誤りがあ�
 - baseline = 市場のみ、評価 = 市場＋補正 に統一
 - build_matrix で INTERACTIONS を計算して X に含める（方針A）
 - 時系列分割: 2023-2024学習、2025評価
+
+### Phase 3-b: 特徴量のみ版の再検証（2026-11-10）
+
+#### 背景
+Phase 3 で「市場ベース＋残差補正」が市場を悪化させることが確定（test 損失 2.0003 vs baseline 1.6026）。
+ユーザー指示により、特徴量のみ版も正しく実装して比較する。
+
+#### 実装内容
+- train_pl_model.py に --no-market フラグ追加
+- 市場ログを加算せず、X @ w のみでスコア計算
+- 評価ベースライン:
+  - uniform（1/頭数、市場も特徴量も使わない）
+  - market（市場のみ、w=0）
+  - feature-only（特徴量のみ、学習後）
+- 保存ID: pl_feature_only（既存の pl は market-based のまま）
+- メモリ対策: build_matrix 後、samples を del で解放
+
+#### 変更前後の状態
+- 変更前（phase 3）: market-based のみ、test 損失 2.0003（悪化）
+- 変更後: --no-market で feature-only を評価可能に
+
+#### 実行結果
+（実行後に追記）
